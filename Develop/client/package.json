@@ -4,7 +4,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint src -c js",
+    "preview": "vite preview"
   },
   "author": "peteCodes4u",
   "license": "MIT",
