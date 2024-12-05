@@ -1,6 +1,16 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Navbar, Nav, Container, Modal, Tab, Form, FormControl, Button, NavDropdown } from "react-bootstrap";
+import {
+  Navbar,
+  Nav,
+  Container,
+  Modal,
+  Tab,
+  Form,
+  FormControl,
+  Button,
+  NavDropdown,
+} from "react-bootstrap";
 import { FaFacebook, FaTwitter, FaInstagram } from "react-icons/fa";
 import SignUpForm from "./SignupForm";
 import LoginForm from "./LoginForm";
@@ -25,9 +35,15 @@ const AppNavbar2 = () => {
                 Home
               </Nav.Link>
               <NavDropdown title="Solutions" id="basic-nav-dropdown">
-                <NavDropdown.Item as={Link} to="/forms">Forms</NavDropdown.Item>
-                <NavDropdown.Item as={Link} to="/ui">User Interface</NavDropdown.Item>
-                <NavDropdown.Item as={Link} to="/database">Database Solutions</NavDropdown.Item>
+                <NavDropdown.Item as={Link} to="/forms">
+                  Forms
+                </NavDropdown.Item>
+                <NavDropdown.Item as={Link} to="/ui">
+                  User Interface
+                </NavDropdown.Item>
+                <NavDropdown.Item as={Link} to="/database">
+                  Database Solutions
+                </NavDropdown.Item>
               </NavDropdown>
               <Nav.Link as={Link} to="/about">
                 About
