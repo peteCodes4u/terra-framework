@@ -1,7 +1,7 @@
 // import user model
 const { User } = require('../models');
 
-// import sign token function from auth
+// import sign token function from auth to be utilized in user controller for sgining tokens on api requests
 const { signToken } = require('../utils/auth');
 
 module.exports = {
@@ -22,13 +22,13 @@ module.exports = {
         const user = await User.create(body);
 
         if(!user) {
-            return res.status(400).json({ message: 'Sorry, Something went wrong - please restart and try again'});
+            return res.status(400).console.log(json({ message: 'Sorry, Something went wrong - please restart and try again'}));
         }
         const token = signToken(user);
         res.json({ token, user });
     },
     // login user, sign token retrun it to client
-    async login({body}, res) {
+    async login({ body }, res) {
         const user = await User.findOne({ $or: [{ username: body.username}, { email: body.email}] });
         if (!user) {
             return res.status(400).json({ message: "There is no usere associated with this request, please check your entry and try again"})

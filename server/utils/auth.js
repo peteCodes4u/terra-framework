@@ -2,8 +2,8 @@
 const jwt = require('jsonwebtoken');
 
 // set token and secret with exp date
-const secret = process.env.JWTSECRET;
 const expiration = '2h';
+const secret = process.env.JWTSECRET;
 
 module.exports = {
     // authentication routes functions
@@ -29,12 +29,12 @@ module.exports = {
             return res.status(400).json({ message: 'This token appears to be invalid! Please try again'});
         }
 
-        // send to next endpoint
+        // send to next API endpoint
         next();
     },
-    signToken: function ({username, email, _id }) {
+    signToken: function ({ username, email, _id }) {
         const payload = { username, email, _id };
 
-        return jwt.sign({data: payload }, secret, { expiresIn: expiration })
+        return jwt.sign({ data: payload }, secret, { expiresIn: expiration });
     },
 };
