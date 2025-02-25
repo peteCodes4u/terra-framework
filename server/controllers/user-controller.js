@@ -23,7 +23,7 @@ module.exports = {
       res.json(foundUser);
     } catch (err) {
       console.error(err);
-      return res.status(500).json({ message: "Internal server error" });
+      res.status(500).json({ message: "Internal server error" });
     }
   },
 
@@ -53,7 +53,7 @@ module.exports = {
       if (!user) {
         return res.status(400).json({
           message:
-            "There is no usere associated with this request, please check your entry and try again",
+            "There is no user associated with this request, please check your entry and try again",
         });
       }
       const correctPw = await user.isCorrectPassword(body.password);
