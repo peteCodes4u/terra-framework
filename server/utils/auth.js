@@ -1,40 +1,48 @@
 // json webtoken initialization
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
 
 // set token and secret with exp date
 const secret = process.env.JWTSECRET;
-const expiration = '2h';
+const expiration = "2h";
 
 module.exports = {
-    // authentication routes functions
-    authMiddleware: function(req, res, next) {
-        // allows tokens via headers or req.query
-        let token = req.query.token || req.headers.authorization;
-        
-        //["Bearer", "<tokenvalue>"]
-        if(req.headers.authorization) {
-            token = token.split(' ').pop().trim();
-        } 
+  // authentication routes functions
+  authMiddleware: function (req, res, next) {
+    // allows tokens via headers or req.query
+    let token = req.query.token || req.headers.authorization;
 
-        if(!token) {
-            return res.status(400).json({ message: 'Sorry, your request has not included a valid token'});
-        }
+    //["Bearer", "<tokenvalue>"]
+    if (req.headers.authorization) {
+      token = token.split(" ").pop().trim();
+    }
 
-        // verify token
-        try {
-            const { data } = jwt.verify(token, secret, { maxAge: expiration });
-            req.user = data;
-        } catch {
-            console.log('INVALID TOKEN')
-            return res.status(400).json({ message: 'This token appears to be invalid! Please try again'});
-        }
+    if (!token) {
+      return res
+        .status(400)
+        .json({
+          message: "Sorry, your request has not included a valid token",
+        });
+    }
 
-        // send to next endpoint
-        next();
-    },
-    signToken: function ({username, email, _id }) {
-        const payload = { username, email, _id };
+    // verify token
+    try {
+      const { data } = jwt.verify(token, secret, { maxAge: expiration });
+      req.user = data;
+    } catch {
+      console.log("INVALID TOKEN");
+      return res
+        .status(400)
+        .json({
+          message: "This token appears to be invalid! Please try again",
+        });
+    }
 
-        return jwt.sign({data: payload }, secret, { expiresIn: expiration })
-    },
+    // send to next endpoint
+    next();
+  },
+  signToken: function ({ username, email, _id }) {
+    const payload = { username, email, _id };
+
+    return jwt.sign({ data: payload }, secret, { expiresIn: expiration });
+  },
 };
