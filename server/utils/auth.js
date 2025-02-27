@@ -2,8 +2,8 @@
 const jwt = require("jsonwebtoken");
 
 // set token and secret with exp date
+const expiration = '2h';
 const secret = process.env.JWTSECRET;
-const expiration = "2h";
 
 module.exports = {
   // authentication routes functions
@@ -37,12 +37,12 @@ module.exports = {
         });
     }
 
-    // send to next endpoint
-    next();
-  },
-  signToken: function ({ username, email, _id }) {
-    const payload = { username, email, _id };
+        // send to next API endpoint
+        next();
+    },
+    signToken: function ({ username, email, _id }) {
+        const payload = { username, email, _id };
 
-    return jwt.sign({ data: payload }, secret, { expiresIn: expiration });
-  },
+        return jwt.sign({ data: payload }, secret, { expiresIn: expiration });
+    },
 };

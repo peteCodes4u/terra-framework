@@ -1,8 +1,8 @@
 // import user model
 const { User } = require("../models");
 
-// import sign token function from auth
-const { signToken } = require("../utils/auth");
+// import sign token function from auth to be utilized in user controller for sgining tokens on api requests
+const { signToken } = require('../utils/auth');
 
 module.exports = {
   // get user by id or username
@@ -29,44 +29,25 @@ module.exports = {
 
   // create a user, sign the token and return it to client
   async createUser({ body }, res) {
-    try {
-      const user = await User.create(body);
+    const user = await User.create(body);
 
-      if (!user) {
-        return res.status(400).json({
-          message: "Sorry, Something went wrong - please restart and try again",
-        });
-      }
-      const token = signToken(user);
-      res.json({ token, user });
-    } catch (err) {
-      console.error(err);
-      return res.status(500).json({ message: "Internal server error" });
+    if(!user) {
+        return res.status(400).console.log(json({ message: 'Sorry, Something went wrong - please restart and try again'}));
     }
-  },
-  // login user, sign token retrun it to client
-  async login({ body }, res) {
-    try {
-      const user = await User.findOne({
-        $or: [{ username: body.username }, { email: body.email }],
-      });
-      if (!user) {
-        return res.status(400).json({
-          message:
-            "There is no user associated with this request, please check your entry and try again",
-        });
-      }
-      const correctPw = await user.isCorrectPassword(body.password);
-      if (!correctPw) {
-        return res
-          .status(400)
-          .json({ message: "Your password is not correct, please try again" });
-      }
-      const token = signToken(user);
-      res.json({ token, user });
-    } catch (err) {
-      console.error(err);
-      return res.status(500).json({ message: "Internal server error" });
+    const token = signToken(user);
+    res.json({ token, user });
+},
+// login user, sign token retrun it to client
+async login({ body }, res) {
+    const user = await User.findOne({ $or: [{ username: body.username}, { email: body.email}] });
+    if (!user) {
+        return res.status(400).json({ message: "There is no usere associated with this request, please check your entry and try again"})
     }
-  },
+    const correctPw = await user.isCorrectPassword(body.password);
+    if (!correctPw) {
+        return res.status(400).json({ message: 'Your password is not correct, please try again'});
+    }
+    const token = signToken(user);
+    res.json({ token, user});
+}
 };
