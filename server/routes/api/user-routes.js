@@ -1,17 +1,18 @@
 const router = require('express').Router();
 const {
-    createUser,
-    getSingleUser,
-    login,
-
+  createUser,
+  getSingleUser,
+  login,
 } = require('../../controllers/user-controller');
 
-// import necessary middleware
+// import needed middleware from utils/auth
 const { authMiddleware } = require('../../utils/auth');
 
-// auth middleware for token verification on API requests
+// update (METHOD = put) authMiddleware to send a token for verification on API requests
 router.route('/').post(createUser).put(authMiddleware);
+
 router.route('/login').post(login);
+
 router.route('/me').get(authMiddleware, getSingleUser);
 
 module.exports = router;

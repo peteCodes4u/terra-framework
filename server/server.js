@@ -1,3 +1,11 @@
+// server.js file is used for setting up the server and starting the server. It is the entry point for the express application.
+// The server.js file is used to import the express module and set up the virtual server. It also imports the routes and connects to the database.
+// The server.js file is used to start the server and listen for incoming requests.
+// The server.js file is used to set up the server to serve static files in production.
+// The server.js file is used to connect to the database and start the server.
+
+// import dotenv package to read .env file - THIS IS REQUIRED TO KEEP SENSITIVE (ENVIRONMENT) INFO SAFE and SECURE.
+require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const db = require('./config/connection');
