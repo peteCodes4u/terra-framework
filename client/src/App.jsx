@@ -3,14 +3,15 @@
 // the Navbar component is imported and rendered in this file
 
 // import styling
-import './App.css';
+import "./App.css";
 // import react-router-dom components for routing
 // Outlet is used to render nested routes
 // Link is used to create links to other pages
-import { Outlet } from 'react-router-dom';
+import { Outlet } from "react-router-dom";
 
 // import navbar component
-import Navbar from './components/Navbar';
+import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
 
 // define the main app component
 function App() {
@@ -18,6 +19,7 @@ function App() {
     <>
       <Navbar />
       <Outlet />
+      <Footer />
     </>
   );
 }

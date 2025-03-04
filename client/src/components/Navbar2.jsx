@@ -1,29 +1,76 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Navbar, Nav, Container, Modal, Tab } from "react-bootstrap";
+import {
+  Navbar,
+  Nav,
+  Container,
+  Modal,
+  Tab,
+  Form,
+  FormControl,
+  Button,
+  NavDropdown,
+} from "react-bootstrap";
+import { FaFacebook, FaTwitter, FaInstagram } from "react-icons/fa";
 import SignUpForm from "./SignupForm";
 import LoginForm from "./LoginForm";
 
 import Auth from "../utils/auth";
 
-const AppNavbar = () => {
+const AppNavbar2 = () => {
   // set modal display state
   const [showModal, setShowModal] = useState(false);
 
   return (
     <>
-      <Navbar bg="dark" variant="dark" expand="lg">
+      <Navbar bg="dark" variant="dark" expand="lg" sticky="top">
         <Container fluid>
           <Navbar.Brand as={Link} to="/">
             Terra API Framework
           </Navbar.Brand>
           <Navbar.Toggle aria-controls="navbar" />
-          <Navbar.Collapse id="navbar" className="d-flex flex-row-reverse">
-            <Nav className="ml-auto d-flex">
+          <Navbar.Collapse id="navbar">
+            <Nav className="mr-auto">
               <Nav.Link as={Link} to="/">
-                Terra API Framework
+                Home
               </Nav.Link>
-              {/* if user is logged in show saved books and logout */}
+              <NavDropdown title="Solutions" id="basic-nav-dropdown">
+                <NavDropdown.Item as={Link} to="/forms">
+                  Forms
+                </NavDropdown.Item>
+                <NavDropdown.Item as={Link} to="/ui">
+                  User Interface
+                </NavDropdown.Item>
+                <NavDropdown.Item as={Link} to="/database">
+                  Database Solutions
+                </NavDropdown.Item>
+              </NavDropdown>
+              <Nav.Link as={Link} to="/about">
+                About
+              </Nav.Link>
+              <Nav.Link as={Link} to="/contact">
+                Contact
+              </Nav.Link>
+            </Nav>
+            <Form className="d-flex">
+              <FormControl
+                type="search"
+                placeholder="Search"
+                className="mr-2"
+                aria-label="Search"
+              />
+              <Button variant="outline-success">Search</Button>
+            </Form>
+            <Nav className="ml-auto d-flex align-items-center">
+              <Nav.Link href="https://facebook.com" target="_blank">
+                <FaFacebook />
+              </Nav.Link>
+              <Nav.Link href="https://twitter.com" target="_blank">
+                <FaTwitter />
+              </Nav.Link>
+              <Nav.Link href="https://instagram.com" target="_blank">
+                <FaInstagram />
+              </Nav.Link>
               {Auth.loggedIn() ? (
                 <>
                   <Nav.Link as={Link} to="/saved">
@@ -77,4 +124,4 @@ const AppNavbar = () => {
   );
 };
 
-export default AppNavbar;
+export default AppNavbar2;
