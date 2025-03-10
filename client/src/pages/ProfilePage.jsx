@@ -17,10 +17,10 @@ const ProfilePage = () => {
   const { id } = useParams();
 
   return (
-    <>
+    <div>
       <h1>Profile Page</h1>
       <p>Welcome to your profile page: {id}</p>
-    </>
+    </div>
   );
 };
 

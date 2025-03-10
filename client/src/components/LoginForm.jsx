@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Form, Button, Alert } from "react-bootstrap";
 // This useHistory hook allows us to redirect the user to a different page in this case their profile page
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import { loginUser } from "../utils/API";
 import Auth from "../utils/auth";
@@ -11,7 +11,7 @@ const LoginForm = () => {
   const [userFormData, setUserFormData] = useState({ email: "", password: "" });
   const [validated] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
@@ -39,7 +39,7 @@ const LoginForm = () => {
       console.log(user);
       Auth.login(token);
       // redirect to profile page
-      history.push(`/profile/${user._id}`);
+      navigate(`/profile/${user._id}`);
     } catch (err) {
       console.error(err);
       setShowAlert(true);
