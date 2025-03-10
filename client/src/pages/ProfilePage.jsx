@@ -1,27 +1,25 @@
-// Import components to use on profile page after a user logins in
-// import Navbar from "../components/Navbar";
+// Import necessary packages
+import React from "react";
+import { useParams } from "react-router-dom";
 
 // Bootstrap Components
-import {
-  Container,
-  //   add additional bootstrap components here when ready
-  //   Col,
-  //   Form,
-  //   Button,
-  //   Card,
-  //   Row
-} from "react-bootstrap";
+// import {
+//   Container,
+//   add additional bootstrap components here when ready
+//   Col,
+//   Form,
+//   Button,
+//   Card,
+//   Row
+// } from "react-bootstrap";
 
 const ProfilePage = () => {
+  const { id } = useParams();
+
   return (
     <>
-      <main className="p-2">
-        <Container>
-          <center>
-            <h1 className="py-2">Your Profile </h1>
-          </center>
-        </Container>
-      </main>
+      <h1>Profile Page</h1>
+      <p>Welcome to your profile page: {id}</p>
     </>
   );
 };

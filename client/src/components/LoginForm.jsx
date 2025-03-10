@@ -1,7 +1,7 @@
 // see SignupForm.js for comments
 import { useState } from "react";
 import { Form, Button, Alert } from "react-bootstrap";
-// This useHistory hook allows us to redirect the user to a different page
+// This useHistory hook allows us to redirect the user to a different page in this case their profile page
 import { useHistory } from "react-router-dom";
 
 import { loginUser } from "../utils/API";
