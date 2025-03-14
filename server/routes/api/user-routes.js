@@ -17,6 +17,8 @@ router.route("/login").post(login);
 
 router.route("/me").get(authMiddleware, getSingleUser);
 
+
+
 // update (METHOD = put) authMiddleware to send a token for verification on API requests
 // delete (METHOD = delete) authMiddleware to send a token for verification on API requests
 router

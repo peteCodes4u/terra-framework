@@ -71,7 +71,7 @@ module.exports = {
       );
       // Check if user is found and if not return error message
       if (!updatedUser) {
-        return res.status(404).json({
+        return res.status(504).json({
           message: "Sorry, this user is not found!",
         });
       }
