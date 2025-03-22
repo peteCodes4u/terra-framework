@@ -1,6 +1,6 @@
 // see SignupForm.js for comments
 import { useState } from "react";
-import { Form, Button, Alert } from "react-bootstrap";
+import { Form, Button, Alert, Dropdown } from "react-bootstrap";
 // This useHistory hook allows us to redirect the user to a different page in this case their profile page
 import { useNavigate } from "react-router-dom";
 
@@ -61,7 +61,7 @@ const LoginForm = () => {
   return (
     <>
       {/* Add logic to add drop down menu when user is logged in */}
-      {isLoggedIn ? (
+      {!isLoggedIn ? (
         <Form noValidate validated={validated} onSubmit={handleFormSubmit}>
           <Alert
             dismissible
