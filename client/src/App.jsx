@@ -17,7 +17,7 @@ import Footer from "./components/Footer";
 function App() {
   return (
     <>
-      {/* <Navbar /> */}
+      {/* <Navbar isLoggedIn={isLoggedIn} userId={userId} /> */}
       <Outlet />
       <Footer />
     </>

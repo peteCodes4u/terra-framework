@@ -46,7 +46,7 @@ const LoginForm = ({ setIsLoggedIn, setUserId }) => {
     }
 
     setUserFormData({
-      username: "",
+      // username: "",
       email: "",
       password: "",
     });
