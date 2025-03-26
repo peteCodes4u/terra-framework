@@ -16,7 +16,7 @@ import App from "./App.jsx";
 import Page1 from "./pages/Page1";
 import ProfilePage from "./pages/ProfilePage.jsx";
 import LoginForm from "./components/LoginForm.jsx";
-import Navbar from "./components/Navbar/index.jsx";
+import Navbar from "./components/Navbar.jsx";
 
 // Create a main function to manage state to implement the ability to add a drop down when a user logs in
 const Main = () => {
