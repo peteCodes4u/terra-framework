@@ -39,6 +39,8 @@ const SignupForm = () => {
       const { token, user } = await response.json();
       console.log(user);
       Auth.login(token);
+      // Refresh the page after successful signup
+      window.location.reload();
     } catch (err) {
       console.error(err);
       setShowAlert(true);

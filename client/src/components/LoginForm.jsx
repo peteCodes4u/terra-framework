@@ -1,12 +1,10 @@
-// see SignupForm.js for comments
 import { useState } from "react";
 import { Form, Button, Alert } from "react-bootstrap";
 
 import { loginUser } from "../utils/API";
 import Auth from "../utils/auth";
 
-// Track login in status for future dropdown menu to be displayed after user logs in
-const LoginForm = ({ setIsLoggedIn, setUserId }) => {
+const LoginForm = () => {
   const [userFormData, setUserFormData] = useState({ email: "", password: "" });
   const [validated] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
@@ -34,25 +32,25 @@ const LoginForm = ({ setIsLoggedIn, setUserId }) => {
       }
 
       const { token, user } = await response.json();
-      console.log(user);
       Auth.login(token);
 
-      // Update login state
-      setIsLoggedIn(true);
-      setUserId(user._id);
+      // Refresh the page after successful login
+      window.location.reload();
+
     } catch (err) {
       console.error(err);
       setShowAlert(true);
     }
 
     setUserFormData({
-      // username: "",
+      username: "",
       email: "",
       password: "",
     });
   };
 
   return (
+    <>
     <Form noValidate validated={validated} onSubmit={handleFormSubmit}>
       <Alert
         dismissible
@@ -99,6 +97,7 @@ const LoginForm = ({ setIsLoggedIn, setUserId }) => {
         Submit
       </Button>
     </Form>
+    </>
   );
 };
 
