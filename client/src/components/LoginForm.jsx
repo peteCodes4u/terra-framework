@@ -34,9 +34,6 @@ const LoginForm = () => {
       const { token, user } = await response.json();
       Auth.login(token);
 
-      // Refresh the page after successful login
-      window.location.reload();
-
     } catch (err) {
       console.error(err);
       setShowAlert(true);
