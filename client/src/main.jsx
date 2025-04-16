@@ -3,6 +3,7 @@
 
 // import react and react-dom for rendering the app
 import ReactDOM from 'react-dom/client'
+import { useState } from 'react'
 
 // import the createBrowserRouter and RouterProvider components from react-router-dom
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
@@ -13,12 +14,20 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 // import the App component and the Page1 component
 import App from './App.jsx'
 import Page1 from './pages/Page1'
+import ProfilePage from './pages/ProfilePage.jsx'
+import LoginForm from './components/LoginForm.jsx'
+import Navbar from './components/Navbar.jsx'  
 
 // create the router
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <App />,
+    element: ( 
+      <>
+        <Navbar/>
+        <App />,
+      </>),
+    
     errorElement: <h1 className='display-2'>Wrong page!</h1>,
     // define the routes for the different pages
     children: [
@@ -30,6 +39,11 @@ const router = createBrowserRouter([
         // define the route for the page1 page
         path: '/page1',
         element: <Page1 />
+      }, 
+      // define the route for the profile page
+      {
+        path: '/profile/:id',
+        element: <ProfilePage />
       }
     ]
   }

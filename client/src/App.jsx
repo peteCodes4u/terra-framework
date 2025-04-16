@@ -10,14 +10,12 @@ import "./App.css";
 import { Outlet } from "react-router-dom";
 
 // import navbar component
-import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 
 // define the main app component
 function App() {
   return (
     <>
-      <Navbar />
       <Outlet />
       <Footer />
     </>

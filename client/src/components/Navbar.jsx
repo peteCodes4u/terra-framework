@@ -1,6 +1,13 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Navbar, Nav, Container, Modal, Tab } from "react-bootstrap";
+import {
+  Navbar,
+  Nav,
+  Container,
+  Modal,
+  Tab,
+  NavDropdown,
+} from "react-bootstrap";
 import SignUpForm from "./SignupForm";
 import LoginForm from "./LoginForm";
 
@@ -9,6 +16,9 @@ import Auth from "../utils/auth";
 const AppNavbar = () => {
   // set modal display state
   const [showModal, setShowModal] = useState(false);
+
+  // Fetch the logged in user ID if it's available
+  const userId = Auth.loggedIn() ? Auth.getProfile().data._id : null;
 
   return (
     <>
@@ -23,14 +33,16 @@ const AppNavbar = () => {
               <Nav.Link as={Link} to="/">
                 Terra API Framework
               </Nav.Link>
-              {/* if user is logged in show saved books and logout */}
+              {/* if user is logged in show the dropdown menu */}
               {Auth.loggedIn() ? (
-                <>
-                  <Nav.Link as={Link} to="/saved">
-                    Welcome to Terra API Framework!
-                  </Nav.Link>
-                  <Nav.Link onClick={Auth.logout}>Logout</Nav.Link>
-                </>
+                <NavDropdown title="Account" id="account-dropdown">
+                  <NavDropdown.Item as={Link} to={`/profile/${userId}`}>
+                    Profile
+                  </NavDropdown.Item>
+                  <NavDropdown.Item onClick={Auth.logout}>
+                    Logout
+                  </NavDropdown.Item>
+                </NavDropdown>
               ) : (
                 <Nav.Link onClick={() => setShowModal(true)}>
                   Login/Sign Up
