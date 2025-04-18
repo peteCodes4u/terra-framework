@@ -22,7 +22,7 @@ const AppNavbar = () => {
 
   return (
     <>
-      <Navbar bg="dark" variant="dark" expand="lg">
+      <Navbar id="navbar" variant="dark" expand="lg">
         <Container fluid>
           <Navbar.Brand as={Link} to="/">
             Terra API Framework

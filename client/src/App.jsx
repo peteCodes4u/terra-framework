@@ -4,6 +4,8 @@
 
 // import styling
 import "./App.css";
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 // import react-router-dom components for routing
 // Outlet is used to render nested routes
 // Link is used to create links to other pages
