@@ -14,7 +14,7 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import App from './App.jsx'
 import Page1 from './pages/Page1'
 import ProfilePage from './pages/ProfilePage.jsx'
-import Navbar from './components/Navbar.jsx'  
+import Navbar from './components/NavigationBar/index.jsx'
 
 // create the router
 const router = createBrowserRouter([
