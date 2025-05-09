@@ -1,0 +1,13 @@
+body.app-style1 {
+  font-family: 'Rubik', sans-serif;
+}
+
+body.app-style1 h1,
+body.app-style1 h2,
+body.app-style1 h3 {
+  font-family: 'Rubik Mono One', sans-serif;
+}
+
+body.app-style1 .navbar {
+  background-color: #0a0a0a;
+}

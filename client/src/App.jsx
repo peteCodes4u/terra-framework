@@ -1,23 +1,44 @@
 // the App.jsx file is the main App component
 //  this file establishes the layout of the application and the routes to the different pages 
 // the Navbar component is imported and rendered in this file
+import React, { useEffect, useState } from "react";
 
 // import styling
-import "./App.css";
+import "./AppStyle1.css";
+import './AppStyle2.css';
+
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-// import react-router-dom components for routing
 // Outlet is used to render nested routes
-// Link is used to create links to other pages
 import { Outlet } from "react-router-dom";
 
 // import navbar component
 import Footer from "./components/Footer";
+import NavigationBar from "./components/NavigationBar";
 
 // define the main app component
 function App() {
+  // Initialize state with the saved style from localStorage or default to true
+  const [isStyle1Active, setIsStyle1Active] = useState(() => {
+    const savedStyle = localStorage.getItem("selectedStyle");
+    return savedStyle ? savedStyle === "app-style1" : true;
+  });
+
+  // Apply the class to the body element and save the style in localStorage
+  useEffect(() => {
+    const selectedStyle = isStyle1Active ? "app-style1" : "app-style2";
+    document.body.className = selectedStyle;
+    localStorage.setItem("selectedStyle", selectedStyle);
+  }, [isStyle1Active]);
+
+  // Function to toggle the active stylesheet
+  const toggleStylesheet = () => {
+    setIsStyle1Active(!isStyle1Active);
+  };
+
   return (
     <>
+      <NavigationBar toggleStylesheet={toggleStylesheet} />
       <Outlet />
       <Footer />
     </>
