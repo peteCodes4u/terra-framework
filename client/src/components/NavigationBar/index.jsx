@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import {
   Navbar,
@@ -7,13 +7,15 @@ import {
   Modal,
   Tab,
   NavDropdown,
+  Button,
 } from "react-bootstrap";
-import SignUpForm from "./SignupForm";
-import LoginForm from "./LoginForm";
 
-import Auth from "../utils/auth";
+import SignUpForm from '../SignUpForm';
+import LoginForm from "../LoginForm";
+import Auth from "../../utils/auth";
 
-const AppNavbar = () => {
+// this is the navigation bar component
+export default function NavigationBar({ toggleStylesheet }) { 
   // set modal display state
   const [showModal, setShowModal] = useState(false);
 
@@ -22,7 +24,7 @@ const AppNavbar = () => {
 
   return (
     <>
-      <Navbar bg="dark" variant="dark" expand="lg">
+      <Navbar id="navbar" variant="dark" expand="lg">
         <Container fluid>
           <Navbar.Brand as={Link} to="/">
             Terra API Framework
@@ -31,7 +33,7 @@ const AppNavbar = () => {
           <Navbar.Collapse id="navbar" className="d-flex flex-row-reverse">
             <Nav className="ml-auto d-flex">
               <Nav.Link as={Link} to="/">
-                Terra API Framework
+                Home
               </Nav.Link>
               {/* if user is logged in show the dropdown menu */}
               {Auth.loggedIn() ? (
@@ -48,11 +50,18 @@ const AppNavbar = () => {
                   Login/Sign Up
                 </Nav.Link>
               )}
+              <Button
+                variant="outline-light"
+                className="ml-2"
+                onClick={toggleStylesheet}
+              >
+                Toggle Theme
+              </Button>
             </Nav>
           </Navbar.Collapse>
         </Container>
       </Navbar>
-      {/* set modal data up */}
+      {/* Modal */}
       <Modal
         size="lg"
         show={showModal}
@@ -88,5 +97,3 @@ const AppNavbar = () => {
     </>
   );
 };
-
-export default AppNavbar;

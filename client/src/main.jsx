@@ -1,9 +1,7 @@
-// the main.jsx file is the main entry point for the application
 // this file renders the main App component and the routes to the different pages
 
 // import react and react-dom for rendering the app
 import ReactDOM from 'react-dom/client'
-import { useState } from 'react'
 
 // import the createBrowserRouter and RouterProvider components from react-router-dom
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
@@ -15,8 +13,6 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import App from './App.jsx'
 import Page1 from './pages/Page1'
 import ProfilePage from './pages/ProfilePage.jsx'
-import LoginForm from './components/LoginForm.jsx'
-import Navbar from './components/Navbar.jsx'  
 
 // create the router
 const router = createBrowserRouter([
@@ -24,9 +20,9 @@ const router = createBrowserRouter([
     path: '/',
     element: ( 
       <>
-        <Navbar/>
-        <App />,
-      </>),
+        <App />
+      </>
+      ),
     
     errorElement: <h1 className='display-2'>Wrong page!</h1>,
     // define the routes for the different pages

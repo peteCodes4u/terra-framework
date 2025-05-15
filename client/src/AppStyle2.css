@@ -1,0 +1,18 @@
+body.app-style2 .small {
+  font-weight: 300;
+  font-style: italic;
+}
+
+body.app-style2 {
+  font-family: 'Permanent Marker', sans-serif;
+}
+
+body.app-style2 h1,
+body.app-style2 h2,
+body.app-style2 h3 {
+  font-family: 'Permanent Marker', sans-serif;
+}
+
+body.app-style2 .navbar {
+  background-color: #14f742;
+}
