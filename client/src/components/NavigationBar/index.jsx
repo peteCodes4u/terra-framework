@@ -1,25 +1,19 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import {
-  Navbar,
-  Nav,
-  Container,
-  NavDropdown,
-  Button,
-} from "react-bootstrap";
+import { Navbar, Nav, Container, NavDropdown, Button } from "react-bootstrap";
 
-import SignUpForm from '../SignUpForm';
+import SignUpForm from "../SignUpForm";
 import LoginForm from "../LoginForm";
 import Auth from "../../utils/auth";
-import "../../../src/AppStyle1.css"
+import "../../../src/AppStyle1.css";
 
 // this is the navigation bar component
-export default function NavigationBar({ toggleStylesheet }) { 
+export default function NavigationBar({ toggleStylesheet }) {
   const location = useLocation();
   const isProfilePage = /^\/profile\/[^/]+$/.test(location.pathname);
 
   // State to control form visibility(Login/ Signup/ etc)
-  const [ activeForm, setActiveForm ] = useState(null) //'login', 'signup', 'null'
+  const [activeForm, setActiveForm] = useState(null); //'login', 'signup', 'null'
 
   // Fetch the logged in user ID if it's available
   const userId = Auth.loggedIn() ? Auth.getProfile().data._id : null;
@@ -40,10 +34,10 @@ export default function NavigationBar({ toggleStylesheet }) {
                 </NavDropdown.Item>
                 {!Auth.loggedIn() ? (
                   <>
-                    <NavDropdown.Item onClick={() => setActiveForm('login')}>
+                    <NavDropdown.Item onClick={() => setActiveForm("login")}>
                       Login
                     </NavDropdown.Item>
-                    <NavDropdown.Item onClick={() => setActiveForm('signup')}>
+                    <NavDropdown.Item onClick={() => setActiveForm("signup")}>
                       Signup
                     </NavDropdown.Item>
                   </>
@@ -54,6 +48,9 @@ export default function NavigationBar({ toggleStylesheet }) {
                     </NavDropdown.Item>
                     <NavDropdown.Item onClick={Auth.logout}>
                       Logout
+                    </NavDropdown.Item>
+                    <NavDropdown.Item as={Link} to={`/booking`}>
+                      Booking
                     </NavDropdown.Item>
                   </>
                 )}
@@ -72,18 +69,18 @@ export default function NavigationBar({ toggleStylesheet }) {
         </Container>
       </Navbar>
       {/* Render forms below the navbar in custom popup dialogue */}
-      {(activeForm === 'login' || activeForm === 'signup') && (
+      {(activeForm === "login" || activeForm === "signup") && (
         <div className="custom-popup-overlay">
           <div className="custom-popup-window">
-            {activeForm === 'login' && (
-              <LoginForm handleModalClose={() => setActiveForm(null)}/>
+            {activeForm === "login" && (
+              <LoginForm handleModalClose={() => setActiveForm(null)} />
             )}
-            {activeForm == 'signup' && (
-              <SignUpForm handleModalClose = {() => setActiveForm(null)}/>
+            {activeForm == "signup" && (
+              <SignUpForm handleModalClose={() => setActiveForm(null)} />
             )}
           </div>
         </div>
       )}
     </>
   );
-};
+}
