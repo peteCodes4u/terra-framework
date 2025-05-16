@@ -11,7 +11,7 @@ import {
 import SignUpForm from '../SignUpForm';
 import LoginForm from "../LoginForm";
 import Auth from "../../utils/auth";
-import "./Popup.css";
+import "../../../src/AppStyle1.css"
 
 // this is the navigation bar component
 export default function NavigationBar({ toggleStylesheet }) { 
