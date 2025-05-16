@@ -1,52 +1,85 @@
 import { Link, useLocation } from "react-router-dom";
-import {
-  Navbar,
-  Nav,
-  Container,
-  NavDropdown,
-} from "react-bootstrap";
+import { Navbar, Nav, Container, NavDropdown, Button } from "react-bootstrap";
 
+import SignUpForm from "../SignUpForm";
+import LoginForm from "../LoginForm";
 import Auth from "../../utils/auth";
-import StyleToggler from "../StyleToggler";
+import "../../../src/AppStyle1.css";
 
 // this is the navigation bar component
-export default function NavigationBar({ activeStyle, setActiveStyle }) {
+export default function NavigationBar({ toggleStylesheet }) {
   const location = useLocation();
   const isProfilePage = /^\/profile\/[^/]+$/.test(location.pathname);
+
+  // State to control form visibility(Login/ Signup/ etc)
+  const [activeForm, setActiveForm] = useState(null); //'login', 'signup', 'null'
+
+  // Fetch the logged in user ID if it's available
   const userId = Auth.loggedIn() ? Auth.getProfile().data._id : null;
 
   return (
-    <Navbar id="navbar" expand="lg" className={`${activeStyle}-navbar`}>
-      <Container fluid>
-        <Navbar.Brand as={Link} to="/" className={`${activeStyle}-brand`}>
-          Terra API Framework
-        </Navbar.Brand>
-        <Navbar.Toggle aria-controls="navbar" className={`${activeStyle}-toggle-btn`} />
-        <Navbar.Collapse id="navbar" className={`${activeStyle}-navbar-collapse`}>
-          <Nav className={`${activeStyle}-nav ml-auto d-flex`}>
-            <NavDropdown title="Explore" id="explore-dropdown" className={`${activeStyle}-dropdown`}>
-              <NavDropdown.Item as={Link} to="/">Home</NavDropdown.Item>
-              {!Auth.loggedIn() ? (
-                <>
-                  <NavDropdown.Item as={Link} to="/login">Login</NavDropdown.Item>
-                  <NavDropdown.Item as={Link} to="/signup">Signup</NavDropdown.Item>
-                </>
-              ) : (
-                <>
-                  <NavDropdown.Item as={Link} to={`/profile/${userId}`}>Profile</NavDropdown.Item>
-                  <NavDropdown.Item onClick={Auth.logout}>Logout</NavDropdown.Item>
-                </>
+    <>
+      <Navbar id="navbar" variant="dark" expand="lg">
+        <Container fluid>
+          <Navbar.Brand as={Link} to="/">
+            Terra API Framework
+          </Navbar.Brand>
+          <Navbar.Toggle aria-controls="navbar" />
+          <Navbar.Collapse id="navbar" className="d-flex flex-row-reverse">
+            <Nav className="ml-auto d-flex">
+              <NavDropdown title="Explore" id="explore-dropdown">
+                <NavDropdown.Item as={Link} to="/">
+                  Home
+                </NavDropdown.Item>
+                {!Auth.loggedIn() ? (
+                  <>
+                    <NavDropdown.Item onClick={() => setActiveForm("login")}>
+                      Login
+                    </NavDropdown.Item>
+                    <NavDropdown.Item onClick={() => setActiveForm("signup")}>
+                      Signup
+                    </NavDropdown.Item>
+                  </>
+                ) : (
+                  <>
+                    <NavDropdown.Item as={Link} to={`/profile/${userId}`}>
+                      Profile
+                    </NavDropdown.Item>
+                    <NavDropdown.Item onClick={Auth.logout}>
+                      Logout
+                    </NavDropdown.Item>
+                    <NavDropdown.Item as={Link} to={`/booking`}>
+                      Booking
+                    </NavDropdown.Item>
+                  </>
+                )}
+              </NavDropdown>
+              {isProfilePage && (
+                <Button
+                  variant="outline-light"
+                  className="ml-2"
+                  onClick={toggleStylesheet}
+                >
+                  Toggle Theme
+                </Button>
               )}
-            </NavDropdown>
-            {isProfilePage && (
-              <StyleToggler
-                activeStyle={activeStyle}
-                setActiveStyle={setActiveStyle}
-              />
+            </Nav>
+          </Navbar.Collapse>
+        </Container>
+      </Navbar>
+      {/* Render forms below the navbar in custom popup dialogue */}
+      {(activeForm === "login" || activeForm === "signup") && (
+        <div className="custom-popup-overlay">
+          <div className="custom-popup-window">
+            {activeForm === "login" && (
+              <LoginForm handleModalClose={() => setActiveForm(null)} />
             )}
-          </Nav>
-        </Navbar.Collapse>
-      </Container>
-    </Navbar>
+            {activeForm == "signup" && (
+              <SignUpForm handleModalClose={() => setActiveForm(null)} />
+            )}
+          </div>
+        </div>
+      )}
+    </>
   );
-};
+}
