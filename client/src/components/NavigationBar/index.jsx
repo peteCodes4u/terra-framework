@@ -32,29 +32,30 @@ export default function NavigationBar({ toggleStylesheet }) {
           <Navbar.Toggle aria-controls="navbar" />
           <Navbar.Collapse id="navbar" className="d-flex flex-row-reverse">
             <Nav className="ml-auto d-flex">
-              <Nav.Link as={Link} to="/">
-                Home
-              </Nav.Link>
-              {/* if user is logged in show the dropdown menu */}
-              {Auth.loggedIn() ? (
-                <NavDropdown title="Account" id="account-dropdown">
-                  <NavDropdown.Item as={Link} to={`/profile/${userId}`}>
-                    Profile
-                  </NavDropdown.Item>
-                  <NavDropdown.Item onClick={Auth.logout}>
-                    Logout
-                  </NavDropdown.Item>
-                </NavDropdown>
-              ) : (
-                <>
-                <Nav.Link onClick={() => setActiveForm('login')}>
-                  Login
-                </Nav.Link>
-                <Nav.Link onClick={() => setActiveForm('signup')}>
-                  Signup
-                </Nav.Link>
-                </>
-              )}
+              <NavDropdown title="Explore" id="explore-dropdown">
+                <NavDropdown.Item as={Link} to="/">
+                  Home
+                </NavDropdown.Item>
+                {!Auth.loggedIn() ? (
+                  <>
+                    <NavDropdown.Item onClick={() => setActiveForm('login')}>
+                      Login
+                    </NavDropdown.Item>
+                    <NavDropdown.Item onClick={() => setActiveForm('signup')}>
+                      Signup
+                    </NavDropdown.Item>
+                  </>
+                ) : (
+                  <>
+                    <NavDropdown.Item as={Link} to={`/profile/${userId}`}>
+                      Profile
+                    </NavDropdown.Item>
+                    <NavDropdown.Item onClick={Auth.logout}>
+                      Logout
+                    </NavDropdown.Item>
+                  </>
+                )}
+              </NavDropdown>
               <Button
                 variant="outline-light"
                 className="ml-2"
