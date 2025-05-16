@@ -1,11 +1,9 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import {
   Navbar,
   Nav,
   Container,
-  Modal,
-  Tab,
   NavDropdown,
   Button,
 } from "react-bootstrap";
@@ -13,11 +11,15 @@ import {
 import SignUpForm from '../SignUpForm';
 import LoginForm from "../LoginForm";
 import Auth from "../../utils/auth";
+import "../../../src/AppStyle1.css"
 
 // this is the navigation bar component
 export default function NavigationBar({ toggleStylesheet }) { 
-  // set modal display state
-  const [showModal, setShowModal] = useState(false);
+  const location = useLocation();
+  const isProfilePage = /^\/profile\/[^/]+$/.test(location.pathname);
+
+  // State to control form visibility(Login/ Signup/ etc)
+  const [ activeForm, setActiveForm ] = useState(null) //'login', 'signup', 'null'
 
   // Fetch the logged in user ID if it's available
   const userId = Auth.loggedIn() ? Auth.getProfile().data._id : null;
@@ -32,68 +34,56 @@ export default function NavigationBar({ toggleStylesheet }) {
           <Navbar.Toggle aria-controls="navbar" />
           <Navbar.Collapse id="navbar" className="d-flex flex-row-reverse">
             <Nav className="ml-auto d-flex">
-              <Nav.Link as={Link} to="/">
-                Home
-              </Nav.Link>
-              {/* if user is logged in show the dropdown menu */}
-              {Auth.loggedIn() ? (
-                <NavDropdown title="Account" id="account-dropdown">
-                  <NavDropdown.Item as={Link} to={`/profile/${userId}`}>
-                    Profile
-                  </NavDropdown.Item>
-                  <NavDropdown.Item onClick={Auth.logout}>
-                    Logout
-                  </NavDropdown.Item>
-                </NavDropdown>
-              ) : (
-                <Nav.Link onClick={() => setShowModal(true)}>
-                  Login/Sign Up
-                </Nav.Link>
+              <NavDropdown title="Explore" id="explore-dropdown">
+                <NavDropdown.Item as={Link} to="/">
+                  Home
+                </NavDropdown.Item>
+                {!Auth.loggedIn() ? (
+                  <>
+                    <NavDropdown.Item onClick={() => setActiveForm('login')}>
+                      Login
+                    </NavDropdown.Item>
+                    <NavDropdown.Item onClick={() => setActiveForm('signup')}>
+                      Signup
+                    </NavDropdown.Item>
+                  </>
+                ) : (
+                  <>
+                    <NavDropdown.Item as={Link} to={`/profile/${userId}`}>
+                      Profile
+                    </NavDropdown.Item>
+                    <NavDropdown.Item onClick={Auth.logout}>
+                      Logout
+                    </NavDropdown.Item>
+                  </>
+                )}
+              </NavDropdown>
+              {isProfilePage && (
+                <Button
+                  variant="outline-light"
+                  className="ml-2"
+                  onClick={toggleStylesheet}
+                >
+                  Toggle Theme
+                </Button>
               )}
-              <Button
-                variant="outline-light"
-                className="ml-2"
-                onClick={toggleStylesheet}
-              >
-                Toggle Theme
-              </Button>
             </Nav>
           </Navbar.Collapse>
         </Container>
       </Navbar>
-      {/* Modal */}
-      <Modal
-        size="lg"
-        show={showModal}
-        onHide={() => setShowModal(false)}
-        aria-labelledby="signup-modal"
-      >
-        {/* tab container to do either signup or login component */}
-        <Tab.Container defaultActiveKey="login">
-          <Modal.Header closeButton>
-            <Modal.Title id="signup-modal">
-              <Nav variant="pills">
-                <Nav.Item>
-                  <Nav.Link eventKey="login">Login</Nav.Link>
-                </Nav.Item>
-                <Nav.Item>
-                  <Nav.Link eventKey="signup">Sign Up</Nav.Link>
-                </Nav.Item>
-              </Nav>
-            </Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <Tab.Content>
-              <Tab.Pane eventKey="login">
-                <LoginForm handleModalClose={() => setShowModal(false)} />
-              </Tab.Pane>
-              <Tab.Pane eventKey="signup">
-                <SignUpForm handleModalClose={() => setShowModal(false)} />
-              </Tab.Pane>
-            </Tab.Content>
-          </Modal.Body>
-        </Tab.Container>
-      </Modal>
+      {/* Render forms below the navbar in custom popup dialogue */}
+      {(activeForm === 'login' || activeForm === 'signup') && (
+        <div className="custom-popup-overlay">
+          <div className="custom-popup-window">
+            {activeForm === 'login' && (
+              <LoginForm handleModalClose={() => setActiveForm(null)}/>
+            )}
+            {activeForm == 'signup' && (
+              <SignUpForm handleModalClose = {() => setActiveForm(null)}/>
+            )}
+          </div>
+        </div>
+      )}
     </>
   );
 };
