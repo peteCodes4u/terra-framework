@@ -1,9 +1,11 @@
-import { act, useState } from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import {
   Navbar,
   Nav,
   Container,
+  Modal,
+  Tab,
   NavDropdown,
   Button,
 } from "react-bootstrap";
@@ -11,13 +13,11 @@ import {
 import SignUpForm from '../SignUpForm';
 import LoginForm from "../LoginForm";
 import Auth from "../../utils/auth";
-import "./Popup.css";
 
 // this is the navigation bar component
 export default function NavigationBar({ toggleStylesheet }) { 
-
-  // State to control form visibility(Login/ Signup/ etc)
-  const [ activeForm, setActiveForm ] = useState(null) //'login', 'signup', 'null'
+  // set modal display state
+  const [showModal, setShowModal] = useState(false);
 
   // Fetch the logged in user ID if it's available
   const userId = Auth.loggedIn() ? Auth.getProfile().data._id : null;
@@ -46,14 +46,9 @@ export default function NavigationBar({ toggleStylesheet }) {
                   </NavDropdown.Item>
                 </NavDropdown>
               ) : (
-                <>
-                <Nav.Link onClick={() => setActiveForm('login')}>
-                  Login
+                <Nav.Link onClick={() => setShowModal(true)}>
+                  Login/Sign Up
                 </Nav.Link>
-                <Nav.Link onClick={() => setActiveForm('signup')}>
-                  Signup
-                </Nav.Link>
-                </>
               )}
               <Button
                 variant="outline-light"
@@ -66,19 +61,39 @@ export default function NavigationBar({ toggleStylesheet }) {
           </Navbar.Collapse>
         </Container>
       </Navbar>
-      {/* Render forms below the navbar in custom popup dialogue */}
-      {(activeForm === 'login' || activeForm === 'signup') && (
-        <div className="custom-popup-overlay">
-          <div className="custom-popup-window">
-            {activeForm === 'login' && (
-              <LoginForm handleModalClose={() => setActiveForm(null)}/>
-            )}
-            {activeForm == 'signup' && (
-              <SignUpForm handleModalClose = {() => setActiveForm(null)}/>
-            )}
-          </div>
-        </div>
-      )}
+      {/* Modal */}
+      <Modal
+        size="lg"
+        show={showModal}
+        onHide={() => setShowModal(false)}
+        aria-labelledby="signup-modal"
+      >
+        {/* tab container to do either signup or login component */}
+        <Tab.Container defaultActiveKey="login">
+          <Modal.Header closeButton>
+            <Modal.Title id="signup-modal">
+              <Nav variant="pills">
+                <Nav.Item>
+                  <Nav.Link eventKey="login">Login</Nav.Link>
+                </Nav.Item>
+                <Nav.Item>
+                  <Nav.Link eventKey="signup">Sign Up</Nav.Link>
+                </Nav.Item>
+              </Nav>
+            </Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <Tab.Content>
+              <Tab.Pane eventKey="login">
+                <LoginForm handleModalClose={() => setShowModal(false)} />
+              </Tab.Pane>
+              <Tab.Pane eventKey="signup">
+                <SignUpForm handleModalClose={() => setShowModal(false)} />
+              </Tab.Pane>
+            </Tab.Content>
+          </Modal.Body>
+        </Tab.Container>
+      </Modal>
     </>
   );
 };
