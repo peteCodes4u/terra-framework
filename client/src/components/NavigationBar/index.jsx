@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import {
   Navbar,
   Nav,
@@ -15,6 +15,8 @@ import "./Popup.css";
 
 // this is the navigation bar component
 export default function NavigationBar({ toggleStylesheet }) { 
+  const location = useLocation();
+  const isProfilePage = /^\/profile\/[^/]+$/.test(location.pathname);
 
   // State to control form visibility(Login/ Signup/ etc)
   const [ activeForm, setActiveForm ] = useState(null) //'login', 'signup', 'null'
@@ -56,13 +58,15 @@ export default function NavigationBar({ toggleStylesheet }) {
                   </>
                 )}
               </NavDropdown>
-              <Button
-                variant="outline-light"
-                className="ml-2"
-                onClick={toggleStylesheet}
-              >
-                Toggle Theme
-              </Button>
+              {isProfilePage && (
+                <Button
+                  variant="outline-light"
+                  className="ml-2"
+                  onClick={toggleStylesheet}
+                >
+                  Toggle Theme
+                </Button>
+              )}
             </Nav>
           </Navbar.Collapse>
         </Container>
