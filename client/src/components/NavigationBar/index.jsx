@@ -34,10 +34,17 @@ export default function NavigationBar({ toggleStylesheet }) {
                 </NavDropdown.Item>
                 {!Auth.loggedIn() ? (
                   <>
+<<<<<<< HEAD
                     <NavDropdown.Item onClick={() => setActiveForm("login")}>
                       Login
                     </NavDropdown.Item>
                     <NavDropdown.Item onClick={() => setActiveForm("signup")}>
+=======
+                    <NavDropdown.Item as={Link} to="/login">
+                      Login
+                    </NavDropdown.Item>
+                    <NavDropdown.Item as={Link} to="/signup">
+>>>>>>> c34999a (Changes completed to route to /login and /signup)
                       Signup
                     </NavDropdown.Item>
                   </>
@@ -68,6 +75,7 @@ export default function NavigationBar({ toggleStylesheet }) {
           </Navbar.Collapse>
         </Container>
       </Navbar>
+<<<<<<< HEAD
       {/* Render forms below the navbar in custom popup dialogue */}
       {(activeForm === "login" || activeForm === "signup") && (
         <div className="custom-popup-overlay">
@@ -81,6 +89,8 @@ export default function NavigationBar({ toggleStylesheet }) {
           </div>
         </div>
       )}
+=======
+>>>>>>> c34999a (Changes completed to route to /login and /signup)
     </>
   );
 }

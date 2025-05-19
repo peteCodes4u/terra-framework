@@ -10,22 +10,38 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 // import the App component and the Page1 component
+<<<<<<< HEAD
 import App from "./App.jsx";
 import Page1 from "./pages/Page1";
 import ProfilePage from "./pages/ProfilePage.jsx";
 import BookingPage from "./pages/BookingPage.jsx";
+=======
+import App from './App.jsx'
+import Page1 from './pages/Page1.jsx'
+import Login from './pages/Login.jsx'
+import Signup from './pages/Signup.jsx'
+import ProfilePage from './pages/ProfilePage.jsx'
+>>>>>>> c34999a (Changes completed to route to /login and /signup)
 
 // create the router
 const router = createBrowserRouter([
   {
+<<<<<<< HEAD
     path: "/",
+=======
+    path: '/',
+>>>>>>> c34999a (Changes completed to route to /login and /signup)
     element: (
       <>
         <App />
       </>
     ),
 
+<<<<<<< HEAD
     errorElement: <h1 className="display-2">Wrong page!</h1>,
+=======
+    errorElement: <h1 className='display-2'>Wrong page!</h1>,
+>>>>>>> c34999a (Changes completed to route to /login and /signup)
     // define the routes for the different pages
     children: [
       {
@@ -35,6 +51,7 @@ const router = createBrowserRouter([
       },
       {
         // define the route for the page1 page
+<<<<<<< HEAD
         path: "/page1",
         element: <Page1 />,
       },
@@ -49,6 +66,36 @@ const router = createBrowserRouter([
       },
     ],
   },
+=======
+        path: '/page1',
+        element: <Page1 />
+      },
+      // define the route for the profile page
+      {
+        path: '/profile/:id',
+        element: <ProfilePage />
+      }, {
+        path: '/login',
+        element: <Page1 />,
+        children: [
+          {
+            index: true,
+            element: < Login />
+          }
+        ]
+      }, {
+        path: '/signup',
+        element: <Page1 />,
+        children: [
+          {
+            index: true,
+            element: < Signup />
+          }
+        ]
+      }
+    ]
+  }
+>>>>>>> c34999a (Changes completed to route to /login and /signup)
 ]);
 
 // render the app
