@@ -11,19 +11,21 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 
 // import the App component and the Page1 component
 import App from './App.jsx'
-import Page1 from './pages/Page1'
+import Page1 from './pages/Page1.jsx'
+import Login from './pages/Login.jsx'
+import Signup from './pages/Signup.jsx'
 import ProfilePage from './pages/ProfilePage.jsx'
 
 // create the router
 const router = createBrowserRouter([
   {
     path: '/',
-    element: ( 
+    element: (
       <>
         <App />
       </>
-      ),
-    
+    ),
+
     errorElement: <h1 className='display-2'>Wrong page!</h1>,
     // define the routes for the different pages
     children: [
@@ -35,15 +37,33 @@ const router = createBrowserRouter([
         // define the route for the page1 page
         path: '/page1',
         element: <Page1 />
-      }, 
+      },
       // define the route for the profile page
       {
         path: '/profile/:id',
         element: <ProfilePage />
+      }, {
+        path: '/login',
+        element: <Page1 />,
+        children: [
+          {
+            index: true,
+            element: < Login />
+          }
+        ]
+      }, {
+        path: '/signup',
+        element: <Page1 />,
+        children: [
+          {
+            index: true,
+            element: < Signup />
+          }
+        ]
       }
     ]
   }
-])
+]);
 
 // render the app
 ReactDOM.createRoot(document.getElementById('root')).render(

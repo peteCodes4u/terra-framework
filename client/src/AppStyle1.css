@@ -30,10 +30,11 @@ body.app-style1 .navbar {
   background: #fff;
   border-radius: 0.5rem;
   box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
-  padding: 0; /* Remove all padding here */
-  min-width: 350px;
-  max-width: 95vw;
-  max-height: 90vh;
+  width: 100%;
+  max-width: 400px;      /* Maximum width */
+  min-width: 300px;      /* Minimum width */
+  max-height: 90vh;      /* Maximum height relative to viewport */
+  padding: 0;
   overflow-y: auto;
   position: relative;
   animation: fadeInScale 0.2s;
@@ -53,7 +54,6 @@ body.app-style1 .navbar {
   color: #f50707;
 }
 
-/* Optional: mimic Bootstrap's modal fade-in */
 @keyframes fadeInScale {
   from { opacity: 0; transform: scale(0.95);}
   to { opacity: 1; transform: scale(1);}
