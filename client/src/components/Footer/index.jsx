@@ -11,8 +11,6 @@ import {
 // React icons that display social media icons and links
 import { FaFacebook, FaTwitter, FaInstagram } from "react-icons/fa";
 
-import React from "react";
-
 const AppFooter = () => {
   return (
     <Navbar bg="dark" variant="dark" className="mt-4">
