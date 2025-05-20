@@ -1,6 +1,8 @@
 // the App.jsx file is the main App component
 //  this file establishes the layout of the application and the routes to the different pages 
 
+import { useEffect, useState } from "react";
+
 // import styling
 import "./AppStyle1.css";
 import './AppStyle2.css';
