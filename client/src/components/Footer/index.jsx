@@ -10,7 +10,7 @@ import {
 } from "react-bootstrap";
 import { FaFacebook, FaTwitter, FaInstagram } from "react-icons/fa";
 
-export default function AppFooter() {
+const AppFooter = () => {
   return (
     <footer className="app-style1-footer">
       <Navbar className="footer-navbar">
