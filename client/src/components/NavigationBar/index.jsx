@@ -1,9 +1,6 @@
-import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Navbar, Nav, Container, NavDropdown, Button } from "react-bootstrap";
 
-import SignUpForm from "../SignUpForm";
-import LoginForm from "../LoginForm";
 import Auth from "../../utils/auth";
 import "../../../src/AppStyle1.css";
 
@@ -12,15 +9,12 @@ export default function NavigationBar({ toggleStylesheet }) {
   const location = useLocation();
   const isProfilePage = /^\/profile\/[^/]+$/.test(location.pathname);
 
-  // State to control form visibility(Login/ Signup/ etc)
-  const [activeForm, setActiveForm] = useState(null); //'login', 'signup', 'null'
-
   // Fetch the logged in user ID if it's available
   const userId = Auth.loggedIn() ? Auth.getProfile().data._id : null;
 
   return (
     <>
-      <Navbar id="navbar" variant="dark" expand="lg">
+      <Navbar id="navbar" expand="lg" className="app-style1-navbar">
         <Container fluid>
           <Navbar.Brand as={Link} to="/">
             Terra API Framework
