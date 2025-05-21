@@ -18,27 +18,27 @@ body.app-style2 .navbar {
   background-color: #14f742;
 }
 /* MAIN APP STYLE - END */
-/* Popup window settings START */
-/* Overlay: dark background, centered content */
-.custom-popup-overlay {
+/* POPUP CUSTOM DIALOGUE DESIGN SETTINGS - START */
+body.app-style2 .custom-popup-overlay {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0,0,0,0.7); /* you can change the color for style2 */
   z-index: 1050;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-/* Popup window: white, rounded, shadow, no bottom padding */
-.custom-popup-window {
-  background: #fff;
+body.app-style2 .custom-popup-window {
+  background: #222; /* or any color for style2 */
+  color: #fff;
   border-radius: 0.5rem;
-  box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
-  padding: 0; /* Remove all padding here */
-  min-width: 350px;
-  max-width: 95vw;
+  box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.25);
+  width: 100%;
+  max-width: 400px;
+  min-width: 300px;
   max-height: 90vh;
+  padding: 0;
   overflow-y: auto;
   position: relative;
   animation: fadeInScale 0.2s;
@@ -46,43 +46,40 @@ body.app-style2 .navbar {
   flex-direction: column;
 }
 
-/* Close button: top right, Bootstrap style */
-.custom-popup-close {
+body.app-style2 .custom-popup-close {
   position: absolute;
   top: 0.75rem;
   right: 1.25rem;
   z-index: 10;
-
+  color: #fff;
 }
-.custom-popup-close:hover {
-  color: #f50707;
-}
-
-/* Optional: mimic Bootstrap's modal fade-in */
-@keyframes fadeInScale {
-  from { opacity: 0; transform: scale(0.95);}
-  to { opacity: 1; transform: scale(1);}
+body.app-style2 .custom-popup-close:hover {
+  color: #14f742;
 }
 
-/* Header: as before */
-.custom-popup-header {
-  border-bottom: 1px solid #dee2e6;
+body.app-style2 .custom-popup-header {
+  border-bottom: 1px solid #444;
   padding: 0.75rem 1.5rem;
   margin-bottom: 1.5rem;
   min-height: 2.5rem;
-  color: #dee2e6;
-  background-color: #0d6efd;
+  color: #222;
+  background-color: #14f742;
   border-top-left-radius: 0.5rem;
   border-top-right-radius: 0.5rem;
 }
 
-/* Body: add only side padding and bottom padding if you want space */
-.custom-popup-body {
+body.app-style2 .custom-popup-body {
   padding: 0 1.5rem 1.5rem 1.5rem;
   flex: 1 1 auto;
 }
 
-.custom-popup-body .btn:last-child {
+body.app-style2 .custom-popup-body .btn:last-child {
   margin-bottom: 0;
 }
-/* Popup window settings END */
+
+@keyframes fadeInScale {
+  from { opacity: 0; transform: scale(0.95);}
+  to { opacity: 1; transform: scale(1);}
+}
+/* POPUP CUSTOM DIALOGUE DESIGN SETTINGS - END */
+

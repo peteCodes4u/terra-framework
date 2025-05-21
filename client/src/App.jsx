@@ -1,7 +1,7 @@
 // the App.jsx file is the main App component
 //  this file establishes the layout of the application and the routes to the different pages 
-// the Navbar component is imported and rendered in this file
-import React, { useEffect, useState } from "react";
+
+import { useEffect, useState } from "react";
 
 // import styling
 import "./AppStyle1.css";
@@ -14,7 +14,7 @@ import { Outlet } from "react-router-dom";
 
 // import navbar component
 import Footer from "./components/Footer";
-import NavigationBar from "./components/NavigationBar";
+import Header from "./components/Header";
 
 // define the main app component
 function App() {
@@ -38,7 +38,7 @@ function App() {
 
   return (
     <>
-      <NavigationBar toggleStylesheet={toggleStylesheet} />
+      <Header  toggleStylesheet={toggleStylesheet} />
       <Outlet />
       <Footer />
     </>
