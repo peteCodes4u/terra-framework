@@ -25,10 +25,10 @@ export default function NavigationBar({ toggleStylesheet }) {
           <Navbar.Brand as={Link} to="/">
             Terra API Framework
           </Navbar.Brand>
-          <Navbar.Toggle aria-controls="navbar" />
-          <Navbar.Collapse id="navbar" className="d-flex flex-row-reverse">
-            <Nav className="ml-auto d-flex">
-              <NavDropdown title="Explore" id="explore-dropdown">
+          <Navbar.Toggle aria-controls="navbar" className="app-style1-toggle-btn" />
+          <Navbar.Collapse id="navbar" className="app-style1-navbar-collapse">
+            <Nav className="app-style1-nav ml-auto d-flex">
+              <NavDropdown title="Explore" id="explore-dropdown" className="app-style1-dropdown">
                 <NavDropdown.Item as={Link} to="/">
                   Home
                 </NavDropdown.Item>
@@ -54,8 +54,7 @@ export default function NavigationBar({ toggleStylesheet }) {
               </NavDropdown>
               {isProfilePage && (
                 <Button
-                  variant="outline-light"
-                  className="ml-2"
+                  className="app-style1-toggle-theme-btn"
                   onClick={toggleStylesheet}
                 >
                   Toggle Theme
