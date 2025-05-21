@@ -12,7 +12,6 @@ body.app-style1 .navbar {
   background-color: #0a0a0a;
 }
 /* MAIN APP STYLE - END */
-
 /* Header Style - Start */
 body.app-style1 .app-style1-header {
   background-color: #0b0b0b;   
@@ -21,7 +20,49 @@ body.app-style1 .app-style1-header {
   font-size: 1rem;
 }
 /* Header Style - END */
+/* NavigationBar Style - START */
+body.app-style1 .app-style1-navbar {
+  background-color: #0a0a0a;
+  color: #f8f9fa;
+  border-bottom: 1px solid #343a40;
+  min-height: 56px;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
 
+body.app-style1 .app-style1-navbar .navbar-brand {
+  color: #f8f9fa !important;
+  font-family: sans-serif, 'Rubik Mono One';
+  font-size: 1.25rem;
+}
+
+body.app-style1 .app-style1-navbar .nav-link,
+body.app-style1 .app-style1-navbar .navbar-nav .nav-link {
+  color: #f8f9fa !important;
+  font-size: 1rem;
+}
+
+body.app-style1 .app-style1-navbar .nav-link:hover,
+body.app-style1 .app-style1-navbar .navbar-nav .nav-link:hover {
+  color: #14f742 !important;
+}
+
+body.app-style1 .app-style1-navbar .dropdown-menu {
+  background-color: #222;
+  color: #f8f9fa;
+}
+
+body.app-style1 .app-style1-navbar .dropdown-item {
+  color: #f8f9fa;
+}
+
+body.app-style1 .app-style1-navbar .dropdown-item:hover,
+body.app-style1 .app-style1-navbar .dropdown-item:focus {
+  background-color: #14f742;
+  color: #222;
+}
+
+/* NavigationBar Styling - END */
 /* Footer style - START */
 body.app-style1 .app-style1-footer {
   background-color: #0b0b0b;   
