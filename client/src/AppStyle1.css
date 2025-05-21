@@ -11,10 +11,62 @@ body.app-style1 h3 {
 body.app-style1 .navbar {
   background-color: #0a0a0a;
 }
-
 /* MAIN APP STYLE - END */
+
+/* Footer style - START */
+body.app-style1 .app-style1-footer {
+  background-color: #292124;   
+  color: #f8f9fa;              
+  padding-top: 1rem;           
+  padding-bottom: 1rem;
+  text-align: center;
+  font-size: 1rem;
+  border-top: 1px solid #343a40;
+}
+
+body.app-style1 .footer-navbar {
+  background-color: #212529;
+  border-radius: 0;
+  margin-top: 1.5rem;
+}
+
+body.app-style1 .footer-search .form-control {
+  margin-right: 0.5rem;
+}
+
+body.app-style1 .footer-search-btn {
+  border-color: #198754;
+  color: #198754;
+  background: transparent;
+}
+
+body.app-style1 .footer-search-btn:hover {
+  background: #198754;
+  color: #fff;
+}
+
+body.app-style1 .footer-social-col {
+  text-align: center;
+}
+
+@media (min-width: 768px) {
+  body.app-style1 .footer-social-col {
+    text-align: right;
+  }
+}
+
+body.app-style1 .footer-social .nav-link {
+  color: #f8f9fa;
+  font-size: 1.5rem;
+  margin: 0 0.25rem;
+}
+
+body.app-style1 .footer-social .nav-link:hover {
+  color: #14f742;
+}
+/* Footer style - END */
+
 /* Popup window settings START */
-/* Overlay: dark background, centered content */
 .custom-popup-overlay {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
@@ -80,4 +132,5 @@ body.app-style1 .navbar {
 .custom-popup-body .btn:last-child {
   margin-bottom: 0;
 }
-/* Popup window settings END */
+
+
