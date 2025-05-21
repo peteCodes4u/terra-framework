@@ -23,14 +23,14 @@ export default function AppFooter() {
                   placeholder="Search"
                   aria-label="Search"
                 />
-                <Button type="submit" className="footer-search-btn">
+                <Button variant="outline-success" type="submit" className="footer-search-btn">
                   Search
                 </Button>
               </Form>
             </Col>
-            <Col xs={12} md={4} className="footer-social-col">
-              <div className="footer-social">
-                <Nav className="d-flex justify-content-center justify-content-md-end">
+            <Col xs={12} md={8} className="footer-right d-flex align-items-center justify-content-end">
+              <div className="footer-social d-flex align-items-center">
+                <Nav className="d-flex">
                   <Nav.Link href="https://facebook.com" target="_blank">
                     <FaFacebook />
                   </Nav.Link>
@@ -41,10 +41,9 @@ export default function AppFooter() {
                     <FaInstagram />
                   </Nav.Link>
                 </Nav>
-              </div>
-              <div className="footer-copyright">
-                &copy; {new Date().getFullYear()} Terra API Framework. All rights
-                reserved.
+                <span className="footer-copyright ms-3">
+                  &copy; {new Date().getFullYear()} Terra API Framework. All rights reserved.
+                </span>
               </div>
             </Col>
           </Row>
