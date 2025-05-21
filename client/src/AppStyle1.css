@@ -1,3 +1,4 @@
+/* MAIN APP STYLE - START */
 body.app-style1 {
   font-family: 'Rubik', sans-serif;
 }
@@ -14,8 +15,6 @@ body.app-style1 .navbar {
 /* MAIN APP STYLE - END */
 /* Header Style - Start */
 body.app-style1 .app-style1-header {
-  background-color: #0b0b0b;   
-  color: #f8f9fa;              
   text-align: center;
   font-size: 1rem;
 }
