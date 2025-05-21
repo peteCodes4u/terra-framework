@@ -1,8 +1,8 @@
 // import user model
-const { User } = require("../models");
+const { User } = require('../models');
 
 // import sign token function from auth to be utilized in user controller for signing tokens on api requests
-const { signToken } = require("../utils/auth");
+const { signToken } = require('../utils/auth');
 
 module.exports = {
   // get user by id or username
