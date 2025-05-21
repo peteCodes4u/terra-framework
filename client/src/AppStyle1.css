@@ -32,17 +32,25 @@ body.app-style1 .app-style1-navbar {
 
 body.app-style1 .app-style1-navbar .navbar-brand {
   color: #f8f9fa !important;
-  font-family: sans-serif, 'Rubik Mono One';
+  font-family:  sans-serif, 'Rubik Mono One';
   font-size: 1.25rem;
 }
 
-body.app-style1 .app-style1-navbar .nav-link,
+body.app-style1 .app-style1-navbar .app-style1-nav {
+  margin-left: auto; /* Bootstrap's ml-auto, pushes nav to the right */
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+body.app-style1 .app-style1-navbar .app-style1-nav .nav-link,
 body.app-style1 .app-style1-navbar .navbar-nav .nav-link {
   color: #f8f9fa !important;
   font-size: 1rem;
 }
 
-body.app-style1 .app-style1-navbar .nav-link:hover,
+body.app-style1 .app-style1-navbar .navbar-brand:hover,
+body.app-style1 .app-style1-navbar .app-style1-nav .nav-link:hover,
 body.app-style1 .app-style1-navbar .navbar-nav .nav-link:hover {
   color: #14f742 !important;
 }
@@ -62,6 +70,17 @@ body.app-style1 .app-style1-navbar .dropdown-item:focus {
   color: #222;
 }
 
+body.app-style1 .app-style1-toggle-theme-btn {
+  margin-left: 0.5rem;
+  color: #14f742;
+  background: transparent;
+  border: 1px solid #14f742;
+  transition: background 0.2s, color 0.2s;
+}
+body.app-style1 .app-style1-toggle-theme-btn:hover {
+  background: #14f742;
+  color: #0a0a0a;
+}
 /* NavigationBar Styling - END */
 /* Footer style - START */
 body.app-style1 .app-style1-footer {
