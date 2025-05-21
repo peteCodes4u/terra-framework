@@ -1,5 +1,5 @@
 // Import Booking model
-const { Booking } = require("../models");
+const { Booking } = require('../models');
 
 // Establish CRUD methods for bookings
 module.exports = {
