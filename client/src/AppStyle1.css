@@ -129,7 +129,6 @@ body.app-style1 .footer-copyright {
   color: #f8f9fa;
 }
 /* Footer style - END */
-
 /* Popup window settings START */
 .custom-popup-overlay {
   position: fixed;
@@ -141,7 +140,6 @@ body.app-style1 .footer-copyright {
   justify-content: center;
 }
 
-/* Popup window: white, rounded, shadow, no bottom padding */
 body.app-style1 .custom-popup-window {
   background: #fff;
   border-radius: 0.5rem;
@@ -158,7 +156,6 @@ body.app-style1 .custom-popup-window {
   flex-direction: column;
 }
 
-/* Close button: top right, Bootstrap style */
 body.app-style1 .custom-popup-close {
   position: absolute;
   top: 0.75rem;
@@ -175,7 +172,6 @@ body.app-style1 .custom-popup-close:hover {
   to { opacity: 1; transform: scale(1);}
 }
 
-/* Popup Header: as before */
 body.app-style1 .custom-popup-header {
   border-bottom: 1px solid #dee2e6;
   padding: 0.75rem 1.5rem;
@@ -187,7 +183,6 @@ body.app-style1 .custom-popup-header {
   border-top-right-radius: 0.5rem;
 }
 
-/* Popup Body: add only side padding and bottom padding if you want space */
 body.app-style1 .custom-popup-body {
   padding: 0 1.5rem 1.5rem 1.5rem;
   flex: 1 1 auto;
@@ -196,5 +191,6 @@ body.app-style1 .custom-popup-body {
 body.app-style1 .custom-popup-body .btn:last-child {
   margin-bottom: 0;
 }
+/* Popup window settings END */
 
 
