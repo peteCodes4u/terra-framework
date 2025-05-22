@@ -51,7 +51,7 @@ body.app-style4 .app-style4-navbar .navbar-nav .nav-link {
 body.app-style4 .app-style4-navbar .navbar-brand:hover,
 body.app-style4 .app-style4-navbar .app-style4-nav .nav-link:hover,
 body.app-style4 .app-style4-navbar .navbar-nav .nav-link:hover {
-  color: #14f742 !important;
+  color: #f714be !important;
 }
 
 body.app-style4 .app-style4-navbar .dropdown-menu {
@@ -119,14 +119,14 @@ body.app-style4 .footer-social .nav-link {
 }
 
 body.app-style4 .footer-social .nav-link:hover {
-  color: #14f742;
+  color: #f714be;
 }
 
 body.app-style4 .footer-copyright {
   margin-left: 1rem;
   white-space: nowrap;
   font-size: 1rem;
-  color: #f8f9fa;
+  color: #f714be;
 }
 /* Footer style - END */
 
