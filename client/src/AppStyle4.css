@@ -129,9 +129,8 @@ body.app-style4 .footer-copyright {
   color: #f714be;
 }
 /* Footer style - END */
-
-/* Popup window settings START */
-.custom-popup-overlay {
+/* Login / Signup form settings START */
+.app-style4-popup-overlay {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
   background: rgba(0,0,0,0.5);
@@ -141,8 +140,7 @@ body.app-style4 .footer-copyright {
   justify-content: center;
 }
 
-/* Popup window: white, rounded, shadow, no bottom padding */
-body.app-style4 .custom-popup-window {
+body.app-style4 .app-style4-popup-window {
   background: #fff;
   border-radius: 0.5rem;
   box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
@@ -158,15 +156,15 @@ body.app-style4 .custom-popup-window {
   flex-direction: column;
 }
 
-/* Close button: top right, Bootstrap style */
-body.app-style4 .custom-popup-close {
+body.app-style4 .app-style4-popup-close {
   position: absolute;
   top: 0.75rem;
   right: 1.25rem;
   z-index: 10;
 
 }
-body.app-style4 .custom-popup-close:hover {
+
+body.app-style4 .app-style4-popup-close:hover {
   color: #f50707;
 }
 
@@ -175,8 +173,7 @@ body.app-style4 .custom-popup-close:hover {
   to { opacity: 1; transform: scale(1);}
 }
 
-/* Popup Header: as before */
-body.app-style4 .custom-popup-header {
+body.app-style4 .app-style4-popup-header {
   border-bottom: 1px solid #dee2e6;
   padding: 0.75rem 1.5rem;
   margin-bottom: 1.5rem;
@@ -187,14 +184,13 @@ body.app-style4 .custom-popup-header {
   border-top-right-radius: 0.5rem;
 }
 
-/* Popup Body: add only side padding and bottom padding if you want space */
-body.app-style4 .custom-popup-body {
+body.app-style4 .app-style4-popup-body {
   padding: 0 1.5rem 1.5rem 1.5rem;
   flex: 1 1 auto;
 }
 
-body.app-style4 .custom-popup-body .btn:last-child {
+body.app-style4 .app-style4-popup-body .btn:last-child {
   margin-bottom: 0;
 }
-
+/* Login / Signup Form settings END */
 
