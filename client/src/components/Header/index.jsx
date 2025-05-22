@@ -5,7 +5,7 @@ import NavigationBar from '../NavigationBar';
 export default function Header({ toggleStylesheet, activeStyle, setActiveStyle }) {
 
     return (
-        <header className="app-style1-header">
+        <header className={`${activeStyle}-header`}>
             <NavigationBar
                 toggleStylesheet={toggleStylesheet}
                 activeStyle={activeStyle}
