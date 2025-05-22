@@ -6,7 +6,10 @@ export default function Login() {
   return (
     <div className="custom-popup-overlay">
       <div className="custom-popup-window">
-        <LoginForm handleModalClose={() => navigate("/")} />
+        <LoginForm
+          activeStyle={activeStyle}
+          handleModalClose={() => navigate("/")}
+        />
       </div>
     </div>
   );
