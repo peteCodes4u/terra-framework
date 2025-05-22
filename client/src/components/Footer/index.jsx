@@ -1,5 +1,3 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
 import {
   Container,
   Navbar,
@@ -12,8 +10,6 @@ import {
 } from "react-bootstrap";
 // React icons that display social media icons and links
 import { FaFacebook, FaTwitter, FaInstagram } from "react-icons/fa";
-
-import React from "react";
 
 const AppFooter = () => {
   return (
