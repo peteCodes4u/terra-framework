@@ -10,10 +10,16 @@ export default function StyleToggler({ activeStyle, setActiveStyle }) {
     ];
 
     return (
-        <NavDropdown title="Theme" id="theme-dropdown" className="ms-2">
+        <NavDropdown
+            title="Theme"
+            id="theme-dropdown"
+            className={`ms-2 ${activeStyle}-theme-dropdown`}
+            menuVariant={activeStyle === "app-style2" ? "light" : "dark"} // optional: dynamic Bootstrap variant
+        >
             {availableStyles.map(style => (
                 <NavDropdown.Item
                     key={style.value}
+                    className={`${activeStyle}-theme-item`}
                     active={activeStyle === style.value}
                     onClick={() => setActiveStyle(style.value)}
                 >
