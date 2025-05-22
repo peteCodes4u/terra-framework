@@ -130,7 +130,7 @@ body.app-style1 .footer-copyright {
 }
 /* Footer style - END */
 /* Popup window settings START */
-.custom-popup-overlay {
+.app-style1-popup-overlay {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
   background: rgba(0,0,0,0.5);
@@ -140,7 +140,7 @@ body.app-style1 .footer-copyright {
   justify-content: center;
 }
 
-body.app-style1 .custom-popup-window {
+body.app-style1 .app-style1-popup-window {
   background: #fff;
   border-radius: 0.5rem;
   box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
@@ -156,14 +156,14 @@ body.app-style1 .custom-popup-window {
   flex-direction: column;
 }
 
-body.app-style1 .custom-popup-close {
+body.app-style1 .app-style1-popup-close {
   position: absolute;
   top: 0.75rem;
   right: 1.25rem;
   z-index: 10;
 
 }
-body.app-style1 .custom-popup-close:hover {
+body.app-style1 .app-style1-popup-close:hover {
   color: #f50707;
 }
 
@@ -172,7 +172,7 @@ body.app-style1 .custom-popup-close:hover {
   to { opacity: 1; transform: scale(1);}
 }
 
-body.app-style1 .custom-popup-header {
+body.app-style1 .app-style1-popup-header {
   border-bottom: 1px solid #dee2e6;
   padding: 0.75rem 1.5rem;
   margin-bottom: 1.5rem;
@@ -183,12 +183,12 @@ body.app-style1 .custom-popup-header {
   border-top-right-radius: 0.5rem;
 }
 
-body.app-style1 .custom-popup-body {
+body.app-style1 .app-style1-popup-body {
   padding: 0 1.5rem 1.5rem 1.5rem;
   flex: 1 1 auto;
 }
 
-body.app-style1 .custom-popup-body .btn:last-child {
+body.app-style1 .app-style1-popup-body .btn:last-child {
   margin-bottom: 0;
 }
 /* Popup window settings END */

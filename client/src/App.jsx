@@ -17,6 +17,7 @@ import { Outlet } from "react-router-dom";
 // import navbar component
 import Footer from "./components/Footer";
 import Header from "./components/Header";
+import { StyleContext } from "./StyleContext";
 
 // define the main app component
 function App() {
@@ -30,14 +31,14 @@ function App() {
   }, [activeStyle]);
 
   return (
-    <>
+    <StyleContext.Provider value={{ activeStyle, setActiveStyle }}>
       <Header
         activeStyle={activeStyle}
         setActiveStyle={setActiveStyle}
       />
       <Outlet />
       <Footer activeStyle={activeStyle}/>
-    </>
+    </StyleContext.Provider>
   );
 }
 
