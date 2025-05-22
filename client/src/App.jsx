@@ -19,9 +19,7 @@ import Header from "./components/Header";
 // define the main app component
 function App() {
   // Initialize state with the saved style from localStorage or default to true
-  const [activeStyle, setActiveStyle] = useState(() => {
-    return localStorage.getItem("selectedStyle") || "app-style1";
-  });
+  const [activeStyle, setActiveStyle] = useState(() => localStorage.getItem("selectedStyle") || "app-style1");
 
   // Apply the class to the body element and save the style in localStorage
   useEffect(() => {
@@ -32,8 +30,8 @@ function App() {
   return (
     <>
       <Header
-        isStyle1Active={activeStyle === "app-style1"}
-        setIsStyle1Active={(isStyle1Active) => setActiveStyle(isStyle1Active ? "app-style1" : "app-style2")}
+        activeStyle={activeStyle}
+        setActiveStyle={setActiveStyle}
       />
       <Outlet />
       <Footer />
