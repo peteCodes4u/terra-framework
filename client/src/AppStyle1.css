@@ -129,7 +129,7 @@ body.app-style1 .footer-copyright {
   color: #f8f9fa;
 }
 /* Footer style - END */
-/* Popup window settings START */
+/* Login / Signup Form settings START */
 .app-style1-popup-overlay {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
@@ -163,6 +163,7 @@ body.app-style1 .app-style1-popup-close {
   z-index: 10;
 
 }
+
 body.app-style1 .app-style1-popup-close:hover {
   color: #f50707;
 }
@@ -191,6 +192,6 @@ body.app-style1 .app-style1-popup-body {
 body.app-style1 .app-style1-popup-body .btn:last-child {
   margin-bottom: 0;
 }
-/* Popup window settings END */
+/* Login / Signup Form settings END */
 
 

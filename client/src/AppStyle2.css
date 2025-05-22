@@ -129,7 +129,7 @@ body.app-style2 .footer-copyright {
   color: #222;
 }
 /* Footer style - END */
-/* Popup window settings START */
+/* Login / Signup form settings START */
 body.app-style2 .custom-popup-overlay {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
@@ -191,5 +191,5 @@ body.app-style2 .custom-popup-body {
 body.app-style2 .custom-popup-body .btn:last-child {
   margin-bottom: 0;
 }
-/* Popup window settings END */
+/* Login / Signup form settings END */
 
