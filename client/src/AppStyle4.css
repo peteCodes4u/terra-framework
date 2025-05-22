@@ -142,7 +142,7 @@ body.app-style4 .footer-copyright {
 }
 
 /* Popup window: white, rounded, shadow, no bottom padding */
-body.app-style4 .custom-popup-window {
+body.app-style4 .app-style4-popup-window {
   background: #fff;
   border-radius: 0.5rem;
   box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
@@ -176,7 +176,7 @@ body.app-style4 .custom-popup-close:hover {
 }
 
 /* Popup Header: as before */
-body.app-style4 .custom-popup-header {
+body.app-style4 .app-style4-popup-header {
   border-bottom: 1px solid #dee2e6;
   padding: 0.75rem 1.5rem;
   margin-bottom: 1.5rem;
@@ -188,12 +188,12 @@ body.app-style4 .custom-popup-header {
 }
 
 /* Popup Body: add only side padding and bottom padding if you want space */
-body.app-style4 .custom-popup-body {
+body.app-style4 .app-style4-popup-body {
   padding: 0 1.5rem 1.5rem 1.5rem;
   flex: 1 1 auto;
 }
 
-body.app-style4 .custom-popup-body .btn:last-child {
+body.app-style4 .app-style4-popup-body .btn:last-child {
   margin-bottom: 0;
 }
 
