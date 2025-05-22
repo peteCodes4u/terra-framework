@@ -4,7 +4,7 @@ import { Form, Button, Alert } from 'react-bootstrap';
 import { createUser } from '../../utils/API';
 import Auth from '../../utils/auth';
 
-const SignupForm = ({ handleModalClose }) => {
+const SignupForm = ({ handleModalClose, activeStyle }) => {
   // set initial form state
   const [userFormData, setUserFormData] = useState({ username: '', email: '', password: '' });
   // set state for form validation
@@ -52,19 +52,19 @@ const SignupForm = ({ handleModalClose }) => {
   };
 
   return (
-    <div className="custom-popup-window">
-      <div className='custom-popup-header d-flex align-items-center justify-content-between mb-3'>
-        <h4 className='mb-0'>Sign Up</h4>
-        {typeof handleModalClose === 'function' && (
+    <div className={`${activeStyle}-popup-window`}>
+      <div className={`${activeStyle}-popup-header d-flex align-items-center justify-content-between mb-3`}>
+        <h4 className="mb-0">Sign Up</h4>
+        {typeof handleModalClose === "function" && (
           <button
-            type='button'
-            className='btn-close'
-            aria-label='Close'
+            type="button"
+            className="btn-close"
+            aria-label="Close"
             onClick={handleModalClose}
           ></button>
         )}
-        </div>
-      <div className='custom-popup-body'>
+      </div>
+      <div className={`${activeStyle}-popup-body`}>
         <Form noValidate validated={validated} onSubmit={handleFormSubmit}>
           {/* show alert if server response is bad */}
           <Alert dismissible onClose={() => setShowAlert(false)} show={showAlert} variant='danger'>
