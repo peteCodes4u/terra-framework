@@ -10,7 +10,7 @@ body.app-style4 h3 {
 }
 
 body.app-style4 .navbar {
-  background-color: #5c0ce7;
+  background: radial-gradient(circle, #5c0ce7 0%, #14f742 100%);
 }
 /* MAIN APP STYLE - END */
 /* Header Style - Start */
