@@ -4,7 +4,7 @@ import { Form, Button, Alert } from "react-bootstrap";
 import { loginUser } from "../../utils/API";
 import Auth from "../../utils/auth";
 
-const LoginForm = ({ handleModalClose, activeStyle }) => {
+const LoginForm = ({ handleModalClose }) => {
   const [userFormData, setUserFormData] = useState({ email: "", password: "" });
   const [validated] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
@@ -47,8 +47,8 @@ const LoginForm = ({ handleModalClose, activeStyle }) => {
   };
 
   return (
-    <div className={`${activeStyle}-popup-window`}>
-      <div className={`${activeStyle}-popup-header d-flex align-items-center justify-content-between mb-3`}>
+    <div className="custom-popup-window">
+      <div className="custom-popup-header d-flex align-items-center justify-content-between mb-3">
         <h4 className="mb-0">Login</h4>
         {typeof handleModalClose === "function" && (
           <button
@@ -59,7 +59,7 @@ const LoginForm = ({ handleModalClose, activeStyle }) => {
           ></button>
         )}
       </div>
-      <div className={`${activeStyle}-popup-body`}>
+      <div className="custom-popup-body">
         <Form noValidate validated={validated} onSubmit={handleFormSubmit}>
           <Alert
             dismissible
