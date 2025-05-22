@@ -8,6 +8,7 @@ import {
 
 import Auth from "../../utils/auth";
 import "../../../src/AppStyle1.css";
+import StyleToggler from "../StyleToggler";
 
 // this is the navigation bar component
 export default function NavigationBar({ activeStyle, setActiveStyle }) {
@@ -47,17 +48,11 @@ export default function NavigationBar({ activeStyle, setActiveStyle }) {
               )}
             </NavDropdown>
             {isProfilePage && (
-              <NavDropdown title="Theme" id="theme-dropdown" className="ms-2">
-                {availableStyles.map(style => (
-                  <NavDropdown.Item
-                    key={style.value}
-                    active={activeStyle === style.value}
-                    onClick={() => setActiveStyle(style.value)}
-                  >
-                    {style.label}
-                  </NavDropdown.Item>
-                ))}
-              </NavDropdown>
+              <StyleToggler
+                activeStyle={activeStyle}
+                setActiveStyle={setActiveStyle}
+                availableStyles={availableStyles}
+              />
             )}
           </Nav>
         </Navbar.Collapse>

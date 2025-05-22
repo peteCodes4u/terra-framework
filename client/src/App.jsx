@@ -6,6 +6,8 @@ import { useEffect, useState } from "react";
 // import styling
 import "./AppStyle1.css";
 import './AppStyle2.css';
+import "./AppStyle3.css";
+import "./AppStyle4.css";
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
