@@ -31,14 +31,12 @@ function App() {
     localStorage.setItem("selectedStyle", selectedStyle);
   }, [isStyle1Active]);
 
-  // Function to toggle the active stylesheet
-  const toggleStylesheet = () => {
-    setIsStyle1Active(!isStyle1Active);
-  };
-
   return (
     <>
-      <Header  toggleStylesheet={toggleStylesheet} />
+      <Header
+        isStyle1Active={isStyle1Active}
+        setIsStyle1Active={setIsStyle1Active}
+      />
       <Outlet />
       <Footer />
     </>
