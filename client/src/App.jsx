@@ -36,7 +36,7 @@ function App() {
         setActiveStyle={setActiveStyle}
       />
       <Outlet />
-      <Footer activeStyle={activeStyle} />
+      <Footer />
     </>
   );
 }

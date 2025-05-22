@@ -10,9 +10,9 @@ import {
 } from "react-bootstrap";
 import { FaFacebook, FaTwitter, FaInstagram } from "react-icons/fa";
 
-export default function AppFooter({ activeStyle }) {
+export default function AppFooter() {
   return (
-    <footer className={`${activeStyle}-footer`}>
+    <footer className="app-style1-footer">
       <Navbar className="footer-navbar">
         <Container fluid>
           <Row className="w-100 align-items-center">
