@@ -7,7 +7,6 @@ import {
 } from "react-bootstrap";
 
 import Auth from "../../utils/auth";
-import "../../../src/AppStyle1.css";
 import StyleToggler from "../StyleToggler";
 
 // this is the navigation bar component
@@ -15,14 +14,6 @@ export default function NavigationBar({ activeStyle, setActiveStyle }) {
   const location = useLocation();
   const isProfilePage = /^\/profile\/[^/]+$/.test(location.pathname);
   const userId = Auth.loggedIn() ? Auth.getProfile().data._id : null;
-
-  // List all available styles here
-  const availableStyles = [
-    { label: "Style 1", value: "app-style1" },
-    { label: "Style 2", value: "app-style2" },
-    { label: "Style 3", value: "app-style3" },
-    // Add more as needed
-  ];
 
   return (
     <Navbar id="navbar" expand="lg" className={`${activeStyle}-navbar`}>
@@ -51,7 +42,6 @@ export default function NavigationBar({ activeStyle, setActiveStyle }) {
               <StyleToggler
                 activeStyle={activeStyle}
                 setActiveStyle={setActiveStyle}
-                availableStyles={availableStyles}
               />
             )}
           </Nav>
