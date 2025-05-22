@@ -15,6 +15,12 @@ export default function NavigationBar({ isStyle1Active, setIsStyle1Active }) {
   const isProfilePage = /^\/profile\/[^/]+$/.test(location.pathname);
   const userId = Auth.loggedIn() ? Auth.getProfile().data._id : null;
 
+  const availableStyles = [
+    { label: "Style 1", value: "app-style1" },
+    { label: "Style 2", value: "app-style2" },
+    // Add more styles here as needed
+  ];
+
   return (
     <>
       <Navbar id="navbar" expand="lg" className={isStyle1Active ? "app-style1-navbar" : "app-style2-navbar"}>
@@ -41,18 +47,15 @@ export default function NavigationBar({ isStyle1Active, setIsStyle1Active }) {
               </NavDropdown>
               {isProfilePage && (
                 <NavDropdown title="Theme" id="theme-dropdown" className="ms-2">
-                  <NavDropdown.Item
-                    active={isStyle1Active}
-                    onClick={() => setIsStyle1Active(true)}
-                  >
-                    Style 1
-                  </NavDropdown.Item>
-                  <NavDropdown.Item
-                    active={!isStyle1Active}
-                    onClick={() => setIsStyle1Active(false)}
-                  >
-                    Style 2
-                  </NavDropdown.Item>
+                  {availableStyles.map(style => (
+                    <NavDropdown.Item
+                      key={style.value}
+                      active={isStyle1Active ? style.value === "app-style1" : style.value === "app-style2"}
+                      onClick={() => setIsStyle1Active(style.value === "app-style1")}
+                    >
+                      {style.label}
+                    </NavDropdown.Item>
+                  ))}
                 </NavDropdown>
               )}
             </Nav>
