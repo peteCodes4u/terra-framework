@@ -186,4 +186,15 @@ body.app-style3 .app-style3-popup-body .btn:last-child {
   margin-bottom: 0;
 }
 /* Login / Signup form settings END */
+/* Page1 styles - START */
+body.app-style3 .app-style3-page1 {
+  background: #3f063a;
+  min-height: 25vh;
+}
+
+body.app-style3 .app-style3-page1 h1 {
+  color: #0d6efd;
+}
+/* Page1 styles - END */
+
 
