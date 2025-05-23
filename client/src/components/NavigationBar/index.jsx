@@ -49,4 +49,4 @@ export default function NavigationBar({ activeStyle, setActiveStyle }) {
       </Container>
     </Navbar>
   );
-}
+};
