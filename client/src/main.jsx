@@ -15,6 +15,7 @@ import Page1 from './pages/Page1.jsx'
 import Login from './pages/Login.jsx'
 import Signup from './pages/Signup.jsx'
 import ProfilePage from './pages/ProfilePage.jsx'
+import ErrorPage from './pages/ErrorPage.jsx'
 
 // create the router
 const router = createBrowserRouter([
@@ -26,7 +27,7 @@ const router = createBrowserRouter([
       </>
     ),
 
-    errorElement: <h1 className='display-2'>Wrong page!</h1>,
+    errorElement: <ErrorPage />,
     // define the routes for the different pages
     children: [
       {
