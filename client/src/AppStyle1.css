@@ -36,7 +36,7 @@ body.app-style1 .app-style1-navbar .navbar-brand {
 }
 
 body.app-style1 .app-style1-navbar .app-style1-nav {
-  margin-left: auto; /* Bootstrap's ml-auto, pushes nav to the right */
+  margin-left: auto;
   display: flex;
   justify-content: flex-end;
   width: 100%;
