@@ -130,10 +130,10 @@ body.app-style4 .footer-copyright {
 }
 /* Footer style - END */
 /* Login / Signup form settings START */
-.app-style4-popup-overlay {
+body.app-style4 .app-style4-popup-overlay {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0,0,0,0.7);
   z-index: 1050;
   display: flex;
   align-items: center;
@@ -143,11 +143,11 @@ body.app-style4 .footer-copyright {
 body.app-style4 .app-style4-popup-window {
   background: #fff;
   border-radius: 0.5rem;
-  box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
+  box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.25);
   width: 100%;
-  max-width: 400px;      
-  min-width: 300px;      
-  max-height: 90vh;      
+  max-width: 400px;
+  min-width: 300px;
+  max-height: 90vh;
   padding: 0;
   overflow-y: auto;
   position: relative;
@@ -161,16 +161,9 @@ body.app-style4 .app-style4-popup-close {
   top: 0.75rem;
   right: 1.25rem;
   z-index: 10;
-
 }
-
 body.app-style4 .app-style4-popup-close:hover {
-  color: #f50707;
-}
-
-@keyframes fadeInScale {
-  from { opacity: 0; transform: scale(0.95);}
-  to { opacity: 1; transform: scale(1);}
+  color: #f714be;
 }
 
 body.app-style4 .app-style4-popup-header {
@@ -178,8 +171,8 @@ body.app-style4 .app-style4-popup-header {
   padding: 0.75rem 1.5rem;
   margin-bottom: 1.5rem;
   min-height: 2.5rem;
-  color: #dee2e6;
-  background-color: #0d6efd;
+  color: #f714be;
+  background-color: #fff;
   border-top-left-radius: 0.5rem;
   border-top-right-radius: 0.5rem;
 }
