@@ -36,43 +36,29 @@ const router = createBrowserRouter([
         <App />
       </>
     ),
-
+    // leverage error handling in react-router
     errorElement: <ErrorPage />,
-    // define the routes for the different pages
+    // define the routes for pages
     children: [
       {
-        // define the route for the home page (currently the same as the page1 page)
+        // define the route for the home page (currently page1 page)
         index: true,
-        element: <Page1 />,
-      },
-      {
-        // define the route for the page1 page
-<<<<<<< HEAD
-        path: "/page1",
-        element: <Page1 />,
-      },
-      // define the route for the profile page
-      {
-        path: "/profile/:id",
-        element: <ProfilePage />,
-      },
-      {
-        path: "/booking",
-        element: <BookingPage />,
-      },
-    ],
-  },
-=======
+        element: <Page1 />
+      }, {
+        // page1 
         path: '/page1',
         element: <Page1 />
       },
-      // define the route for the profile page
+      // profile page
       {
         path: '/profile/:id',
         element: <ProfilePage />
-      }, {
+      }, 
+      // login and signup routes
+      {
         path: '/login',
         element: <Page1 />,
+        // nested routes for login and signup
         children: [
           {
             index: true,
