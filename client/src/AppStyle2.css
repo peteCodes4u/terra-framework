@@ -196,4 +196,21 @@ body.app-style2 .app-style2-page1 h1 {
   color: #0d6efd;
 }
 /* Page1 styles - END */
+/* Profile Page styles - START */
+body.app-style2 .app-style2-profile-page {
+  background: #0d0d0d;
+  text-align: center;
+  min-height: 25vh;
+  padding: 2rem 0;
+}
 
+body.app-style2 .app-style2-profile-page h1 {
+  color: #0d6efd;
+  margin-bottom: 1rem;
+}
+
+body.app-style2 .app-style2-profile-page p {
+  color: #ef0c0c;
+  font-size: 1.2rem;
+}
+/* Profile Page styles - END */
