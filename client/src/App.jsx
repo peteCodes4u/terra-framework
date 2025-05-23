@@ -9,19 +9,23 @@ import './AppStyle2.css';
 import "./AppStyle3.css";
 import "./AppStyle4.css";
 
+// import the context for managing styles
+import { StyleContext } from "./StyleContext";
+
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 // Outlet is used to render nested routes
 import { Outlet } from "react-router-dom";
 
-// import navbar component
+// import components
 import Footer from "./components/Footer";
 import Header from "./components/Header";
-import { StyleContext } from "./StyleContext";
+
+
 
 // define the main app component
-function App() {
-  // Initialize state with the saved style from localStorage or default to true
+export default function App() { 
+    // Initialize state with the saved style from localStorage or default to true
   const [activeStyle, setActiveStyle] = useState(() => localStorage.getItem("selectedStyle") || "app-style1");
 
   // Apply the class to the body element and save the style in localStorage
@@ -40,6 +44,4 @@ function App() {
       <Footer activeStyle={activeStyle}/>
     </StyleContext.Provider>
   );
-}
-
-export default App;
+};
