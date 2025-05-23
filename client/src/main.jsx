@@ -76,7 +76,7 @@ const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: < Login />
+            element: <Login />
           }
         ]
       }, {
@@ -85,7 +85,7 @@ const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: < Signup />
+            element: <Signup />
           }
         ]
       }
