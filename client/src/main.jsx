@@ -15,6 +15,7 @@ import Page1 from './pages/Page1.jsx'
 import Login from './pages/Login.jsx'
 import Signup from './pages/Signup.jsx'
 import ProfilePage from './pages/ProfilePage.jsx'
+import ErrorPage from './pages/ErrorPage.jsx'
 
 // create the router
 const router = createBrowserRouter([
@@ -25,30 +26,33 @@ const router = createBrowserRouter([
         <App />
       </>
     ),
-
-    errorElement: <h1 className='display-2'>Wrong page!</h1>,
-    // define the routes for the different pages
+    // leverage error handling in react-router
+    errorElement: <ErrorPage />,
+    // define the routes for pages
     children: [
       {
-        // define the route for the home page (currently the same as the page1 page)
+        // define the route for the home page (currently page1 page)
         index: true,
         element: <Page1 />
       }, {
-        // define the route for the page1 page
+        // page1 
         path: '/page1',
         element: <Page1 />
       },
-      // define the route for the profile page
+      // profile page
       {
         path: '/profile/:id',
         element: <ProfilePage />
-      }, {
+      }, 
+      // login and signup routes
+      {
         path: '/login',
         element: <Page1 />,
+        // nested routes for login and signup
         children: [
           {
             index: true,
-            element: < Login />
+            element: <Login />
           }
         ]
       }, {
@@ -57,7 +61,7 @@ const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: < Signup />
+            element: <Signup />
           }
         ]
       }

@@ -1,26 +1,26 @@
 /* MAIN APP STYLE - START */
-body.app-style1 {
+body.app-style4 {
   font-family: 'Rubik', sans-serif;
 }
 
-body.app-style1 h1,
-body.app-style1 h2,
-body.app-style1 h3 {
+body.app-style4 h1,
+body.app-style4 h2,
+body.app-style4 h3 {
   font-family: 'Rubik Mono One', sans-serif;
 }
 
-body.app-style1 .navbar {
-  background-color: #0a0a0a;
+body.app-style4 .navbar {
+  background: radial-gradient(circle, #5c0ce7 0%, #14f742 100%);
 }
 /* MAIN APP STYLE - END */
 /* Header Style - Start */
-body.app-style1 .app-style1-header {
+body.app-style4 .app-style4-header {
   text-align: center;
   font-size: 1rem;
 }
 /* Header Style - END */
 /* NavigationBar Style - START */
-body.app-style1 .app-style1-navbar {
+body.app-style4 .app-style4-navbar {
   background-color: #0a0a0a;
   color: #f8f9fa;
   border-bottom: 1px solid #343a40;
@@ -29,67 +29,67 @@ body.app-style1 .app-style1-navbar {
   padding-right: 1rem;
 }
 
-body.app-style1 .app-style1-navbar .navbar-brand {
+body.app-style4 .app-style4-navbar .navbar-brand {
   color: #f8f9fa !important;
   font-family:  sans-serif, 'Rubik Mono One';
   font-size: 1.25rem;
 }
 
-body.app-style1 .app-style1-navbar .app-style1-nav {
+body.app-style4 .app-style4-navbar .app-style4-nav {
   margin-left: auto;
   display: flex;
   justify-content: flex-end;
   width: 100%;
 }
 
-body.app-style1 .app-style1-navbar .app-style1-nav .nav-link,
-body.app-style1 .app-style1-navbar .navbar-nav .nav-link {
+body.app-style4 .app-style4-navbar .app-style4-nav .nav-link,
+body.app-style4 .app-style4-navbar .navbar-nav .nav-link {
   color: #f8f9fa !important;
   font-size: 1rem;
 }
 
-body.app-style1 .app-style1-navbar .navbar-brand:hover,
-body.app-style1 .app-style1-navbar .app-style1-nav .nav-link:hover,
-body.app-style1 .app-style1-navbar .navbar-nav .nav-link:hover {
-  color: #14f742 !important;
+body.app-style4 .app-style4-navbar .navbar-brand:hover,
+body.app-style4 .app-style4-navbar .app-style4-nav .nav-link:hover,
+body.app-style4 .app-style4-navbar .navbar-nav .nav-link:hover {
+  color: #f714be !important;
 }
 
-body.app-style1 .app-style1-navbar .dropdown-menu {
+body.app-style4 .app-style4-navbar .dropdown-menu {
   background-color: #222;
   color: #f8f9fa;
 }
 
-body.app-style1 .app-style1-navbar .dropdown-item {
+body.app-style4 .app-style4-navbar .dropdown-item {
   color: #f8f9fa;
 }
 
-body.app-style1 .app-style1-navbar .dropdown-item:hover,
-body.app-style1 .app-style1-navbar .dropdown-item:focus {
+body.app-style4 .app-style4-navbar .dropdown-item:hover,
+body.app-style4 .app-style4-navbar .dropdown-item:focus {
   background-color: #14f742;
   color: #222;
 }
 
-body.app-style1 .app-style1-toggle-theme-btn {
+body.app-style4 .app-style4-toggle-theme-btn {
   margin-left: 0.5rem;
   color: #14f742;
   background: transparent;
   border: 1px solid #14f742;
   transition: background 0.2s, color 0.2s;
 }
-body.app-style1 .app-style1-toggle-theme-btn:hover {
+body.app-style4 .app-style4-toggle-theme-btn:hover {
   background: #14f742;
   color: #0a0a0a;
 }
 /* NavigationBar Styling - END */
 /* Footer style - START */
-body.app-style1 .app-style1-footer {
+body.app-style4 .app-style4-footer {
   background-color: #0b0b0b;   
   color: #f8f9fa;              
   text-align: center;
   font-size: 1rem;
 }
 
-body.app-style1 .footer-navbar {
+body.app-style4 .footer-navbar {
   min-height: 56px;
   padding-top: 0;
   padding-bottom: 0;
@@ -97,40 +97,40 @@ body.app-style1 .footer-navbar {
   align-items: center;
 }
 
-body.app-style1 .footer-search .form-control {
+body.app-style4 .footer-search .form-control {
   margin-right: 0.5rem;
 }
 
-body.app-style1 .footer-right {
+body.app-style4 .footer-right {
   display: flex !important;
   align-items: center;
   justify-content: flex-end;
 }
 
-body.app-style1 .footer-social {
+body.app-style4 .footer-social {
   display: flex;
   align-items: center;
 }
 
-body.app-style1 .footer-social .nav-link {
+body.app-style4 .footer-social .nav-link {
   color: #f8f9fa;
   font-size: 1.5rem;
   margin: 0 0.25rem;
 }
 
-body.app-style1 .footer-social .nav-link:hover {
-  color: #14f742;
+body.app-style4 .footer-social .nav-link:hover {
+  color: #f714be;
 }
 
-body.app-style1 .footer-copyright {
+body.app-style4 .footer-copyright {
   margin-left: 1rem;
   white-space: nowrap;
   font-size: 1rem;
-  color: #f8f9fa;
+  color: #f714be;
 }
 /* Footer style - END */
-/* Login / Signup Form settings START */
-body.app-style1 .app-style1-popup-overlay {
+/* Login / Signup form settings START */
+body.app-style4 .app-style4-popup-overlay {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
   background: rgba(0,0,0,0.7);
@@ -140,7 +140,7 @@ body.app-style1 .app-style1-popup-overlay {
   justify-content: center;
 }
 
-body.app-style1 .app-style1-popup-window {
+body.app-style4 .app-style4-popup-window {
   background: #fff;
   border-radius: 0.5rem;
   box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.25);
@@ -156,67 +156,65 @@ body.app-style1 .app-style1-popup-window {
   flex-direction: column;
 }
 
-body.app-style1 .app-style1-popup-close {
+body.app-style4 .app-style4-popup-close {
   position: absolute;
   top: 0.75rem;
   right: 1.25rem;
   z-index: 10;
-
+}
+body.app-style4 .app-style4-popup-close:hover {
+  color: #f714be;
 }
 
-body.app-style1 .app-style1-popup-close:hover {
-  color: #f50707;
-}
-
-@keyframes fadeInScale {
-  from { opacity: 0; transform: scale(0.95);}
-  to { opacity: 1; transform: scale(1);}
-}
-
-body.app-style1 .app-style1-popup-header {
+body.app-style4 .app-style4-popup-header {
   border-bottom: 1px solid #dee2e6;
   padding: 0.75rem 1.5rem;
   margin-bottom: 1.5rem;
   min-height: 2.5rem;
-  color: #dee2e6;
-  background-color: #0d6efd;
+  color: #f714be;
+  background-color: #fff;
+  border-top-left-radius: 0.5rem;
+  border-top-right-radius: 0.5rem;
 }
 
-body.app-style1 .app-style1-popup-body {
+body.app-style4 .app-style4-popup-body {
   padding: 0 1.5rem 1.5rem 1.5rem;
   flex: 1 1 auto;
 }
 
-body.app-style1 .app-style1-popup-body .btn:last-child {
+body.app-style4 .app-style4-popup-body .btn:last-child {
   margin-bottom: 0;
 }
 /* Login / Signup Form settings END */
+/* Login / Signup form settings END */
 /* Page1 styles - START */
-body.app-style1 .app-style1-page1 {
-  background: #f8f9fa;
+body.app-style4 .app-style4-page1 {
+  background: #c795c3;
   min-height: 25vh;
 }
 
-body.app-style1 .app-style1-page1 h1 {
+body.app-style4 .app-style4-page1 h1 {
   color: #0d6efd;
 }
 /* Page1 styles - END */
 /* Profile Page styles - START */
-body.app-style1 .app-style1-profile-page {
-  background: #f8f9fa;
+body.app-style4 .app-style4-profile-page {
+  background: #faafec;
   text-align: center;
   min-height: 25vh;
   padding: 2rem 0;
 }
 
-body.app-style1 .app-style1-profile-page h1 {
+body.app-style4 .app-style4-profile-page h1 {
   color: #0d6efd;
   margin-bottom: 1rem;
 }
 
-body.app-style1 .app-style1-profile-page p {
-  color: #222;
+body.app-style4 .app-style4-profile-page p {
+  color: #ef0c0c;
   font-size: 1.2rem;
 }
 /* Profile Page styles - END */
+
+
 
