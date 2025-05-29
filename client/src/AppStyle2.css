@@ -1,9 +1,4 @@
 /* MAIN APP STYLE - START */
-body.app-style2 .small {
-  font-weight: 300;
-  font-style: italic;
-}
-
 body.app-style2 {
   font-family: 'Permanent Marker', sans-serif;
 }
@@ -15,30 +10,145 @@ body.app-style2 h3 {
 }
 
 body.app-style2 .navbar {
-  background-color: #14f742;
+  background-color: #1b1081;
 }
 /* MAIN APP STYLE - END */
-/* Popup window settings START */
-/* Overlay: dark background, centered content */
-.custom-popup-overlay {
+/* Header Style - Start */
+body.app-style2 .app-style2-header {
+  text-align: center;
+  font-size: 1rem;
+}
+/* Header Style - END */
+/* NavigationBar Style - START */
+body.app-style2 .app-style2-navbar {
+  background-color: #14f742;
+  color: #222;
+  border-bottom: 1px solid #343a40;
+  min-height: 56px;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+body.app-style2 .app-style2-navbar .navbar-brand {
+  color: #222 !important;
+  font-family: 'Permanent Marker', sans-serif;
+  font-size: 1.25rem;
+}
+
+body.app-style2 .app-style2-navbar .app-style2-nav {
+  margin-left: auto;
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+body.app-style2 .app-style2-navbar .app-style2-nav .nav-link,
+body.app-style2 .app-style2-navbar .navbar-nav .nav-link {
+  color: #222 !important;
+  font-size: 1rem;
+}
+
+body.app-style2 .app-style2-navbar .navbar-brand:hover,
+body.app-style2 .app-style2-navbar .app-style2-nav .nav-link:hover,
+body.app-style2 .app-style2-navbar .navbar-nav .nav-link:hover {
+  color: #f211b2 !important;
+}
+
+body.app-style2 .app-style2-navbar .dropdown-menu {
+  background-color: #fff;
+  color: #222;
+}
+
+body.app-style2 .app-style2-navbar .dropdown-item {
+  color: #222;
+}
+
+body.app-style2 .app-style2-navbar .dropdown-item:hover,
+body.app-style2 .app-style2-navbar .dropdown-item:focus {
+  background-color: #0a0a0a;
+  color: #14f742;
+}
+
+body.app-style2 .app-style2-toggle-theme-btn {
+  margin-left: 0.5rem;
+  color: #0a0a0a;
+  background: transparent;
+  border: 1px solid #0a0a0a;
+  transition: background 0.2s, color 0.2s;
+}
+body.app-style2 .app-style2-toggle-theme-btn:hover {
+  background: #0a0a0a;
+  color: #14f742;
+}
+/* NavigationBar Styling - END */
+/* Footer style - START */
+body.app-style2 .app-style2-footer {
+  background-color: #fff;
+  color: #222;
+  text-align: center;
+  font-size: 1rem;
+}
+
+body.app-style2 .footer-navbar {
+  min-height: 56px;
+  padding-top: 0;
+  padding-bottom: 0;
+  display: flex;
+  align-items: center;
+}
+
+body.app-style2 .footer-search .form-control {
+  margin-right: 0.5rem;
+}
+
+body.app-style2 .footer-right {
+  display: flex !important;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+body.app-style2 .footer-social {
+  display: flex;
+  align-items: center;
+}
+
+body.app-style2 .footer-social .nav-link {
+  color: #e979de;
+  font-size: 1.5rem;
+  margin: 0 0.25rem;
+}
+
+body.app-style2 .footer-social .nav-link:hover {
+  color: #14f742;
+}
+
+body.app-style2 .footer-copyright {
+  margin-left: 1rem;
+  white-space: nowrap;
+  font-size: 1rem;
+  color: #e979de;
+}
+/* Footer style - END */
+/* Login / Signup Form settings START */
+body.app-style2 .app-style2-popup-overlay {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0,0,0,0.7);
   z-index: 1050;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-/* Popup window: white, rounded, shadow, no bottom padding */
-.custom-popup-window {
+body.app-style2 .app-style2-popup-window {
   background: #fff;
   border-radius: 0.5rem;
-  box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
-  padding: 0; /* Remove all padding here */
-  min-width: 350px;
-  max-width: 95vw;
+  box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.25);
+  width: 100%;
+  max-width: 400px;
+  min-width: 300px;
   max-height: 90vh;
+  padding: 0;
   overflow-y: auto;
   position: relative;
   animation: fadeInScale 0.2s;
@@ -46,43 +156,61 @@ body.app-style2 .navbar {
   flex-direction: column;
 }
 
-/* Close button: top right, Bootstrap style */
-.custom-popup-close {
+body.app-style2 .app-style2-popup-close {
   position: absolute;
   top: 0.75rem;
   right: 1.25rem;
   z-index: 10;
-
 }
-.custom-popup-close:hover {
-  color: #f50707;
-}
-
-/* Optional: mimic Bootstrap's modal fade-in */
-@keyframes fadeInScale {
-  from { opacity: 0; transform: scale(0.95);}
-  to { opacity: 1; transform: scale(1);}
+body.app-style2 .app-style2-popup-close:hover {
+  color: #14f742;
 }
 
-/* Header: as before */
-.custom-popup-header {
-  border-bottom: 1px solid #dee2e6;
+body.app-style2 .app-style2-popup-header {
+  border-bottom: 1px solid #444;
   padding: 0.75rem 1.5rem;
   margin-bottom: 1.5rem;
   min-height: 2.5rem;
-  color: #dee2e6;
-  background-color: #0d6efd;
+  color: #222;
+  background-color: #14f742;
   border-top-left-radius: 0.5rem;
   border-top-right-radius: 0.5rem;
 }
 
-/* Body: add only side padding and bottom padding if you want space */
-.custom-popup-body {
+body.app-style2 .app-style2-popup-body {
   padding: 0 1.5rem 1.5rem 1.5rem;
   flex: 1 1 auto;
 }
 
-.custom-popup-body .btn:last-child {
+body.app-style2 .app-style2-popup-body .btn:last-child {
   margin-bottom: 0;
 }
-/* Popup window settings END */
+/* Login / Signup Form settings END */
+/* Page1 styles - START */
+body.app-style2 .app-style2-page1 {
+  background: #e979de;
+  min-height: 25vh;
+}
+
+body.app-style2 .app-style2-page1 h1 {
+  color: #0d6efd;
+}
+/* Page1 styles - END */
+/* Profile Page styles - START */
+body.app-style2 .app-style2-profile-page {
+  background: #0d0d0d;
+  text-align: center;
+  min-height: 25vh;
+  padding: 2rem 0;
+}
+
+body.app-style2 .app-style2-profile-page h1 {
+  color: #0d6efd;
+  margin-bottom: 1rem;
+}
+
+body.app-style2 .app-style2-profile-page p {
+  color: #ef0c0c;
+  font-size: 1.2rem;
+}
+/* Profile Page styles - END */

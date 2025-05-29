@@ -1,5 +1,9 @@
-// react components
-// import { useState, useEffect } from 'react';
+// outlet
+import { Outlet } from "react-router-dom";
+// Styling context used for importing context to use the active style. Context is a way to
+// share data between components without having to pass props down manually at every level.
+// This is useful for theming, as it allows us to change the style of the entire app
+import { useStyle } from "../StyleContext";
 
 // Bootstrap Components
 import {
@@ -7,16 +11,12 @@ import {
   Card,
   Col,
   Row,
-  //   add additional bootstrap components here when ready
-  //   Form,
-  //   Button,
-
-  //   Row
 } from "react-bootstrap";
 
-const PageOne = () => {
+const Page1 = () => {
+  const { activeStyle } = useStyle();
   return (
-    <>
+    <div className={`${activeStyle}-page1`}>
       <main className="py-2">
         <Container className="text-center">
           <h1 className="py-2">Terra Framework </h1>
@@ -57,8 +57,9 @@ const PageOne = () => {
           </Row>
         </Container>
       </main>
-    </>
+      <Outlet />
+    </div>
   );
 };
 
-export default PageOne;
+export default Page1;

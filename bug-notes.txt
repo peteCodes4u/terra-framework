@@ -1,7 +1,0 @@
-This bug was resolvd by adding the missing and needed dependency for dotenv.
-Without the installation of dotenv the environment variables could not be read from the .env file and thusly the JWTSECRET was not included in requests.
-This issue caused a downstream impact in the createUser function indicating the token signing failed.
-The token signing fails when the secret value was being passed as NULL. 
-This issue was resolved with the following steps:
-1. Install dotenv package to the SERVER folder via NPM
-2. ENSURE a .env file is included in the SERVER folder with a JWTSECRET value included in the file.
