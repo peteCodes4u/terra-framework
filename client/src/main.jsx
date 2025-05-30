@@ -11,9 +11,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 
 // import the App component and the Page1 component
 import App from './App.jsx'
-import Page1 from "./pages/Page1";
-import ProfilePage from "./pages/ProfilePage.jsx";
-import BookingPage from "./pages/BookingPage.jsx";
+import BookingPage from './pages/BookingPage.jsx';
 import Page1 from './pages/Page1.jsx'
 import Login from './pages/Login.jsx'
 import Signup from './pages/Signup.jsx'
