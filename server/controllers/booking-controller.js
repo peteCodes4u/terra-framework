@@ -12,13 +12,23 @@ module.exports = {
       res.status(500).json(err);
     }
   },
-  // Get all bookings
-  async getAllBookings(req, res) {
+  // Get user by id or email
+  async getOneBooking({ name = null, params }, res) {
     try {
-      const bookings = await Booking.find();
-      res.status(200).json(bookings);
+      const foundBooking = await Booking.findOne({
+        $or: [
+          { _id: name ? name._id : params.id }
+
+        ],
+      });
+      if (!foundBooking) {
+        return res.status(400).json({
+          message: "Sorry this booking doesn't exist in our records",
+        });
+      }
+      res.json(foundBooking);
     } catch (err) {
-      res.status(500).json(err);
+      res.status(500).json({ message: "internal server error" });
     }
   },
   //   Delete a booking
