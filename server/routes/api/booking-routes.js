@@ -20,3 +20,5 @@ router
     .route('/:id')
     .put(authMiddleware, updateBooking)
     .delete(authMiddleware, deleteBooking);
+
+module.exports = router;
