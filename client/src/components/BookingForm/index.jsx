@@ -1,7 +1,7 @@
 export default function BookingForm() {
   return (
     <div className="booking-form">
-      <h2>Booking Form</h2>
+      <h2>Booking</h2>
       <form>
         <label htmlFor="name">Name:</label>
         <input type="text" id="name" name="name" required />
