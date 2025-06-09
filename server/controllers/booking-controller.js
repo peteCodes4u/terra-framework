@@ -7,7 +7,7 @@ module.exports = {
   async createBooking(req, res) {
     try {
       const booking = await Booking.create(req.body);
-      res.status(201).json(booking);
+      res.status(200).json(booking);
     } catch (err) {
       res.status(500).json(err);
     }

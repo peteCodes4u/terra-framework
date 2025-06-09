@@ -19,19 +19,25 @@ const userSchema = new Schema(
             type: String,
             required: true,
         },
+        bookings: [
+            {
+                type: Schema.Types.ObjectId,
+                ref: 'Booking',
+            },
+        ],
     },
 
     // set to use virtuals if needed
     {
         toJSON: {
             virtuals: true,
-        }    
+        }
     }
 );
 
 // password hashing
-userSchema.pre('save', async function(next) {
-    if(this.isNew || this.isModified('password')) {
+userSchema.pre('save', async function (next) {
+    if (this.isNew || this.isModified('password')) {
         const saltRounds = 10;
         this.password = await bcrypt.hash(this.password, saltRounds);
     }
