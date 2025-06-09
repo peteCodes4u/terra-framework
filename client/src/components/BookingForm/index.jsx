@@ -20,7 +20,7 @@ export default function BookingForm() {
   // handle form submission
   const handleSubmit = async (event) => {
     event.preventDefault();
-    const response = await fetch('/api/bookings', {
+    const response = await fetch('/api/booking', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
