@@ -1,4 +1,4 @@
-const { Schema, model } = require("mongoose");
+const { Schema, model } = require('mongoose');
 
 // Model will have name, email, date, and time fields
 
@@ -30,5 +30,5 @@ const bookingSchema = new Schema(
   }
 );
 
-const Booking = model("Booking", bookingSchema);
+const Booking = model('Booking', bookingSchema);
 module.exports = Booking;
