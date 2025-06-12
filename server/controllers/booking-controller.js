@@ -1,6 +1,8 @@
 // Import Booking model
 const { Booking } = require("../models");
 
+const { signToken } = require("../utils/auth");
+
 // Establish CRUD methods for bookings
 module.exports = {
   // Create a new booking
@@ -11,6 +13,8 @@ module.exports = {
     } catch (err) {
       res.status(500).json(err);
     }
+    const token = signToken(booking);
+    res.json({ token, booking });
   },
   // Get user by id or email
   async getOneBooking({ name = null, params }, res) {
