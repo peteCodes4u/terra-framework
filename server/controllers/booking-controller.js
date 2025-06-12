@@ -7,11 +7,13 @@ const { signToken } = require("../utils/auth");
 module.exports = {
   // Create a new booking
   async createBooking(req, res) {
-    try {
-      const booking = await Booking.create(req.body);
-      res.status(200).json(booking);
-    } catch (err) {
-      res.status(500).json(err);
+    const booking = await Booking.create(req.body);
+
+    if (!booking) {
+      return res.status(400).console.log(json({
+        message: "Something went wrong - could not create booking, please try again",
+      }));
+
     }
     const token = signToken(booking);
     res.json({ token, booking });
