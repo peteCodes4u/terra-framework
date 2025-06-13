@@ -34,3 +34,13 @@ export const loginUser = (userData) => {
   });
 };
 
+// rout to book an appointment
+export const createBooking = (bookingData) => {
+  return fetch("/api/booking", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(bookingData),
+  });
+};

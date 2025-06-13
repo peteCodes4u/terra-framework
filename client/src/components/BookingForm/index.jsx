@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Form, Button, Alert } from 'react-bootstrap';
-
+import { createBooking } from '../../utils/API';
 // import { createBooking } from '../../utils/API';
 import Auth from '../../utils/auth';
 
@@ -37,37 +37,13 @@ export default function BookingForm() {
       event.preventDefault();
       event.stopPropagation();
     }
-    // try to create booking
-    try {
-      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/booking`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
 
-      if (!response.ok) {
-        throw new Error('Booking Couldnt be created!');
-      }
-      const { token } = await response.json();
-      if (token && typeof token === 'string') {
-        Auth.login(token);
-      } else {
-        throw new Error('Invalid token received!');
-      }
-
-      if (!token || !booking) {
-        throw new Error('Invalid response data: Missing token or booking.');
-      }
-
-      setErrorMessage(err.message);
-
-    } catch (err) {
-      console.error(err);
-      setShowAlert(true);
-    }
-    // reset form data
+    const response = await createBooking(formData);
+    if (!response.ok) {
+      const errorText = await response.text();
+      setErrorMessage(`Booking could not be created: ${errorText}`);
+      return;
+    };
 
     setFormData({
       name: '',

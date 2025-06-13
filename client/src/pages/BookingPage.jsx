@@ -9,9 +9,7 @@ export default function BookingPage() {
         Please book your consultation with us and we will get back to you!
       </h4>
       <br />
-      <form>
         <BookingForm />
-      </form>
     </>
   );
 }
