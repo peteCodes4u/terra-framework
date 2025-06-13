@@ -18,6 +18,7 @@ module.exports = {
     const token = signToken(booking);
     res.json({ token, booking });
   },
+
   // Get user by id or email
   async getOneBooking({ name = null, params }, res) {
     try {
