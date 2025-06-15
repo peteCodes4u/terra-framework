@@ -34,7 +34,7 @@ export const loginUser = (userData) => {
   });
 };
 
-// rout to book an appointment
+// route to book an appointment
 export const createBooking = (bookingData) => {
   return fetch("/api/booking", {
     method: "POST",
