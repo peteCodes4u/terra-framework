@@ -1,9 +1,6 @@
 import { useState } from 'react';
 import { Form, Button, Alert } from 'react-bootstrap';
 import { createBooking } from '../../utils/API';
-// import { createBooking } from '../../utils/API';
-import Auth from '../../utils/auth';
-
 
 /**
  * BookingForm Component
