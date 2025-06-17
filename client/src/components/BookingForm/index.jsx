@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Form, Button, Alert } from 'react-bootstrap';
 import { createBooking } from '../../utils/API';
-
+import { BookingTile } from '../BookingTile';
 /**
  * BookingForm Component
  * This component renders a form for users to book an appointment.
