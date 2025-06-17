@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Form, Button, Alert } from 'react-bootstrap';
 import { createBooking } from '../../utils/API';
-import { BookingTile } from '../BookingTile';
+import BookingTile from '../BookingTile';
+
 /**
  * BookingForm Component
  * This component renders a form for users to book an appointment.
@@ -16,8 +17,10 @@ export default function BookingForm() {
     date: '',
     time: ''
   });
+  // set state for booking
+  const [booking, setBooking] = useState(null);
   const [validated] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
+  // const [errorMessage, setErrorMessage] = useState('');
   // handle input change
   const handleInputChange = (event) => {
     const { name, value } = event.target;
@@ -33,25 +36,26 @@ export default function BookingForm() {
     if (form.checkValidity() === false) {
       event.preventDefault();
       event.stopPropagation();
-    }
-
-    const response = await createBooking(formData);
-    if (!response.ok) {
-      const errorText = await response.text();
-      setErrorMessage(`Booking could not be created: ${errorText}`);
       return;
-    };
-
-    setFormData({
-      name: '',
-      email: '',
-      date: '',
-      time: ''
-    });
+    }
+    try {
+      const data = await createBooking(formData);
+      setBooking(data.booking || data);
+    } catch (err) {
+      alert("Booking failed! Please try again.");
+    }
   };
+
+  setFormData({
+    name: '',
+    email: '',
+    date: '',
+    time: ''
+  });
+
   return (
     <div className="booking-form">
-      {errorMessage && <Alert variant="danger">{errorMessage}</Alert>}
+      {/* {errorMessage && <Alert variant="danger">{errorMessage}</Alert>} */}
       <Form onSubmit={handleSubmit}>
         <div className="form-group">
           <label htmlFor="name">Name:</label>
@@ -99,6 +103,7 @@ export default function BookingForm() {
         </div>
         <Button type="submit">Book Now</Button>
       </Form>
+      {booking && <BookingTile booking={booking} />}
     </div>
   );
 }
