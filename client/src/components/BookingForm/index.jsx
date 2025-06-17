@@ -24,8 +24,12 @@ export default function BookingForm() {
   // handle input change
   const handleInputChange = (event) => {
     const { name, value } = event.target;
-    setFormData({ ...formData, [name]: value });
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
+
   // set state for form validation
   // Removed redundant handleChange function
   // handle form submission
