@@ -43,7 +43,9 @@ export default function BookingForm() {
       return;
     }
     try {
-      const data = await createBooking(formData);
+      const response = await createBooking(formData);
+      if (!response.ok) throw new Error("Booking failed");
+      const data = await response.json();
       setBooking(data.booking || data);
       // Reset the form fields after successful submission
       setFormData({ name: '', email: '', date: '', time: '' });
