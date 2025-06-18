@@ -10,13 +10,7 @@ import BookingTile from '../BookingTile';
  * by sending the data to the server. It also provides validation and error handling.
  */
 export default function BookingForm() {
-  // set form state
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    date: '',
-    time: ''
-  });
+
   // set state for booking
   const [booking, setBooking] = useState(null);
   const [validated] = useState(false);
@@ -31,6 +25,12 @@ export default function BookingForm() {
   };
 
   // set state for form validation
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    date: '',
+    time: ''
+  });
   // Removed redundant handleChange function
   // handle form submission
   const handleSubmit = async (event) => {
@@ -45,22 +45,17 @@ export default function BookingForm() {
     try {
       const data = await createBooking(formData);
       setBooking(data.booking || data);
+      // Reset the form fields after successful submission
+      setFormData({ name: '', email: '', date: '', time: '' });
     } catch (err) {
       alert("Booking failed! Please try again.");
     }
   };
 
-  setFormData({
-    name: '',
-    email: '',
-    date: '',
-    time: ''
-  });
-
   return (
     <div className="booking-form">
       {/* {errorMessage && <Alert variant="danger">{errorMessage}</Alert>} */}
-      <Form onSubmit={handleSubmit}>
+      <Form onSubmit={console.log(handleSubmit)}>
         <div className="form-group">
           <label htmlFor="name">Name:</label>
           <input
@@ -71,6 +66,7 @@ export default function BookingForm() {
             value={formData.name}
             onChange={handleInputChange}
           />
+
         </div>
         <div className="form-group">
           <label htmlFor="email">Email:</label>
