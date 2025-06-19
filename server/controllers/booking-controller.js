@@ -19,6 +19,19 @@ module.exports = {
     res.json({ token, booking });
   },
 
+  // get all bookings
+  async getAllBookings(req, res) {
+    try {
+      const bookings = await Booking.find({});
+      if (!bookings || bookings.length === 0) {
+        return res.status(404).json({ message: "No bookings found" });
+      }
+      res.json(bookings);
+    } catch (err) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  },
+
   // Get user by id or email
   async getOneBooking({ name = null, params }, res) {
     try {

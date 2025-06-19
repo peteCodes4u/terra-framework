@@ -11,7 +11,7 @@ const {
 const { authMiddleware } = require('../../utils/auth');
 
 // update (METHOD = put) authMiddleware to send a token for verification on API requests
-router.route("/").post(createUser).put(authMiddleware);
+router.route("/signup").post(createUser).put(authMiddleware);
 
 router.route("/login").post(login);
 
