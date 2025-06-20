@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Form, Button } from 'react-bootstrap';
 import { createBooking } from '../../utils/API';
 import { getAllBookings } from '../../utils/API';
@@ -24,8 +24,24 @@ export default function BookingForm() {
       [name]: value,
     }));
   };
+  // fetch all bookings when user creates a booking
+  const fetchBookings = async () => {
+    try {
+      const response = await getAllBookings();
+      if (!response.ok) throw new Error('Failed to get bookings');
+      const data = await response.json();
+      setBookings(data);
+      // error handling with message
+    } catch (error) {
+      return res.status(400).json({ message: "Failed to fetch bookings" });
+    }
+  };
 
-  // set state for form validation
+  useEffect(() => {
+    fetchBookings();
+  }, []); // Empty dependency array to run only once on mount
+
+  // set state for form validation outside of handler to prevent React Infinite Loop
   const [formData, setFormData] = useState({
     name: '',
     email: '',
