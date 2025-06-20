@@ -12,10 +12,10 @@ import { getAllBookings } from '../../utils/API';
  */
 export default function BookingForm() {
 
-  // set state for booking
+  // set state for booking and bookings
   const [booking, setBooking] = useState(null);
-  const [validated] = useState(false);
-  // const [errorMessage, setErrorMessage] = useState('');
+  const [bookings, setBookings] = useState([]);
+
   // handle input change
   const handleInputChange = (event) => {
     const { name, value } = event.target;
