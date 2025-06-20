@@ -54,3 +54,12 @@ export const getAllBookings = (token) => {
     },
   });
 };
+// route to get a single booking
+// export const getOneBooking = (token) => {
+//   return fetch("/api/booking/me", {
+//     headers: {
+//       "Content-Type": "application/json",
+//       authorization: `Bearer ${token}`,
+//     },
+//   });
+// };

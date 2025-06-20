@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Form, Button } from 'react-bootstrap';
 import { createBooking } from '../../utils/API';
 import { getAllBookings } from '../../utils/API';
-// import BookingTile from '../BookingTile';
+import Auth from '../../utils/auth';
 
 /**
  * BookingForm Component
@@ -27,13 +27,14 @@ export default function BookingForm() {
   // fetch all bookings when user creates a booking
   const fetchBookings = async () => {
     try {
-      const response = await getAllBookings();
+      const token = Auth.getToken();
+      const response = await getAllBookings(token);
       if (!response.ok) throw new Error('Failed to get bookings');
       const data = await response.json();
       setBookings(data);
       // error handling with message
     } catch (error) {
-      return res.status(400).json({ message: "Failed to fetch bookings" });
+      console.error("Failed to fetch bookings", error);
     }
   };
 
@@ -121,8 +122,9 @@ export default function BookingForm() {
             value={formData.time}
             onChange={handleInputChange}
           />
+          <Button type="submit">Book Now</Button>
         </div>
-        <Button type="submit">Book Now</Button>
+
       </Form>
       {/* Map function used to render the bookings list */}
       <div>

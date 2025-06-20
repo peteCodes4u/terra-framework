@@ -15,8 +15,6 @@ router.route('/').post(createBooking).put(authMiddleware);
 // Get all bookings
 router.route('/').get(authMiddleware, getAllBookings);
 
-// router.route('me').get(authMiddleware, getOneBooking);
-
 // Update and Delete Bookings
 router
     .route('/:id')
