@@ -44,3 +44,13 @@ export const createBooking = (bookingData) => {
     body: JSON.stringify(bookingData),
   });
 };
+
+// route to get all bookings
+export const getAllBookings = (token) => {
+  return fetch("/api/booking", {
+    headers: {
+      "Content-Type": "application/json",
+      authorization: `Bearer ${token}`,
+    },
+  });
+};

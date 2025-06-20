@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { Form, Button, Alert } from 'react-bootstrap';
+import { Form, Button } from 'react-bootstrap';
 import { createBooking } from '../../utils/API';
-import BookingTile from '../BookingTile';
+import { getAllBookings } from '../../utils/API';
+// import BookingTile from '../BookingTile';
 
 /**
  * BookingForm Component
@@ -57,7 +58,7 @@ export default function BookingForm() {
   return (
     <div className="booking-form">
       {/* {errorMessage && <Alert variant="danger">{errorMessage}</Alert>} */}
-      <Form onSubmit={console.log(handleSubmit)}>
+      <Form onSubmit={handleSubmit}>
         <div className="form-group">
           <label htmlFor="name">Name:</label>
           <input
@@ -105,7 +106,7 @@ export default function BookingForm() {
         </div>
         <Button type="submit">Book Now</Button>
       </Form>
-      {booking && <BookingTile booking={booking} />}
+      {/* {booking && <BookingTile booking={booking} />} */}
     </div>
   );
 }

@@ -18,26 +18,39 @@ module.exports = {
     const token = signToken(booking);
     res.json({ token, booking });
   },
-
-  // Get user by id or email
-  async getOneBooking({ name = null, params }, res) {
+  // Need to update this route to get all bookings
+  // Get all bookings
+  async getAllBookings(req, res) {
     try {
-      const foundBooking = await Booking.findOne({
-        $or: [
-          { _id: name ? name._id : params.id }
-
-        ],
-      });
-      if (!foundBooking) {
-        return res.status(400).json({
-          message: "Sorry this booking doesn't exist in our records",
-        });
+      const bookings = await Booking.find({});
+      if (!bookings || bookings.length === 0) {
+        return res.status(404).json({ message: "No bookings found" });
       }
-      res.json(foundBooking);
+      res.json(bookings);
     } catch (err) {
-      res.status(500).json({ message: "internal server error" });
+      console.error(err);
+      res.status(500).json({ message: "Internal server error" });
     }
   },
+  // Get user by id or email
+  // async getOneBooking({ name = null, params }, res) {
+  //     try {
+  //       const foundBooking = await Booking.findOne({
+  //         $or: [
+  //           { _id: name ? name._id : params.id }
+
+  //         ],
+  //       });
+  //       if (!foundBooking) {
+  //         return res.status(400).json({
+  //           message: "Sorry this booking doesn't exist in our records",
+  //         });
+  //       }
+  //       res.json(foundBooking);
+  //     } catch (err) {
+  //       res.status(500).json({ message: "internal server error" });
+  //     }
+  //   },
   //   Delete a booking
   async deleteBooking(req, res) {
     try {

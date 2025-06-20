@@ -3,7 +3,7 @@ const router = require('express').Router();
 // Import Booking functionality from controller to establish route with CRUD functions
 const {
     createBooking,
-    getOneBooking,
+    getAllBookings,
     deleteBooking,
     updateBooking
 } = require('../../controllers/booking-controller');
@@ -12,8 +12,10 @@ const {
 const { authMiddleware } = require('../../utils/auth');
 
 router.route('/').post(createBooking).put(authMiddleware);
+// Get all bookings
+router.route('/').get(authMiddleware, getAllBookings);
 
-router.route('me').get(authMiddleware, getOneBooking);
+// router.route('me').get(authMiddleware, getOneBooking);
 
 // Update and Delete Bookings
 router
