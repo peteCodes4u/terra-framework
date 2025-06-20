@@ -124,7 +124,16 @@ export default function BookingForm() {
         </div>
         <Button type="submit">Book Now</Button>
       </Form>
-      {/* {booking && <BookingTile booking={booking} />} */}
+      {/* Map function used to render the bookings list */}
+      <div>
+        {bookings.map((b) => (
+          <div key={b._id || b.date + b.time}>
+            <p>Date: {b.date} </p>
+            <p>Time: {b.time}</p>
+          </div>
+        ))}
+      </div>
     </div>
+
   );
 }
