@@ -66,6 +66,8 @@ export default function BookingForm() {
       setBooking(data.booking || data);
       // Reset the form fields after successful submission
       setFormData({ name: '', email: '', date: '', time: '' });
+      await fetchBookings(); // Refresh bookings after creating a new one
+      alert("Booking successful!");
     } catch (err) {
       alert("Booking failed! Please try again.");
     }
