@@ -126,12 +126,12 @@ export default function BookingForm() {
         </div>
 
       </Form>
-      {/* Map function used to render the bookings list */}
+      {/* Map function used to render all bookings list, we want to render only the bookings that the user chooses */}
       <div>
-        {bookings.map((b) => (
-          <div key={b._id || b.date + b.time}>
-            <p>Date: {b.date} </p>
-            <p>Time: {b.time}</p>
+        {(Array.isArray(bookings) ? bookings : []).map((b, idx) => (
+          <div key={b?._id || (b?.date && b?.time ? b.date + b.time : idx)}>
+            <p>Date: {b?.date || 'N/A'} </p>
+            <p>Time: {b?.time || 'N/A'}</p>
           </div>
         ))}
       </div>
