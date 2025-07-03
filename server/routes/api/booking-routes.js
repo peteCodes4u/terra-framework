@@ -11,9 +11,10 @@ const {
 // import needed middleware from utils/auth
 const { authMiddleware } = require('../../utils/auth');
 
-router.route('/').post(createBooking).put(authMiddleware);
-// Get all bookings
-router.route('/').get(authMiddleware, getAllBookings);
+// create and get Bookings
+// POST to create a booking and GET to retrieve all bookings
+router.route('/').post(createBooking, authMiddleware).get(authMiddleware, getAllBookings);
+
 
 // Update and Delete Bookings
 router
