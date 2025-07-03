@@ -7,18 +7,19 @@ const { signToken } = require("../utils/auth");
 module.exports = {
   // Create a new booking
   async createBooking(req, res) {
-    const booking = await Booking.create(req.body);
+    try {
+      const booking = await Booking.create({
+        ...req.body,
+        user: req.user._id, // Attach user ID from auth middleware 
+      });
+      res.status(200).json(booking);
 
-    if (!booking) {
-      return res.status(400).console.log(json({
-        message: "Something went wrong - could not create booking, please try again",
-      }));
-
+    } catch (err) {
+      res.status(500).json({ message: "Server error", error: err.message });
     }
-    const token = signToken(booking);
-    res.json({ token, booking });
-  },
-  // Need to update this route to get all bookings
+
+
+  }
   // Get all bookings
   async getAllBookings(context) {
 
