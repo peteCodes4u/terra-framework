@@ -5,6 +5,8 @@ import ReactDOM from "react-dom/client";
 
 // import the createBrowserRouter and RouterProvider components from react-router-dom
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+// import the BookingsProvider to provide booking context to the app
+import { BookingsProvider } from "./context/BookingsContext.jsx";
 
 // import the bootstrap css file
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -76,5 +78,11 @@ const router = createBrowserRouter([
 ]);
 // render the app
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <RouterProvider router={router} />
+  // wrap the App component with BookingsProvider to provide booking context
+  // and render the router using RouterProvider
+  // this allows the app to access booking data and manage bookings state
+  <BookingsProvider>
+    <App />
+    <RouterProvider router={router} />
+  </BookingsProvider>
 );
