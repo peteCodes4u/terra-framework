@@ -14,7 +14,7 @@ export default function BookingForm() {
 
   // set state for booking and bookings
   const [booking, setBooking] = useState(null);
-  const [bookings, setBookings] = useState([]);
+  const [bookings, setBookings] = useBookings();
 
   // handle input change
   const handleInputChange = (event) => {

@@ -35,11 +35,12 @@ export const loginUser = (userData) => {
 };
 
 // route to book an appointment
-export const createBooking = (bookingData) => {
+export const createBooking = (bookingData, token) => {
   return fetch("/api/booking", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(bookingData),
   });
@@ -54,12 +55,3 @@ export const getAllBookings = (token) => {
     },
   });
 };
-// route to get a single booking
-// export const getOneBooking = (token) => {
-//   return fetch("/api/booking/me", {
-//     headers: {
-//       "Content-Type": "application/json",
-//       authorization: `Bearer ${token}`,
-//     },
-//   });
-// };
