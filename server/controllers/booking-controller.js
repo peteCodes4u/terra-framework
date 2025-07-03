@@ -20,7 +20,7 @@ module.exports = {
   },
   // Need to update this route to get all bookings
   // Get all bookings
-  async getAllBookings(req, res) {
+  async getAllBookings(context) {
 
     try {
       const bookings = await Booking.find({});

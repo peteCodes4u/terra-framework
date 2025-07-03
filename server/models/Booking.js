@@ -21,6 +21,11 @@ const bookingSchema = new Schema(
       type: String,
       required: true,
     },
+    user: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: true, // Ensure that a booking is always associated with a user
+    }
   },
   // set to use virtuals if needed
   {
