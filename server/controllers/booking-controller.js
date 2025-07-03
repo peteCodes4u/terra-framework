@@ -19,42 +19,18 @@ module.exports = {
     }
 
 
-  }
+  },
   // Get all bookings
-  async getAllBookings(context) {
-
+  async getAllBookings(req, res) {
     try {
-      const bookings = await Booking.find({});
-      if (!bookings || bookings.length === 0) {
-        return res.status(404).json({ message: "No bookings found" });
-      }
+      const bookings = await Booking.find({ user: req.user._id });
       res.json(bookings);
     } catch (err) {
       console.error(err);
       res.status(500).json({ message: "Internal server error" });
     }
-    // const token = signToken(bookings);
-    // res.json({ token, bookings });
-  },
-  // Get user by id or email
-  // async getOneBooking({ name = null, params }, res) {
-  //   try {
-  //     const foundBooking = await Booking.findOne({
-  //       $or: [
-  //         { _id: name ? name._id : params.id }
 
-  //       ],
-  //     });
-  //     if (!foundBooking) {
-  //       return res.status(400).json({
-  //         message: "Sorry this booking doesn't exist in our records",
-  //       });
-  //     }
-  //     res.json(foundBooking);
-  //   } catch (err) {
-  //     res.status(500).json({ message: "internal server error" });
-  //   }
-  // },
+  },
   //   Delete a booking
   async deleteBooking(req, res) {
     try {
