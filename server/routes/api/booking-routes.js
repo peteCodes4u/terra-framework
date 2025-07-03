@@ -13,7 +13,7 @@ const { authMiddleware } = require('../../utils/auth');
 
 // create and get Bookings
 // POST to create a booking and GET to retrieve all bookings
-router.route('/').post(createBooking, authMiddleware).get(authMiddleware, getAllBookings);
+router.route('/').post(authMiddleware, createBooking).get(authMiddleware, getAllBookings);
 
 
 // Update and Delete Bookings
