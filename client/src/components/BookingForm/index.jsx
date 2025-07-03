@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Form, Button } from 'react-bootstrap';
-import { createBooking } from '../../utils/API';
-import { getAllBookings } from '../../utils/API';
+import { createBooking, getAllBookings } from '../../utils/API';
+import { useBookings } from '../../context/BookingsContext';
 import Auth from '../../utils/auth';
 
 /**
@@ -53,6 +53,7 @@ export default function BookingForm() {
   // handle form submission
   const handleSubmit = async (event) => {
     event.preventDefault();
+    const token = Auth.getToken();
     // check if form has everything (as per react-bootstrap docs)
     const form = event.currentTarget;
     if (form.checkValidity() === false) {
@@ -61,7 +62,7 @@ export default function BookingForm() {
       return;
     }
     try {
-      const response = await createBooking(formData);
+      const response = await createBooking(formData, token);
       if (!response.ok) throw new Error("Booking failed");
       const data = await response.json();
       setBooking(data.booking || data);
