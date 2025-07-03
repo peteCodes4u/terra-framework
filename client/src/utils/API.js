@@ -35,14 +35,14 @@ export const loginUser = (userData) => {
 };
 
 // route to book an appointment
-export const createBooking = (bookingData, token) => {
+export const createBooking = (formData, token) => {
   return fetch("/api/booking", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify(bookingData),
+    body: JSON.stringify(formData),
   });
 };
 

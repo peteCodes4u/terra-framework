@@ -14,7 +14,7 @@ export default function BookingForm() {
 
   // set state for booking and bookings
   const [booking, setBooking] = useState(null);
-  const [bookings, setBookings] = useBookings();
+  const { bookings, setBookings } = useBookings();
 
   // handle input change
   const handleInputChange = (event) => {
@@ -28,6 +28,10 @@ export default function BookingForm() {
   const fetchBookings = async () => {
     try {
       const token = Auth.getToken();
+      if (!token) {
+        console.warn("No token found, not fetching bookings.");
+        return; // Don't fetch if not logged in
+      }
       const response = await getAllBookings(token);
       if (!response.ok) throw new Error('Failed to get bookings');
       const data = await response.json();
