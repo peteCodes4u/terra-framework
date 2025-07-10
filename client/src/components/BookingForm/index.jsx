@@ -79,6 +79,16 @@ export default function BookingForm() {
     }
   };
 
+  // Function that formats time from 24-hour to 12-hour format
+  function formatTime24to12(time24) {
+    if (!time24) return 'N/A';
+    const [hourStr, minute] = time24.split(':');
+    let hour = parseInt(hourStr, 10);
+    const convert = hour >= 12 ? 'PM' : 'AM';
+    hour = hour % 12 || 12; // Convert 0 to 12 for midnight
+    return `${hour}:${minute} ${convert}`;
+  }
+  // Render the booking form
   return (
     <div className="booking-form">
       {/* {errorMessage && <Alert variant="danger">{errorMessage}</Alert>} */}
@@ -136,7 +146,7 @@ export default function BookingForm() {
         {(Array.isArray(bookings) ? bookings : []).map((b, idx) => (
           <div key={b?._id || (b?.date && b?.time ? b.date + b.time : idx)}>
             <p>Date: {b?.date || 'N/A'} </p>
-            <p>Time: {b?.time || 'N/A'}</p>
+            <p>Time: {formatTime24to12(b?.time) || 'N/A'}</p>
           </div>
         ))}
       </div>
