@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Form, Button } from 'react-bootstrap';
 import { createBooking, getAllBookings } from '../../utils/API';
 import { useBookings } from '../../context/BookingsContext';
+import BookingTile from '../BookingTile';
 import Auth from '../../utils/auth';
 
 /**
@@ -144,10 +145,10 @@ export default function BookingForm() {
       {/* Map function used to render all bookings list, we want to render only the bookings that the user chooses */}
       <div>
         {(Array.isArray(bookings) ? bookings : []).map((b, idx) => (
-          <div key={b?._id || (b?.date && b?.time ? b.date + b.time : idx)}>
+          <BookingTile key={b?._id || (b?.date && b?.time ? b.date + b.time : idx)}>
             <p>Date: {b?.date || 'N/A'} </p>
             <p>Time: {formatTime24to12(b?.time) || 'N/A'}</p>
-          </div>
+          </BookingTile>
         ))}
       </div>
     </div>
