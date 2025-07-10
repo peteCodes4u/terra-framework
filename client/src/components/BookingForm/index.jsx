@@ -80,15 +80,7 @@ export default function BookingForm() {
     }
   };
 
-  // Function that formats time from 24-hour to 12-hour format
-  function formatTime24to12(time24) {
-    if (!time24) return 'N/A';
-    const [hourStr, minute] = time24.split(':');
-    let hour = parseInt(hourStr, 10);
-    const convert = hour >= 12 ? 'PM' : 'AM';
-    hour = hour % 12 || 12; // Convert 0 to 12 for midnight
-    return `${hour}:${minute} ${convert}`;
-  }
+
   // Render the booking form
   return (
     <div className="booking-form">
@@ -144,12 +136,11 @@ export default function BookingForm() {
       </Form>
       {/* Map function used to render all bookings list, we want to render only the bookings that the user chooses */}
       <div>
-        {(Array.isArray(bookings) ? bookings : []).map((b, idx) => (
-          <BookingTile key={b?._id || (b?.date && b?.time ? b.date + b.time : idx)}>
-            <p>Date: {b?.date || 'N/A'} </p>
-            <p>Time: {formatTime24to12(b?.time) || 'N/A'}</p>
-          </BookingTile>
-        ))}
+        {bookings && bookings.length > 0 ? (
+          bookings.map((b) => <BookingTile key={b._id} booking={b} />)
+        ) : (
+          <div>No bookings found.</div>
+        )}
       </div>
     </div>
 
