@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Form, Button } from 'react-bootstrap';
 import { createBooking, getAllBookings } from '../../utils/API';
+import { useStyle } from '../../StyleContext';
 import { useBookings } from '../../context/BookingsContext';
 import BookingTile from '../BookingTile';
 import Auth from '../../utils/auth';
@@ -16,6 +17,7 @@ export default function BookingForm() {
   // set state for booking and bookings
   const [booking, setBooking] = useState(null);
   const { bookings, setBookings } = useBookings();
+  const { activeStyle } = useStyle();
 
   // handle input change
   const handleInputChange = (event) => {
@@ -83,59 +85,61 @@ export default function BookingForm() {
 
   // Render the booking form
   return (
-    <div className="booking-form">
-      {/* {errorMessage && <Alert variant="danger">{errorMessage}</Alert>} */}
-      <Form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label htmlFor="name">Name:</label>
-          <input
-            type="text"
-            id="name"
-            name="name"
-            required
-            value={formData.name}
-            onChange={handleInputChange}
-          />
+    <div className="booking-form-container">
+      <div className="booking-form-left">
+        {/* {errorMessage && <Alert variant="danger">{errorMessage}</Alert>} */}
+        <Form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label htmlFor="name">Name:</label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              required
+              value={formData.name}
+              onChange={handleInputChange}
+            />
 
-        </div>
-        <div className="form-group">
-          <label htmlFor="email">Email:</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            required
-            value={formData.email}
-            onChange={handleInputChange}
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="date">Date:</label>
-          <input
-            type="date"
-            id="date"
-            name="date"
-            required
-            value={formData.date}
-            onChange={handleInputChange}
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="time">Time:</label>
-          <input
-            type="time"
-            id="time"
-            name="time"
-            required
-            value={formData.time}
-            onChange={handleInputChange}
-          />
-          <Button type="submit">Book Now</Button>
-        </div>
+          </div>
+          <div className="form-group">
+            <label htmlFor="email">Email:</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              required
+              value={formData.email}
+              onChange={handleInputChange}
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="date">Date:</label>
+            <input
+              type="date"
+              id="date"
+              name="date"
+              required
+              value={formData.date}
+              onChange={handleInputChange}
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="time">Time:</label>
+            <input
+              type="time"
+              id="time"
+              name="time"
+              required
+              value={formData.time}
+              onChange={handleInputChange}
+            />
+            <Button type="submit">Book Now</Button>
+          </div>
 
-      </Form>
+        </Form>
+      </div>
       {/* Map function used to render all bookings list, we want to render only the bookings that the user chooses */}
-      <div>
+      <div className={`${activeStyle}-booking-tile booking-form-right`}>
         {bookings && bookings.length > 0 ? (
           bookings.map((b) => <BookingTile key={b._id} booking={b} />)
         ) : (

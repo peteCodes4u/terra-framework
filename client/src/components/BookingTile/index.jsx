@@ -1,6 +1,4 @@
 
-
-
 // Function that formats time from 24-hour to 12-hour format
 function formatTime24to12(time24) {
     if (!time24) return 'N/A';

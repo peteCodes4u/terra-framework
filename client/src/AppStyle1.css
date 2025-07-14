@@ -238,3 +238,23 @@ body.app-style1 .app-style1-booking-page p {
 }
 
 /* Booking page ends */
+
+/* Booking Tile starts */
+
+body.app-style1 .booking-form-container {
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-start;
+  gap: 2rem;
+}
+
+body.app-style1 .booking-form-left {
+  flex: 1;
+}
+
+body.app-style1 .booking-form-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
