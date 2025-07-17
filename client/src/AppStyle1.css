@@ -278,6 +278,12 @@ body.app-style1 .booking-form-right .booking-tile {
   transition: box-shadow 0.2s;
 }
 
+body.app-style1 .booking-form-right .booking-tile p {
+  font-size: 1.1rem;
+  color: #222;
+  margin-bottom: 0.5rem 0;
+}
+
 body.app-style1 .booking-form-right .booking-tile:hover {
   box-shadow: 0 6px 24px rgba(0, 0, 0, 0.15);
   border-color: #0d6efd;
