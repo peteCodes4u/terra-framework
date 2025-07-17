@@ -257,7 +257,10 @@ body.app-style1 .booking-form-right {
   flex: 1;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-end;
+  padding-top: 2rem;
+  padding-right: 2rem;
+  min-width: 350px;
 }
 
 body.app-style1 .booking-form-right .booking-tile {
