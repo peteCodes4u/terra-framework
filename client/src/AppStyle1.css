@@ -254,6 +254,13 @@ body.app-style1 .booking-form-left {
 }
 
 body.app-style1 .booking-form-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+body.app-style1 .booking-form-right .booking-tile {
   background: #fff;
   border-radius: 24px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
@@ -265,10 +272,10 @@ body.app-style1 .booking-form-right {
   flex-direction: column;
   align-items: flex-start;
   border: 1px solid #e1e1e1;
-  transition: box-shadow 0.2s ease;
+  transition: box-shadow 0.2s;
 }
 
-body.app-style1 .booking-form-right:hover {
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+body.app-style1 .booking-form-right .booking-tile:hover {
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.15);
   border-color: #0d6efd;
 }
