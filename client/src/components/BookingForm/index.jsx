@@ -140,7 +140,7 @@ export default function BookingForm() {
       </div>
       {/* Map function used to render all bookings list, we want to render only the bookings that the user chooses */}
       <div className={`${activeStyle}-booking-tile booking-form-right`}>
-        <h2>Your Bookings</h2>
+        <h2 style={{ marginBottom: '1rem', color: '#0d6efd' }}>Your Bookings</h2>
         {bookings && bookings.length > 0 ? (
           bookings.map((b) => <BookingTile key={b._id} booking={b} />)
         ) : (
