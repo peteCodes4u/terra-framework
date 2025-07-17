@@ -17,7 +17,7 @@ export default function BookingPage() {
       </p>
 
       <BookingForm />
-      <BookingTile booking={latestBooking} />
+      <BookingTile />
     </div>
   );
 }
