@@ -1,3 +1,4 @@
+import { Button } from 'react-bootstrap';
 
 // Function that formats time from 24-hour to 12-hour format
 function formatTime24to12(time24) {
@@ -22,9 +23,14 @@ export default function BookingTile({ booking }) {
         return <div className="booking-tile">No booking data available.</div>;
     }
     return (
+        // I need to add a update and cancel button nested inside the booking tile
+        // How do I make these buttons functional? Where would that logic go?        
+
         <div className="booking-tile">
             <p>Date: {formatDate(booking.date)}</p>
             <p>Time: {formatTime24to12(booking.time)}</p>
+            <Button variant="primary">Update</Button>
+            <Button variant="danger">Cancel</Button>
         </div>
     );
 }
