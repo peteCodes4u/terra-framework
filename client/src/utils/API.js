@@ -55,3 +55,25 @@ export const getAllBookings = (token) => {
     },
   });
 };
+
+// Route to update a booking by its ID
+export const updateBooking = (bookingId, userData, token) => {
+  return fetch(`/api/booking/${bookingId}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(userData),
+  });
+};
+// Route to delete a booking by its ID
+export const deleteBooking = (bookingId, token) => {
+  return fetch(`/api/booking/${bookingId}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      authorization: `Bearer ${token}`,
+    },
+  });
+};
