@@ -45,6 +45,20 @@ export default function BookingForm() {
     }
   };
 
+  // Handler to delete a booking
+  const handleDeleteBooking = async (bookingId) => {
+    const token = Auth.getToken();
+    await deleteBooking(bookingId, token);
+    fetchBookings(); // Refresh bookings after deletion
+  };
+
+  // Handler to update a booking
+  const handleUpdateBooking = async (bookingId, updatedData) => {
+    const token = Auth.getToken();
+    await updateBooking(bookingId, updatedData, token);
+    fetchBookings(); // Refresh bookings after update
+  };
+
   useEffect(() => {
     fetchBookings();
   }, []); // Empty dependency array to run only once on mount
@@ -148,6 +162,10 @@ export default function BookingForm() {
         ) : (
           <div>No bookings found.</div>
         )}
+        {/* Map function used to render all bookings with delete and update handlers */}
+        {bookings && bookings.length > 0 && bookings.map((b) => (
+          <BookingTile key={b._id} booking={b} onDelete={handleDeleteBooking} onUpdate={handleUpdateBooking} />
+        ))}
       </div>
     </div>
 
