@@ -29,8 +29,8 @@ export default function BookingTile({ booking }) {
         <div className="booking-tile">
             <p>Date: {formatDate(booking.date)}</p>
             <p>Time: {formatTime24to12(booking.time)}</p>
-            <Button variant="primary">Update</Button>
-            <Button variant="danger">Cancel</Button>
+            <Button variant="primary" onClick={() => onUpdate && onUpdate(booking._id, booking)}>Update</Button>
+            <Button variant="danger" onClick={() => onDelete && onDelete(booking._id)}>Cancel</Button>
         </div>
     );
 }
