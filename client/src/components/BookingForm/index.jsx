@@ -53,9 +53,12 @@ export default function BookingForm() {
   };
 
   // Handler to update a booking
-  const handleUpdateBooking = async (bookingId, updatedData) => {
+  const handleUpdateBooking = async (bookingId) => {
     const token = Auth.getToken();
-    await updateBooking(bookingId, updatedData, token);
+    // Example to test update functionality
+    const updatedTime = { ...booking, time: "12:00" }; // Update time to "12:00"
+    await updateBooking(bookingId, updatedTime, token);
+
     fetchBookings(); // Refresh bookings after update
   };
 
@@ -156,12 +159,12 @@ export default function BookingForm() {
       <div className={`${activeStyle}-booking-tile booking-form-right`}>
         <h2 style={{ marginBottom: '1rem', color: '#0d6efd' }}>Your Bookings</h2>
         {/* Render recent booking first, if it exists */}
-        {booking && <BookingTile booking={booking} />}
+        {/* {booking && <BookingTile booking={booking} />}
         {bookings && bookings.length > 0 ? (
           bookings.map((b) => <BookingTile key={b._id} booking={b} />)
         ) : (
           <div>No bookings found.</div>
-        )}
+        )} */}
         {/* Map function used to render all bookings with delete and update handlers */}
         {bookings && bookings.length > 0 && bookings.map((b) => (
           <BookingTile key={b._id} booking={b} onDelete={handleDeleteBooking} onUpdate={handleUpdateBooking} />

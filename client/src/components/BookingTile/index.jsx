@@ -18,7 +18,7 @@ function formatDate(dateStr) {
 }
 
 // Export function that renders a booking tile when a booking is created
-export default function BookingTile({ booking }) {
+export default function BookingTile({ booking, onDelete, onUpdate }) {
     if (!booking) {
         return <div className="booking-tile">No booking data available.</div>;
     }
