@@ -1,4 +1,4 @@
-import { Button } from 'react-bootstrap';
+import Button from 'react-bootstrap/Button';
 
 // Function that formats time from 24-hour to 12-hour format
 function formatTime24to12(time24) {
