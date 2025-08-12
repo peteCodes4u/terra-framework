@@ -17,6 +17,7 @@ export default function BookingForm() {
   // set state for booking and bookings
   const [booking, setBooking] = useState(null);
   const { bookings, setBookings } = useBookings();
+  console.log('Bookings:', bookings);
   const { activeStyle } = useStyle();
 
   // handle input change
@@ -166,9 +167,10 @@ export default function BookingForm() {
           <div>No bookings found.</div>
         )} */}
         {/* Map function used to render all bookings with delete and update handlers */}
-        {bookings && bookings.length > 0 && bookings.map((b) => (
-          <BookingTile key={b._id} booking={b} onDelete={handleDeleteBooking} onUpdate={handleUpdateBooking} />
-        ))}
+        {bookings && bookings.length > 0 && bookings.filter(b => b && b.date && b.time) // filters only valid bookings
+          .map((b) => (
+            <BookingTile key={b._id} booking={b} onDelete={handleDeleteBooking} onUpdate={handleUpdateBooking} />
+          ))}
       </div>
     </div>
 

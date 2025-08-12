@@ -19,11 +19,11 @@ function formatDate(dateStr) {
 
 // Export function that renders a booking tile when a booking is created
 export default function BookingTile({ booking, onDelete, onUpdate }) {
+    console.log('BookingTile received booking', booking);
     if (!booking) {
-        return <div className="booking-tile">No booking data available.</div>;
+        return <div className='booking-tile'>No booking data available.</div>;
     }
     return (
-
         <div className="booking-tile">
             <p>Date: {formatDate(booking.date)}</p>
             <p>Time: {formatTime24to12(booking.time)}</p>
