@@ -23,8 +23,6 @@ export default function BookingTile({ booking, onDelete, onUpdate }) {
         return <div className="booking-tile">No booking data available.</div>;
     }
     return (
-        // I need to add a update and cancel button nested inside the booking tile
-        // How do I make these buttons functional? Where would that logic go?        
 
         <div className="booking-tile">
             <p>Date: {formatDate(booking.date)}</p>
