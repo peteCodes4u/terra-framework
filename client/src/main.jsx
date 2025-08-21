@@ -6,7 +6,7 @@ import ReactDOM from "react-dom/client";
 // import the createBrowserRouter and RouterProvider components from react-router-dom
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 // import the BookingsProvider to provide booking context to the app
-import { BookingsProvider } from "./context/BookingsContext.jsx";
+// import { BookingsProvider } from "./context/BookingsContext.jsx";
 
 // import the bootstrap css file
 import "bootstrap/dist/css/bootstrap.min.css";

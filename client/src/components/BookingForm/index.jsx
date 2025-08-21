@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Form, Button } from 'react-bootstrap';
 import { createBooking, getAllBookings, deleteBooking, updateBooking } from '../../utils/API';
 import { useStyle } from '../../StyleContext';
-import { useBookings } from '../../context/BookingsContext';
+// import { useBookings } from '../../context/BookingsContext';
 import BookingTile from '../BookingTile';
 import Auth from '../../utils/auth';
 
