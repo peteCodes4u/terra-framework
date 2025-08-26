@@ -16,8 +16,8 @@ export default function BookingForm() {
 
   // set state for booking and bookings
   const [booking, setBooking] = useState(null);
-  const { bookings, setBookings } = useBookings();
-  console.log('Bookings:', bookings);
+  // const { bookings, setBookings } = useBookings();
+  // console.log('Bookings:', bookings);
   const { activeStyle } = useStyle();
 
   // handle input change
@@ -39,7 +39,7 @@ export default function BookingForm() {
       const response = await getAllBookings(token);
       if (!response.ok) throw new Error('Failed to get bookings');
       const data = await response.json();
-      setBookings(data);
+      setBooking(data);
       // error handling with message
     } catch (error) {
       console.error("Failed to fetch bookings", error);
@@ -167,7 +167,7 @@ export default function BookingForm() {
           <div>No bookings found.</div>
         )} */}
         {/* Map function used to render all bookings with delete and update handlers */}
-        {bookings && bookings.length > 0 && bookings.filter(b => b && b.date && b.time) // filters only valid bookings
+        {booking && booking.length > 0 && booking.filter(b => b && b.date && b.time) // filters only valid bookings
           .map((b) => (
             <BookingTile key={b._id} booking={b} onDelete={handleDeleteBooking} onUpdate={handleUpdateBooking} />
           ))}

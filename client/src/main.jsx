@@ -81,7 +81,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
   // wrap the App component with BookingsProvider to provide booking context
   // and render the router using RouterProvider
   // this allows the app to access booking data and manage bookings state
-  <BookingsProvider>
-    <RouterProvider router={router} />
-  </BookingsProvider>
+
+  <RouterProvider router={router} />
+
 );
