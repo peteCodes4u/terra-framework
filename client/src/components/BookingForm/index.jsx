@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { Form, Button } from 'react-bootstrap';
 import { createBooking, getAllBookings, deleteBooking, updateBooking } from '../../utils/API';
 import { useStyle } from '../../StyleContext';
-// import { useBookings } from '../../context/BookingsContext';
 import BookingTile from '../BookingTile';
 import Auth from '../../utils/auth';
 
@@ -16,8 +15,6 @@ export default function BookingForm() {
 
   // set state for booking and bookings
   const [booking, setBooking] = useState(null);
-  // const { bookings, setBookings } = useBookings();
-  // console.log('Bookings:', bookings);
   const { activeStyle } = useStyle();
 
   // handle input change
@@ -159,13 +156,7 @@ export default function BookingForm() {
       {/* Map function used to render all bookings list, we want to render only the bookings that the user chooses */}
       <div className={`${activeStyle}-booking-tile booking-form-right`}>
         <h2 style={{ marginBottom: '1rem', color: '#0d6efd' }}>Your Bookings</h2>
-        {/* Render recent booking first, if it exists */}
-        {/* {booking && <BookingTile booking={booking} />}
-        {bookings && bookings.length > 0 ? (
-          bookings.map((b) => <BookingTile key={b._id} booking={b} />)
-        ) : (
-          <div>No bookings found.</div>
-        )} */}
+
         {/* Map function used to render all bookings with delete and update handlers */}
         {booking && booking.length > 0 && booking.filter(b => b && b.date && b.time) // filters only valid bookings
           .map((b) => (
