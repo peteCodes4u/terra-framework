@@ -13,7 +13,11 @@ function formatTime24to12(time24) {
 // Function that formats date to include month day and year only
 function formatDate(dateStr) {
     if (!dateStr) return 'N/A';
-    const date = new Date(dateStr);
+    // Only use the date part if there's a time portion
+    const pureDateStr = dateStr.split('T')[0];
+    const [year, month, day] = pureDateStr.split('-').map(Number);
+    if (!year || !month || !day) return 'Invalid date';
+    const date = new Date(year, month - 1, day);
     return date.toLocaleDateString('en-US');
 }
 
