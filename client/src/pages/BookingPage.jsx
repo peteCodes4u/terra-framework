@@ -60,7 +60,11 @@ const handleModalSubmit = async (updatedData) => {
 
   return (
     <section className={`${activeStyle}-booking`}>
-      <div className={`${activeStyle}-booking-form`}>
+      <div className={`${activeStyle}-booking-page-header`}>
+      <h2>Book an Appointment</h2>
+      <h2>Your Bookings</h2>
+      </div>
+      <div className={`${activeStyle}-booking-feature`}>
         <BookingForm 
           onBookingCreated={handleCreateBooking}
           showModal={showModal}
@@ -68,7 +72,6 @@ const handleModalSubmit = async (updatedData) => {
           initialData={bookingToEdit}
           onBookingUpdated={handleModalSubmit}
         />
-      </div>
       <div className={`${activeStyle}-booking-records-container`}>
                 {bookings.map(b => (
           <BookingTile
@@ -78,6 +81,7 @@ const handleModalSubmit = async (updatedData) => {
             onUpdate={handleUpdate}
           />
         ))}
+        </div>
       </div>
     </section>
   );

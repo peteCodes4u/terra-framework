@@ -37,18 +37,18 @@ export default function BookingForm({
     time: ''
   });
 
-    // Modal state for updating a booking
+  // Modal state for updating a booking
   const [updatedForm, setUpdatedForm] = useState({
     date: '',
     time: ''
   });
 
-    const handleInputChange = (e) => {
+  const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-    // Handle input changes for the modal form
+  // Handle input changes for the modal form
   const handleModalInputChange = (e) => {
     const { name, value } = e.target;
     setUpdatedForm(prev => ({ ...prev, [name]: value }));
@@ -69,14 +69,15 @@ export default function BookingForm({
     if (onClose) onClose();
     setUpdatedForm({ date: '', time: '' });
   };
-  
+
   // Render the booking form
   return (
-    <div className="booking-form-container">
-      <div className="booking-form-left">
-        {/* {errorMessage && <Alert variant="danger">{errorMessage}</Alert>} */}
-        <Form onSubmit={handleSubmit}>
-          <div className="form-group">
+    <>
+      <Form className={`${activeStyle}-booking-form`} onSubmit={handleSubmit}>
+        <div className={`${activeStyle}-form-container`}>
+
+
+          <div className={`${activeStyle}-form-group`}>
             <label htmlFor="name">Name:</label>
             <input
               type="text"
@@ -86,9 +87,8 @@ export default function BookingForm({
               value={formData.name}
               onChange={handleInputChange}
             />
-
           </div>
-          <div className="form-group">
+          <div className={`${activeStyle}-form-group`}>
             <label htmlFor="email">Email:</label>
             <input
               type="email"
@@ -99,7 +99,7 @@ export default function BookingForm({
               onChange={handleInputChange}
             />
           </div>
-          <div className="form-group">
+          <div className={`${activeStyle}-form-group`}>
             <label htmlFor="date">Date:</label>
             <input
               type="date"
@@ -110,7 +110,7 @@ export default function BookingForm({
               onChange={handleInputChange}
             />
           </div>
-          <div className="form-group">
+          <div className={`${activeStyle}-form-group`}>
             <label htmlFor="time">Time:</label>
             <input
               type="time"
@@ -120,11 +120,10 @@ export default function BookingForm({
               value={formData.time}
               onChange={handleInputChange}
             />
-            <Button type="submit">Book Now</Button>
           </div>
-
-        </Form>
-      </div>
+          <Button type="submit">Book Now</Button>
+        </div>
+      </Form>
       {/* Update Modal */}
 
       <Modal show={showModal} onHide={onClose}>
@@ -157,6 +156,6 @@ export default function BookingForm({
           </Form>
         </Modal.Body>
       </Modal>
-    </div>
+    </>
   );
 };
