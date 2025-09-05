@@ -8,11 +8,11 @@ module.exports = {
   // Create a new booking
   async createBooking(req, res) {
     try {
-      console.log("req.user:", req.user); // Add this
-      console.log("req.body:", req.body);
+      // console.log("req.user:", req.user);
+      // console.log("req.body:", req.body);
       const booking = await Booking.create({
         ...req.body,
-        user: req.user._id, // Attach user ID from auth middleware 
+        user: req.user._id, 
       });
       res.status(200).json(booking);
 
