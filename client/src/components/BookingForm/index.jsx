@@ -16,7 +16,6 @@ export default function BookingForm({
     if (initialData) {
       let formattedDate = '';
       if (initialData.date) {
-        // Handles ISO strings and Date objects
         const d = new Date(initialData.date);
         if (!isNaN(d)) {
           formattedDate = d.toISOString().slice(0, 10);
