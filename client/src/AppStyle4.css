@@ -217,21 +217,78 @@ body.app-style4 .app-style4-profile-page p {
 /* Profile Page styles - END */
 
 /* Booking page starts */
-
-body.app-style4 .app-style4-booking-page {
-  background: #f8f9fa;
-  min-height: 25vh;
-  padding: 2rem 0;
+.app-style4-booking {
+  background-color: #c720c7;
 }
 
-body.app-style4 .app-style4-booking-page h1 {
-  color: #0d6efd;
+.app-style4-booking-page-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-left: 5%;
+  margin-right: 5%;
+  padding: 2%
 }
 
-body.app-style4 .app-style4-booking-page p {
-  color: #222;
-  font-size: 1.2rem;
+.app-style4-booking-feature {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding-left: 10%;
+  padding-right: 10%;
 }
 
-/* Booking page ends */
+.app-style4-booking-form {
+  background-color:#fff;
+  border-radius: 1rem;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  padding: 2rem;
+  margin-bottom: 2rem;
+  max-width: 400px;
+  width: 100%;
+  height: 40%; 
+}
+
+.app-style4-booking-tile {
+  background-color:#24f643;
+  border-radius: 1rem;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  padding: 2rem;
+  margin-bottom: 2rem;
+  max-width: 400px;
+  width: 100%;
+  height: 205px; 
+}
+
+.app-style4-form-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.app-style4-form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1.25rem; /* space between groups */
+}
+
+.app-style4-form-group label {
+  margin-bottom: 0.5rem; /* space between label and input */
+  font-weight: 500;
+}
+
+.app-style4-form-group input,
+.app-style4-form-group select,
+.app-style4-form-group textarea {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+.app-style4-booking-form button[type="submit"] {
+  width: 100%;
+  margin-top: 0.5rem;
+}
 

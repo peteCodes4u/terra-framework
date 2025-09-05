@@ -253,14 +253,14 @@ body.app-style1 .app-style1-profile-page p {
 }
 
 .app-style1-booking-tile {
-    background-color:#fff;
+  background-color:#fff;
   border-radius: 1rem;
   box-shadow: 0 4px 16px rgba(0,0,0,0.15);
   padding: 2rem;
   margin-bottom: 2rem;
   max-width: 400px;
   width: 100%;
-  height: 10%; 
+  height: 205px; 
 }
 
 .app-style1-form-container {
