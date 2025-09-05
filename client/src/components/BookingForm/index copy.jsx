@@ -8,8 +8,27 @@ export default function BookingForm({
   onClose,
   initialData = {},
   onBookingUpdated
+
 }) {
   const { activeStyle } = useStyle();
+
+  useEffect(() => {
+    if (initialData) {
+      let formattedDate = '';
+      if (initialData.date) {
+        const d = new Date(initialData.date);
+        if (!isNaN(d)) {
+          formattedDate = d.toISOString().slice(0, 10);
+        } else {
+          formattedDate = initialData.date;
+        }
+      }
+      setUpdatedForm({
+        date: formattedDate,
+        time: initialData.time || ''
+      });
+    }
+  }, [initialData]);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -17,73 +36,24 @@ export default function BookingForm({
     date: '',
     time: ''
   });
-  const [availableTimes, setAvailableTimes] = useState([]);
-  const [loadingTimes, setLoadingTimes] = useState(false);
 
+  // Modal state for updating a booking
   const [updatedForm, setUpdatedForm] = useState({
     date: '',
     time: ''
   });
-  const [modalAvailableTimes, setModalAvailableTimes] = useState([]);
-  const [loadingModalTimes, setLoadingModalTimes] = useState(false);
-
-  // Initialize updated form for modal
-  useEffect(() => {
-    if (initialData) {
-      let formattedDate = '';
-      if (initialData.date) {
-        const d = new Date(initialData.date);
-        formattedDate = !isNaN(d) ? d.toISOString().slice(0, 10) : initialData.date;
-      }
-      setUpdatedForm({ date: formattedDate, time: initialData.time || '' });
-    }
-  }, [initialData]);
-
-  // Fetch available times for new booking
-  useEffect(() => {
-    if (!formData.date) {
-      setAvailableTimes([]);
-      return;
-    }
-
-    setLoadingTimes(true);
-    fetch(`/api/availability?date=${formData.date}`)
-      .then(res => res.json())
-      .then(data => setAvailableTimes(data.availableTimes || []))
-      .catch(err => {
-        console.error("Failed to fetch availability:", err);
-        setAvailableTimes([]);
-      })
-      .finally(() => setLoadingTimes(false));
-  }, [formData.date]);
-
-  // Fetch available times for update modal
-  useEffect(() => {
-    if (!updatedForm.date) {
-      setModalAvailableTimes([]);
-      return;
-    }
-
-    setLoadingModalTimes(true);
-    fetch(`/api/availability?date=${updatedForm.date}`)
-      .then(res => res.json())
-      .then(data => setModalAvailableTimes(data.availableTimes || []))
-      .catch(err => {
-        console.error("Failed to fetch modal availability:", err);
-        setModalAvailableTimes([]);
-      })
-      .finally(() => setLoadingModalTimes(false));
-  }, [updatedForm.date]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  // Handle input changes for the modal form
   const handleModalInputChange = (e) => {
     const { name, value } = e.target;
     setUpdatedForm(prev => ({ ...prev, [name]: value }));
   };
+
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -100,11 +70,13 @@ export default function BookingForm({
     setUpdatedForm({ date: '', time: '' });
   };
 
+  // Render the booking form
   return (
     <>
-      {/* New Booking Form */}
       <Form className={`${activeStyle}-booking-form`} onSubmit={handleSubmit}>
         <div className={`${activeStyle}-form-container`}>
+
+
           <div className={`${activeStyle}-form-group`}>
             <label htmlFor="name">Name:</label>
             <input
@@ -140,31 +112,20 @@ export default function BookingForm({
           </div>
           <div className={`${activeStyle}-form-group`}>
             <label htmlFor="time">Time:</label>
-            {loadingTimes ? (
-              <p>Loading available times...</p>
-            ) : (
-              <select
-                id="time"
-                name="time"
-                required
-                value={formData.time}
-                onChange={handleInputChange}
-                disabled={!formData.date || availableTimes.length === 0}
-              >
-                <option value="">Select a time</option>
-                {availableTimes.map(time => (
-                  <option key={time} value={time}>{time}</option>
-                ))}
-              </select>
-            )}
+            <input
+              type="time"
+              id="time"
+              name="time"
+              required
+              value={formData.time}
+              onChange={handleInputChange}
+            />
           </div>
-          <Button type="submit" disabled={!formData.date || !formData.time}>
-            Book Now
-          </Button>
+          <Button type="submit">Book Now</Button>
         </div>
       </Form>
+      {/* Update Modal */}
 
-      {/* Update Booking Modal */}
       <Modal show={showModal} onHide={onClose}>
         <Modal.Header closeButton>
           <Modal.Title>Update Booking</Modal.Title>
@@ -182,24 +143,14 @@ export default function BookingForm({
             </Form.Group>
             <Form.Group controlId="formTime">
               <Form.Label>Time</Form.Label>
-              {loadingModalTimes ? (
-                <p>Loading available times...</p>
-              ) : (
-                <Form.Control
-                  as="select"
-                  name="time"
-                  value={updatedForm.time}
-                  onChange={handleModalInputChange}
-                  disabled={!updatedForm.date || modalAvailableTimes.length === 0}
-                >
-                  <option value="">Select a time</option>
-                  {modalAvailableTimes.map(time => (
-                    <option key={time} value={time}>{time}</option>
-                  ))}
-                </Form.Control>
-              )}
+              <Form.Control
+                type="time"
+                name="time"
+                value={updatedForm.time}
+                onChange={handleModalInputChange}
+              />
             </Form.Group>
-            <Button variant="primary" type="submit" disabled={!updatedForm.date || !updatedForm.time}>
+            <Button variant="primary" type="submit">
               Update Booking
             </Button>
           </Form>
@@ -207,4 +158,4 @@ export default function BookingForm({
       </Modal>
     </>
   );
-}
+};
