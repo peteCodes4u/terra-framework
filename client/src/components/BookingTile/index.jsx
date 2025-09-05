@@ -1,4 +1,5 @@
 import Button from 'react-bootstrap/Button';
+import { useStyle } from '../../StyleContext';
 
 // Function that formats time from 24-hour to 12-hour format
 function formatTime24to12(time24) {
@@ -6,7 +7,7 @@ function formatTime24to12(time24) {
     const [hourStr, minute] = time24.split(':');
     let hour = parseInt(hourStr, 10);
     const convert = hour >= 12 ? 'PM' : 'AM';
-    hour = hour % 12 || 12; // Convert 0 to 12 for midnight
+    hour = hour % 12 || 12;
     return `${hour}:${minute} ${convert}`;
 }
 
@@ -23,12 +24,9 @@ function formatDate(dateStr) {
 
 // Export function that renders a booking tile when a booking is created
 export default function BookingTile({ booking, onDelete, onUpdate }) {
-    console.log('BookingTile received booking', booking);
-    if (!booking) {
-        return <div className='booking-tile'>No booking data available.</div>;
-    }
+    const { activeStyle } = useStyle();
     return (
-        <div className="booking-tile">
+        <div className={`${activeStyle}-booking-tile`}>
             <p>Date: {formatDate(booking.date)}</p>
             <p>Time: {formatTime24to12(booking.time)}</p>
             <Button variant="primary" onClick={() => onUpdate && onUpdate(booking._id, booking)}>Update</Button>

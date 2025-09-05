@@ -1,22 +1,26 @@
 import { useState, useEffect } from 'react';
 import { Form, Button, Modal } from 'react-bootstrap';
-import { createBooking, getAllBookings, deleteBooking, updateBooking } from '../../utils/API';
 import { useStyle } from '../../StyleContext';
-import BookingTile from '../BookingTile';
-import Auth from '../../utils/auth';
 
-/**
- * BookingForm Component
- * This component renders a form for users to book an appointment.
- * It includes fields for name, email, date, and time, and handles form submission
- * by sending the data to the server. It also provides validation and error handling.
- */
-export default function BookingForm() {
+export default function BookingForm({
+  onBookingCreated,
+  showModal = false,
+  onClose,
+  initialData = {},
+  onBookingUpdated
 
-  // set state for booking and bookings
-  const [booking, setBooking] = useState(null);
+}) {
   const { activeStyle } = useStyle();
-  // set state for form validation outside of handler to prevent React Infinite Loop
+
+    useEffect(() => {
+    if (initialData) {
+      setUpdatedForm({
+        date: initialData.date || '',
+        time: initialData.time || ''
+      });
+    }
+  }, [initialData]);
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -24,103 +28,39 @@ export default function BookingForm() {
     time: ''
   });
 
-  // set state for modal
-  const [showModal, setShowModal] = useState(false);
-  const [selectedAppointment, setSelectedAppointment] = useState(null);
+    // Modal state for updating a booking
   const [updatedForm, setUpdatedForm] = useState({
-    Date: "",
-    Time: ""
+    date: '',
+    time: ''
   });
 
-
-
-  // fetch all bookings when user creates a booking
-  const fetchBookings = async () => {
-    try {
-      const token = Auth.getToken();
-      if (!token) {
-        console.warn("No token found, not fetching bookings.");
-        return; // Don't fetch if not logged in
-      }
-      const response = await getAllBookings(token);
-      if (!response.ok) throw new Error('Failed to get bookings');
-      const data = await response.json();
-      setBooking(data);
-      // error handling with message
-    } catch (error) {
-      console.error("Failed to fetch bookings", error);
-    }
+    const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  // Handler to delete a booking
-  const handleDeleteBooking = async (bookingId) => {
-    const token = Auth.getToken();
-    await deleteBooking(bookingId, token);
-    fetchBookings(); // Refresh bookings after deletion
-  };
-
-  // Handler to update a booking
-  const handleUpdateBooking = async (bookingId) => {
-    const appointmentToUpdate = booking.find(b => b._id === bookingId);
-    setSelectedAppointment(appointmentToUpdate);
-    setUpdatedForm({ date: appointmentToUpdate.date, time: appointmentToUpdate.time });
-    setShowModal(true);
-  };
-
-  // Handle modal input changes
+    // Handle input changes for the modal form
   const handleModalInputChange = (e) => {
     const { name, value } = e.target;
     setUpdatedForm(prev => ({ ...prev, [name]: value }));
   };
-  // Submit update from modal
-  const handleModalSubmit = async (e) => {
+
+
+  const handleSubmit = (e) => {
     e.preventDefault();
-    const token = Auth.getToken();
-    await updateBooking(selectedAppointment._id, updatedForm, token);
-    setShowModal(false);
-    setSelectedAppointment(null);
-    fetchBookings();
+    onBookingCreated(formData);
+    setFormData({ name: '', email: '', date: '', time: '' });
   };
 
-  useEffect(() => {
-    fetchBookings();
-  }, []); // Empty dependency array to run only once on mount
-
-  // handle input change
-  const handleInputChange = (event) => {
-    const { name, value } = event.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-  // Removed redundant handleChange function
-  // handle form submission
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    const token = Auth.getToken();
-    // check if form has everything (as per react-bootstrap docs)
-    const form = event.currentTarget;
-    if (form.checkValidity() === false) {
-      event.preventDefault();
-      event.stopPropagation();
-      return;
+  const handleModalSubmit = (e) => {
+    e.preventDefault();
+    if (onBookingUpdated) {
+      onBookingUpdated({ ...initialData, ...updatedForm });
     }
-    try {
-      const response = await createBooking(formData, token);
-      if (!response.ok) throw new Error("Booking failed");
-      const data = await response.json();
-      setBooking(data.booking || data);
-      // Reset the form fields after successful submission
-      setFormData({ name: '', email: '', date: '', time: '' });
-      await fetchBookings(); // Refresh bookings after creating a new one
-      alert("Booking successful!");
-    } catch (err) {
-      alert("Booking failed! Please try again.");
-    }
+    if (onClose) onClose();
+    setUpdatedForm({ date: '', time: '' });
   };
-
-
+  
   // Render the booking form
   return (
     <div className="booking-form-container">
@@ -176,20 +116,9 @@ export default function BookingForm() {
 
         </Form>
       </div>
-      {/* Map function used to render all bookings list, we want to render only the bookings that the user chooses */}
-      <div className={`${activeStyle}-booking-tile booking-form-right`}>
-        <h2 style={{ marginBottom: '1rem', color: '#0d6efd' }}>Your Bookings</h2>
-
-        {/* Map function used to render all bookings with delete and update handlers */}
-        {booking && booking.length > 0 && booking.filter(b => b && b.date && b.time) // filters only valid bookings
-          .map((b) => (
-            <BookingTile key={b._id} booking={b} onDelete={handleDeleteBooking} onUpdate={handleUpdateBooking} />
-          ))}
-      </div>
-
       {/* Update Modal */}
 
-      <Modal show={showModal} onHide={() => setShowModal(false)}>
+      <Modal show={showModal} onHide={onClose}>
         <Modal.Header closeButton>
           <Modal.Title>Update Booking</Modal.Title>
         </Modal.Header>
@@ -220,6 +149,5 @@ export default function BookingForm() {
         </Modal.Body>
       </Modal>
     </div>
-
   );
 };
