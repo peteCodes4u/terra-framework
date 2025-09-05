@@ -12,10 +12,20 @@ export default function BookingForm({
 }) {
   const { activeStyle } = useStyle();
 
-    useEffect(() => {
+  useEffect(() => {
     if (initialData) {
+      let formattedDate = '';
+      if (initialData.date) {
+        // Handles ISO strings and Date objects
+        const d = new Date(initialData.date);
+        if (!isNaN(d)) {
+          formattedDate = d.toISOString().slice(0, 10);
+        } else {
+          formattedDate = initialData.date;
+        }
+      }
       setUpdatedForm({
-        date: initialData.date || '',
+        date: formattedDate,
         time: initialData.time || ''
       });
     }
