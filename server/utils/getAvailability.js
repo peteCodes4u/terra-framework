@@ -1,51 +1,70 @@
 const calendarData = require("../calendarData.json");
 const { addMinutes, isBefore, isAfter, parseISO, format } = require("date-fns");
-const {normalizeCalendarData} = require("./normalizeCalendar");
+const { normalizeCalendarData } = require("./normalizeCalendar");
 
-function getAvailability(dateStr) {
-  const events = normalizeCalendarData();
+/**
+ * Get available times for a specific date
+ * @param {string} dateStr - 'YYYY-MM-DD'
+ * @param {Array} bookedEvents - array of booked events [{ start, end }]
+ * @returns {Object} { date, availableTimes: [], unavailableTimes: [] }
+ */
+function getAvailability(dateStr, bookedEvents = []) {
+  // Combine DB bookings + calendar rules (mock events + unavailableDates)
+  const events = [...normalizeCalendarData(), ...bookedEvents];
+
   const businessHours = calendarData.businessHours;
   const slotLength = calendarData.slotLengthMinutes || 30;
 
   const date = new Date(dateStr);
-  const dayOfWeek = date.toLocaleDateString("en-US", { weekday: "long" }).toLowerCase();
+  const dayOfWeek = date
+    .toLocaleDateString("en-US", { weekday: "long" })
+    .toLowerCase();
+
   const hours = businessHours[dayOfWeek];
-
-  if (!hours) return { date: dateStr, availableTimes: [], unavailableTimes: [] };
-
-  let slots = buildSlots(dateStr, hours.start, hours.end, slotLength);
-
-  // Remove past slots
-  slots = slots.filter(slot => isAfter(parseISO(slot), new Date()));
-
-  // Remove unavailable dates
-  if (calendarData.unavailableDates.includes(dateStr)) {
-    return { date: dateStr, availableTimes: [], unavailableTimes: slots };
+  if (!hours) {
+    return { date: dateStr, availableTimes: [], unavailableTimes: [] };
   }
 
-  // Filter conflicts with events (+buffer)
-  const conflictFree = slots.filter(slot => {
+  // Generate all possible slots for this date
+  let slots = buildSlots(dateStr, hours.start, hours.end, slotLength);
+
+  // Remove slots in the past
+  slots = slots.filter((slot) => isAfter(parseISO(slot), new Date()));
+
+  // If date is completely unavailable
+  if (calendarData.unavailableDates.includes(dateStr)) {
+    return {
+      date: dateStr,
+      availableTimes: [],
+      unavailableTimes: slots.map((s) => format(parseISO(s), "HH:mm")),
+    };
+  }
+
+  // Remove any slots that overlap with existing events/bookings
+  const conflictFree = slots.filter((slot) => {
     const slotStart = parseISO(slot);
-    return events.every(ev => {
+    const slotEnd = addMinutes(slotStart, slotLength);
+
+    // Keep slot only if it does NOT overlap with any event
+    return events.every((ev) => {
       const evStart = parseISO(ev.start);
       const evEnd = parseISO(ev.end);
-      const bufferBefore = addMinutes(evStart, -slotLength);
-      const bufferAfter = addMinutes(evEnd, slotLength);
-
-      return !(slotStart >= bufferBefore && slotStart < bufferAfter);
+      return slotEnd <= evStart || slotStart >= evEnd;
     });
   });
 
-  const unavailableTimes = slots.filter(s => !conflictFree.includes(s));
+  const unavailableTimes = slots.filter((s) => !conflictFree.includes(s));
 
   return {
     date: dateStr,
-    availableTimes: conflictFree.map(s => format(parseISO(s), "HH:mm")),
-    unavailableTimes: unavailableTimes.map(s => format(parseISO(s), "HH:mm"))
+    availableTimes: conflictFree.map((s) => format(parseISO(s), "HH:mm")),
+    unavailableTimes: unavailableTimes.map((s) => format(parseISO(s), "HH:mm")),
   };
 }
 
-// Build slots using dynamic length
+/**
+ * Build time slots for a single day
+ */
 function buildSlots(dateStr, startTime, endTime, intervalMinutes) {
   const slots = [];
   let current = new Date(`${dateStr}T${startTime}:00`);
@@ -59,4 +78,4 @@ function buildSlots(dateStr, startTime, endTime, intervalMinutes) {
   return slots;
 }
 
-module.exports = {getAvailability};
+module.exports = { getAvailability };

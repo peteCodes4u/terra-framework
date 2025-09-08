@@ -1,129 +1,145 @@
-import { useState, useEffect } from 'react';
-import { Form, Button, Modal } from 'react-bootstrap';
-import { useStyle } from '../../StyleContext';
+import { useState, useEffect } from "react";
+import { Form, Button, Modal } from "react-bootstrap";
+import { useStyle } from "../../StyleContext";
 
 export default function BookingForm({
   onBookingCreated,
   showModal = false,
   onClose,
   initialData = {},
-  onBookingUpdated
+  onBookingUpdated,
 }) {
   const { activeStyle } = useStyle();
 
+  // === Form state ===
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    date: '',
-    time: ''
+    name: "",
+    email: "",
+    date: "",
+    time: "",
   });
   const [availableTimes, setAvailableTimes] = useState([]);
   const [loadingTimes, setLoadingTimes] = useState(false);
 
+  // === Modal state ===
   const [updatedForm, setUpdatedForm] = useState({
-    date: '',
-    time: ''
+    date: "",
+    time: "",
   });
   const [modalAvailableTimes, setModalAvailableTimes] = useState([]);
   const [loadingModalTimes, setLoadingModalTimes] = useState(false);
 
-  // Initialize updated form for modal
+  // === Initialize modal form with initialData ===
   useEffect(() => {
-    if (initialData) {
-      let formattedDate = '';
-      if (initialData.date) {
-        const d = new Date(initialData.date);
-        formattedDate = !isNaN(d) ? d.toISOString().slice(0, 10) : initialData.date;
-      }
-      setUpdatedForm({ date: formattedDate, time: initialData.time || '' });
+    if (initialData?.date) {
+      const formattedDate = new Date(initialData.date)
+        .toISOString()
+        .slice(0, 10);
+      setUpdatedForm({ date: formattedDate, time: initialData.time || "" });
     }
   }, [initialData]);
 
-  // Fetch available times for new booking
+  // === Fetch available times for main form ===
   useEffect(() => {
     if (!formData.date) {
       setAvailableTimes([]);
       return;
     }
-
     setLoadingTimes(true);
     fetch(`/api/availability?date=${formData.date}`)
-      .then(res => res.json())
-      .then(data => setAvailableTimes(data.availableTimes || []))
-      .catch(err => {
+      .then((res) => res.json())
+      .then((data) => {
+        setAvailableTimes(data.availableTimes || []);
+      })
+      .catch((err) => {
         console.error("Failed to fetch availability:", err);
         setAvailableTimes([]);
       })
       .finally(() => setLoadingTimes(false));
   }, [formData.date]);
 
-  // Fetch available times for update modal
+  // === Fetch available times for modal form ===
   useEffect(() => {
     if (!updatedForm.date) {
       setModalAvailableTimes([]);
       return;
     }
-
     setLoadingModalTimes(true);
     fetch(`/api/availability?date=${updatedForm.date}`)
-      .then(res => res.json())
-      .then(data => setModalAvailableTimes(data.availableTimes || []))
-      .catch(err => {
+      .then((res) => res.json())
+      .then((data) => {
+        setModalAvailableTimes(data.availableTimes || []);
+      })
+      .catch((err) => {
         console.error("Failed to fetch modal availability:", err);
         setModalAvailableTimes([]);
       })
       .finally(() => setLoadingModalTimes(false));
   }, [updatedForm.date]);
 
+  // === Handlers ===
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleModalInputChange = (e) => {
     const { name, value } = e.target;
-    setUpdatedForm(prev => ({ ...prev, [name]: value }));
+    setUpdatedForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  // === Submit for new booking ===
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const startDate = new Date(`${formData.date}T${formData.time}`);
-    const endDate = new Date(startDate.getTime() + 30 * 60 * 1000); // 30 min slot
+    const endDate = new Date(startDate.getTime() + 30 * 60 * 1000);
 
     const payload = {
       name: formData.name,
       email: formData.email,
       start: startDate.toISOString(),
       end: endDate.toISOString(),
-      date: formData.date, // YYYY-MM-DD
+      date: formData.date,
     };
 
-    onBookingCreated(payload);
+    await onBookingCreated(payload);
 
-    setFormData({ name: '', email: '', date: '', time: '' });
+    // Remove booked time from local availableTimes immediately
+    setAvailableTimes((prev) => prev.filter((time) => time !== formData.time));
+
+    // Reset form but keep the selected date
+    setFormData({ name: "", email: "", date: formData.date, time: "" });
   };
 
+  // === Submit for modal update ===
+  const handleModalSubmit = async (e) => {
+    e.preventDefault();
 
-const handleModalSubmit = (e) => {
-  e.preventDefault();
+    if (!onBookingUpdated) return;
 
-  if (onBookingUpdated) {
     const startDate = new Date(`${updatedForm.date}T${updatedForm.time}`);
     const endDate = new Date(startDate.getTime() + 30 * 60 * 1000);
 
-    onBookingUpdated({
+    await onBookingUpdated({
       ...initialData,
       start: startDate.toISOString(),
       end: endDate.toISOString(),
       date: updatedForm.date,
     });
-  }
 
-  if (onClose) onClose();
-  setUpdatedForm({ date: '', time: '' });
-};
+    // Remove booked time from modal availableTimes immediately
+    setModalAvailableTimes((prev) =>
+      prev.filter((time) => time !== updatedForm.time)
+    );
 
+    // Reset modal form but keep the selected date
+    setUpdatedForm({ date: updatedForm.date, time: "" });
+
+    if (onClose) onClose();
+  };
+
+  // === Render ===
   return (
     <>
       {/* New Booking Form */}
@@ -176,8 +192,10 @@ const handleModalSubmit = (e) => {
                 disabled={!formData.date || availableTimes.length === 0}
               >
                 <option value="">Select a time</option>
-                {availableTimes.map(time => (
-                  <option key={time} value={time}>{time}</option>
+                {availableTimes.map((time) => (
+                  <option key={time} value={time}>
+                    {time}
+                  </option>
                 ))}
               </select>
             )}
@@ -214,16 +232,24 @@ const handleModalSubmit = (e) => {
                   name="time"
                   value={updatedForm.time}
                   onChange={handleModalInputChange}
-                  disabled={!updatedForm.date || modalAvailableTimes.length === 0}
+                  disabled={
+                    !updatedForm.date || modalAvailableTimes.length === 0
+                  }
                 >
                   <option value="">Select a time</option>
-                  {modalAvailableTimes.map(time => (
-                    <option key={time} value={time}>{time}</option>
+                  {modalAvailableTimes.map((time) => (
+                    <option key={time} value={time}>
+                      {time}
+                    </option>
                   ))}
                 </Form.Control>
               )}
             </Form.Group>
-            <Button variant="primary" type="submit" disabled={!updatedForm.date || !updatedForm.time}>
+            <Button
+              variant="primary"
+              type="submit"
+              disabled={!updatedForm.date || !updatedForm.time}
+            >
               Update Booking
             </Button>
           </Form>

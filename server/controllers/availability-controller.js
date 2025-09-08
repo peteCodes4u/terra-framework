@@ -1,6 +1,10 @@
 const { getAvailability } = require('../utils/getAvailability');
 const Booking = require("../models/Booking");
 
+/**
+ * Controller: check availability for a given date
+ * Example: GET /api/availability?date=2025-09-08
+ */
 async function checkAvailability(req, res) {
   const { date } = req.query;
 
@@ -9,11 +13,17 @@ async function checkAvailability(req, res) {
   }
 
   try {
-    // Fetch bookings from DB
+    // Fetch bookings for this date from DB
     const bookings = await Booking.find({ date });
 
-    // Inject bookings into availability calculation
-    const availability = getAvailability(date, bookings);
+    // Convert bookings into event objects for getAvailability
+    const bookedEvents = bookings.map(b => ({
+      start: b.start,
+      end: b.end,
+    }));
+
+    // Merge DB bookings with business rules
+    const availability = getAvailability(date, bookedEvents);
 
     res.json(availability);
   } catch (err) {
