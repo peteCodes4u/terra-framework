@@ -1,46 +1,38 @@
-const {normalizeCalendarData} = require('./normalizeCalendar');
-const calendarData = require('../calendarData.json');
-const { addMinutes, isBefore, isAfter, parseISO, format } = require( "date-fns");
+const calendarData = require("../calendarData.json");
+const { addMinutes, isBefore, isAfter, parseISO, format } = require("date-fns");
+const {normalizeCalendarData} = require("./normalizeCalendar");
 
 function getAvailability(dateStr) {
   const events = normalizeCalendarData();
   const businessHours = calendarData.businessHours;
+  const slotLength = calendarData.slotLengthMinutes || 30;
 
   const date = new Date(dateStr);
   const dayOfWeek = date.toLocaleDateString("en-US", { weekday: "long" }).toLowerCase();
   const hours = businessHours[dayOfWeek];
 
-  if (!hours) {
-    return { date: dateStr, availableTimes: [], unavailableTimes: [] };
-  }
+  if (!hours) return { date: dateStr, availableTimes: [], unavailableTimes: [] };
 
-  // Generate 30-min slots within business hours
-  let slots = buildSlots(dateStr, hours.start, hours.end, 30);
+  let slots = buildSlots(dateStr, hours.start, hours.end, slotLength);
 
-  // 1. Remove past slots
+  // Remove past slots
   slots = slots.filter(slot => isAfter(parseISO(slot), new Date()));
 
-  // 2. Remove slots that fall on unavailable dates
-  const unavailableDates = calendarData.unavailableDates;
-  if (unavailableDates.includes(dateStr)) {
+  // Remove unavailable dates
+  if (calendarData.unavailableDates.includes(dateStr)) {
     return { date: dateStr, availableTimes: [], unavailableTimes: slots };
   }
 
-  // 3. Filter out conflicts with events (+ buffer)
+  // Filter conflicts with events (+buffer)
   const conflictFree = slots.filter(slot => {
     const slotStart = parseISO(slot);
     return events.every(ev => {
       const evStart = parseISO(ev.start);
       const evEnd = parseISO(ev.end);
+      const bufferBefore = addMinutes(evStart, -slotLength);
+      const bufferAfter = addMinutes(evEnd, slotLength);
 
-      const bufferBefore = addMinutes(evStart, -30);
-      const bufferAfter = addMinutes(evEnd, 30);
-
-      // slot is invalid if it falls inside event or buffer
-      if (slotStart >= bufferBefore && slotStart < bufferAfter) {
-        return false;
-      }
-      return true;
+      return !(slotStart >= bufferBefore && slotStart < bufferAfter);
     });
   });
 
@@ -53,7 +45,7 @@ function getAvailability(dateStr) {
   };
 }
 
-// helper to build 30-min slots
+// Build slots using dynamic length
 function buildSlots(dateStr, startTime, endTime, intervalMinutes) {
   const slots = [];
   let current = new Date(`${dateStr}T${startTime}:00`);
@@ -63,7 +55,8 @@ function buildSlots(dateStr, startTime, endTime, intervalMinutes) {
     slots.push(current.toISOString());
     current = addMinutes(current, intervalMinutes);
   }
+
   return slots;
 }
 
-module.exports = { getAvailability }
+module.exports = {getAvailability};

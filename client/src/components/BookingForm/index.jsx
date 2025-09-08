@@ -87,18 +87,42 @@ export default function BookingForm({
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onBookingCreated(formData);
+
+    const startDate = new Date(`${formData.date}T${formData.time}`);
+    const endDate = new Date(startDate.getTime() + 30 * 60 * 1000); // 30 min slot
+
+    const payload = {
+      name: formData.name,
+      email: formData.email,
+      start: startDate.toISOString(),
+      end: endDate.toISOString(),
+      date: formData.date, // YYYY-MM-DD
+    };
+
+    onBookingCreated(payload);
+
     setFormData({ name: '', email: '', date: '', time: '' });
   };
 
-  const handleModalSubmit = (e) => {
-    e.preventDefault();
-    if (onBookingUpdated) {
-      onBookingUpdated({ ...initialData, ...updatedForm });
-    }
-    if (onClose) onClose();
-    setUpdatedForm({ date: '', time: '' });
-  };
+
+const handleModalSubmit = (e) => {
+  e.preventDefault();
+
+  if (onBookingUpdated) {
+    const startDate = new Date(`${updatedForm.date}T${updatedForm.time}`);
+    const endDate = new Date(startDate.getTime() + 30 * 60 * 1000);
+
+    onBookingUpdated({
+      ...initialData,
+      start: startDate.toISOString(),
+      end: endDate.toISOString(),
+      date: updatedForm.date,
+    });
+  }
+
+  if (onClose) onClose();
+  setUpdatedForm({ date: '', time: '' });
+};
 
   return (
     <>
