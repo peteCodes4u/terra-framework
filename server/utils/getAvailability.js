@@ -1,8 +1,8 @@
-import { normalizeCalendarData } from './normalizeCalendar';
-import calendarData from "../../server/calendarData.json" assert { type: "json" };
-import { addMinutes, isBefore, isAfter, parseISO, format } from "date-fns";
+const {normalizeCalendarData} = require('./normalizeCalendar');
+const calendarData = require('../calendarData.json');
+const { addMinutes, isBefore, isAfter, parseISO, format } = require( "date-fns");
 
-export function getAvailability(dateStr) {
+function getAvailability(dateStr) {
   const events = normalizeCalendarData();
   const businessHours = calendarData.businessHours;
 
@@ -65,3 +65,5 @@ function buildSlots(dateStr, startTime, endTime, intervalMinutes) {
   }
   return slots;
 }
+
+module.exports = { getAvailability }

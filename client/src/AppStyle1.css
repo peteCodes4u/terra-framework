@@ -271,11 +271,11 @@ body.app-style1 .app-style1-profile-page p {
 .app-style1-form-group {
   display: flex;
   flex-direction: column;
-  margin-bottom: 1.25rem; /* space between groups */
+  margin-bottom: 1.25rem;
 }
 
 .app-style1-form-group label {
-  margin-bottom: 0.5rem; /* space between label and input */
+  margin-bottom: 0.5rem;
   font-weight: 500;
 }
 

@@ -5,7 +5,9 @@
 // The server.js file is used to connect to the database and start the server.
 
 // import dotenv package to read .env file - THIS IS REQUIRED TO KEEP SENSITIVE (ENVIRONMENT) INFO SAFE and SECURE.
+
 require('dotenv').config();
+const {getAvailability} = require('./utils/getAvailability');
 const express = require('express');
 const path = require('path');
 const db = require('./config/connection');
@@ -16,6 +18,23 @@ const PORT = process.env.PORT || 3001;
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+
+// Availability endpoint (works exactly like login)
+app.get("/api/availability", (req, res) => {
+  const { date } = req.query;
+
+  if (!date) {
+    return res.status(400).json({ error: "Missing required query param: date" });
+  }
+
+  try {
+    const availability = getAvailability(date);
+    res.json(availability);
+  } catch (err) {
+    console.error("Error getting availability:", err);
+    res.status(500).json({ error: "Failed to fetch availability" });
+  }
+});
 
 // server client/build as static assets
 if (process.env.NODE_ENV === "production") {

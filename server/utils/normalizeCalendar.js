@@ -1,8 +1,8 @@
-import fs from "fs";
-import path from "path";
+const fs = require("fs");
+const path = require("path");
 
-export function normalizeCalendarData() {
-  const filePath = path.join(process.cwd(), "server", "calendarData.json");
+function normalizeCalendarData() {
+  const filePath = path.join(__dirname, "..", "calendarData.json");
   const raw = fs.readFileSync(filePath, "utf-8");
   const data = JSON.parse(raw);
 
@@ -36,3 +36,5 @@ export function normalizeCalendarData() {
 
   return events;
 }
+
+module.exports= { normalizeCalendarData }
