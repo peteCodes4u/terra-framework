@@ -19,7 +19,7 @@ const PORT = process.env.PORT || 3001;
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// Availability endpoint (works exactly like login)
+// Availability endpoint
 app.get("/api/availability", (req, res) => {
   const { date } = req.query;
 
