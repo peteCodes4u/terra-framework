@@ -9,29 +9,20 @@ const { normalizeCalendarData } = require("./normalizeCalendar");
  * @returns {Object} { date, availableTimes: [], unavailableTimes: [] }
  */
 function getAvailability(dateStr, bookedEvents = []) {
-  // Combine DB bookings + calendar rules (mock events + unavailableDates)
   const events = [...normalizeCalendarData(), ...bookedEvents];
-
   const businessHours = calendarData.businessHours;
   const slotLength = calendarData.slotLengthMinutes || 30;
-
+  const bufferMinutes = 30;
   const date = new Date(dateStr);
-  const dayOfWeek = date
-    .toLocaleDateString("en-US", { weekday: "long" })
-    .toLowerCase();
-
+  const dayOfWeek = date.toLocaleDateString("en-US", { weekday: "long" }).toLowerCase();
   const hours = businessHours[dayOfWeek];
   if (!hours) {
     return { date: dateStr, availableTimes: [], unavailableTimes: [] };
   }
 
-  // Generate all possible slots for this date
   let slots = buildSlots(dateStr, hours.start, hours.end, slotLength);
-
-  // Remove slots in the past
   slots = slots.filter((slot) => isAfter(parseISO(slot), new Date()));
 
-  // If date is completely unavailable
   if (calendarData.unavailableDates.includes(dateStr)) {
     return {
       date: dateStr,
@@ -40,16 +31,15 @@ function getAvailability(dateStr, bookedEvents = []) {
     };
   }
 
-  // Remove any slots that overlap with existing events/bookings
+  // Block slots that overlap with events + buffer before/after
   const conflictFree = slots.filter((slot) => {
     const slotStart = parseISO(slot);
     const slotEnd = addMinutes(slotStart, slotLength);
 
-    // Keep slot only if it does NOT overlap with any event
-    return events.every((ev) => {
-      const evStart = parseISO(ev.start);
-      const evEnd = parseISO(ev.end);
-      return slotEnd <= evStart || slotStart >= evEnd;
+    return !events.some((ev) => {
+      const evStart = addMinutes(parseISO(ev.start), -bufferMinutes); // buffer before
+      const evEnd = addMinutes(parseISO(ev.end), bufferMinutes);      // buffer after
+      return slotStart < evEnd && slotEnd > evStart;
     });
   });
 

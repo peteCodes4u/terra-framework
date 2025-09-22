@@ -19,6 +19,7 @@ export default function BookingForm({
     time: "",
   });
   const [availableTimes, setAvailableTimes] = useState([]);
+  const [unavailableTimes, setUnavailableTimes] = useState([]);
   const [loadingTimes, setLoadingTimes] = useState(false);
 
   // === Modal state ===
@@ -27,6 +28,7 @@ export default function BookingForm({
     time: "",
   });
   const [modalAvailableTimes, setModalAvailableTimes] = useState([]);
+  const [modalUnavailableTimes, setModalUnavailableTimes] = useState([]);
   const [loadingModalTimes, setLoadingModalTimes] = useState(false);
 
   // === Initialize modal form with initialData ===
@@ -43,6 +45,7 @@ export default function BookingForm({
   useEffect(() => {
     if (!formData.date) {
       setAvailableTimes([]);
+      setUnavailableTimes([]);
       return;
     }
     setLoadingTimes(true);
@@ -50,10 +53,12 @@ export default function BookingForm({
       .then((res) => res.json())
       .then((data) => {
         setAvailableTimes(data.availableTimes || []);
+        setUnavailableTimes(data.unavailableTimes || []);
       })
       .catch((err) => {
         console.error("Failed to fetch availability:", err);
         setAvailableTimes([]);
+        setUnavailableTimes([]);
       })
       .finally(() => setLoadingTimes(false));
   }, [formData.date]);
@@ -62,6 +67,7 @@ export default function BookingForm({
   useEffect(() => {
     if (!updatedForm.date) {
       setModalAvailableTimes([]);
+      setModalUnavailableTimes([]);
       return;
     }
     setLoadingModalTimes(true);
@@ -69,10 +75,12 @@ export default function BookingForm({
       .then((res) => res.json())
       .then((data) => {
         setModalAvailableTimes(data.availableTimes || []);
+        setModalUnavailableTimes(data.unavailableTimes || []);
       })
       .catch((err) => {
         console.error("Failed to fetch modal availability:", err);
         setModalAvailableTimes([]);
+        setModalUnavailableTimes([]);
       })
       .finally(() => setLoadingModalTimes(false));
   }, [updatedForm.date]);
@@ -192,7 +200,9 @@ export default function BookingForm({
                 disabled={!formData.date || availableTimes.length === 0}
               >
                 <option value="">Select a time</option>
-                {availableTimes.map((time) => (
+                {availableTimes
+                .filter(time => !unavailableTimes.includes(time))
+                .map((time) => (
                   <option key={time} value={time}>
                     {time}
                   </option>
@@ -237,7 +247,9 @@ export default function BookingForm({
                   }
                 >
                   <option value="">Select a time</option>
-                  {modalAvailableTimes.map((time) => (
+                  {modalAvailableTimes
+                  .filter(time => !modalUnavailableTimes.includes(time))
+                  .map((time) => (
                     <option key={time} value={time}>
                       {time}
                     </option>
