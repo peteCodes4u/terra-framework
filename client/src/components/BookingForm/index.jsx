@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Form, Button, Modal } from "react-bootstrap";
 import { useStyle } from "../../StyleContext";
+import { parseISO, format } from "date-fns";
 
 export default function BookingForm({
   onBookingCreated,
@@ -209,11 +210,14 @@ export default function BookingForm({
                 disabled={!formData.date || availableTimes.length === 0}
               >
                 <option value="">Select a time</option>
-                {availableTimes.map((time) => (
-                  <option key={time} value={time}>
-                    {time}
-                  </option>
-                ))}
+                {availableTimes.map((time) => {
+                  const parsed = parseISO(`${formData.date}T${time}`);
+                  return (
+                    <option key={time} value={time}>
+                      {format(parsed, "h:mm a")}
+                    </option>
+                  )
+                })}
               </select>
             )}
           </div>
@@ -263,11 +267,14 @@ export default function BookingForm({
                   }
                 >
                   <option value="">Select a time</option>
-                  {modalAvailableTimes.map((time) => (
+                {availableTimes.map((time) => {
+                  const parsed = parseISO(`${formData.date}T${time}`);
+                  return (
                     <option key={time} value={time}>
-                      {time}
+                      {format(parsed, "h:mm a")}
                     </option>
-                  ))}
+                  )
+                })}
                 </Form.Control>
               )}
             </Form.Group>
