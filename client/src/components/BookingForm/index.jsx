@@ -199,6 +199,13 @@ export default function BookingForm({
                 required
                 value={formData.time}
                 onChange={handleInputChange}
+                onClick={() => {
+                  if (!formData.date) return;
+                  fetch(`/api/availability?date=${formData.date}`)
+                    .then((res) => res.json())
+                    .then((data) => setAvailableTimes(data.availableTimes || []))
+                    .catch((err) => console.error("Failed to refresh availability:", err));
+                }}
                 disabled={!formData.date || availableTimes.length === 0}
               >
                 <option value="">Select a time</option>
@@ -241,6 +248,15 @@ export default function BookingForm({
                   as="select"
                   name="time"
                   value={updatedForm.time}
+                  onClick={() => {
+                    if (!updatedForm.date) return;
+                    fetch(`/api/availability?date=${updatedForm.date}`)
+                      .then((res) => res.json())
+                      .then((data) => setModalAvailableTimes(data.availableTimes || []))
+                      .catch((err) =>
+                        console.error("Failed to refresh availability:", err)
+                      );
+                  }}
                   onChange={handleModalInputChange}
                   disabled={
                     !updatedForm.date || modalAvailableTimes.length === 0
