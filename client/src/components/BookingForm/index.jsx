@@ -108,6 +108,11 @@ export default function BookingForm({
     // Remove booked time from local availableTimes immediately
     setAvailableTimes((prev) => prev.filter((time) => time !== formData.time));
 
+    fetch(`/api/availability?date=${formData.date}`)
+      .then((res) => res.json())
+      .then((data) => setAvailableTimes(data.availableTimes || []))
+      .catch((err) => console.error("Failed to refresh availability:", err));
+
     // Reset form but keep the selected date
     setFormData({ name: "", email: "", date: formData.date, time: "" });
   };
@@ -132,6 +137,11 @@ export default function BookingForm({
     setModalAvailableTimes((prev) =>
       prev.filter((time) => time !== updatedForm.time)
     );
+
+    fetch(`/api/availability?date=${updatedForm.date}`)
+      .then((res) => res.json())
+      .then((data) => setModalAvailableTimes(data.availableTimes || []))
+      .catch((err) => console.error("Failed to refresh modal availability:", err));
 
     // Reset modal form but keep the selected date
     setUpdatedForm({ date: updatedForm.date, time: "" });

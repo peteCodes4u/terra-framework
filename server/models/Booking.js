@@ -14,7 +14,7 @@ const bookingSchema = new Schema(
       match: [/.+@.+\..+/, "Must use a valid email address"],
     },
     date: {
-      type: Date,
+      type: String,
       required: true,
     },
     start: {
