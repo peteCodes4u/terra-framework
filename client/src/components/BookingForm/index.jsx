@@ -28,6 +28,9 @@ export default function BookingForm({
 
   // === Modal state ===
   const [updatedForm, setUpdatedForm] = useState({
+    name: "",
+    email: "",
+    phoneNumber: "",
     date: "",
     time: "",
   });
@@ -40,7 +43,14 @@ export default function BookingForm({
       const formattedDate = new Date(initialData.date)
         .toISOString()
         .slice(0, 10);
-      setUpdatedForm({ date: formattedDate, time: initialData.time || "" });
+      setUpdatedForm({
+        name: initialData.name || "",
+        email: initialData.email || "",
+        phoneNumber: initialData.phoneNumber || "",
+        date: formattedDate,
+        time: initialData.time || "",
+      });
+
     }
   }, [initialData]);
 
@@ -140,7 +150,10 @@ export default function BookingForm({
 
     try {
       const response = await onBookingUpdated({
-        ...initialData,
+        _id: initialData._id,
+        name: updatedForm.name,
+        email: updatedForm.email,
+        phoneNumber: updatedForm.phoneNumber,
         start: startDate.toISOString(),
         end: endDate.toISOString(),
         date: updatedForm.date,
@@ -289,6 +302,33 @@ export default function BookingForm({
         </Modal.Header>
         <Modal.Body>
           <Form onSubmit={handleModalSubmit}>
+            <Form.Group controlId="formName">
+              <Form.Label>Name</Form.Label>
+              <Form.Control
+                type="text"
+                name="name"
+                value={updatedForm.name}
+                onChange={handleModalInputChange}
+              />
+            </Form.Group>
+            <Form.Group>
+                <Form.Label>Email</Form.Label>
+                <Form.Control
+                  type="email"
+                  name="email"
+                  value={updatedForm.email}
+                  onChange={handleModalInputChange}
+                />
+            </Form.Group>
+            <Form.Group>
+              <Form.Label>Phone Number</Form.Label>
+              <Form.Control 
+                type="tel"
+                name="phoneNumber"
+                value={updatedForm.phoneNumber}
+                onChange={handleModalInputChange}
+              />
+            </Form.Group>
             <Form.Group controlId="formDate">
               <Form.Label>Date</Form.Label>
               <Form.Control

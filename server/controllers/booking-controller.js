@@ -21,11 +21,11 @@ module.exports = {
       const existingBookings = await Booking.find({ date: dateStr });
 
       const conflict = existingBookings.some((b) => {
-      const bufferStart = addMinutes(new Date(b.start), -30);
-      const bufferEnd = addMinutes(new Date(b.end), 30);
+        const bufferStart = addMinutes(new Date(b.start), -30);
+        const bufferEnd = addMinutes(new Date(b.end), 30);
 
-      // New booking overlaps or too close to an existing one
-      return startDate < bufferEnd && endDate > bufferStart;
+        // New booking overlaps or too close to an existing one
+        return startDate < bufferEnd && endDate > bufferStart;
       });
 
       if (conflict) {
@@ -77,17 +77,39 @@ module.exports = {
   },
 
   // Update a booking
+  // Update a booking
   async updateBooking(req, res) {
     try {
-      const booking = await Booking.findByIdAndUpdate(req.params.id, req.body, {
-        new: true,
-      });
+      const { name, email, phoneNumber, start, end } = req.body;
+
+      // Ensure booking exists
+      const booking = await Booking.findById(req.params.id);
       if (!booking) {
         return res.status(404).json({ message: "Booking not found" });
       }
+
+      // Update allowed fields
+      if (name !== undefined) booking.name = name;
+      if (email !== undefined) booking.email = email;
+      if (phoneNumber !== undefined) booking.phoneNumber = phoneNumber;
+
+      if (start && end) {
+        const startDate = new Date(start);
+        const endDate = new Date(end);
+
+        // Recompute the date string (YYYY-MM-DD)
+        booking.start = startDate;
+        booking.end = endDate;
+        booking.date = startDate.toISOString().split("T")[0];
+      }
+
+      await booking.save();
+
       res.status(200).json(booking);
     } catch (err) {
-      res.status(400).json(err);
+      console.error("Error updating booking:", err);
+      res.status(400).json({ message: "Error updating booking", error: err.message });
     }
-  },
+  }
+
 };
