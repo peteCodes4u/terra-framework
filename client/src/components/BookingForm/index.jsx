@@ -10,6 +10,7 @@ export default function BookingForm({
   initialData = {},
   onBookingUpdated,
 }) {
+  const today = new Date(); 
   const { activeStyle } = useStyle();
 
   // === Form state ===
@@ -238,7 +239,11 @@ export default function BookingForm({
                     .then((data) => setAvailableTimes(data.availableTimes || []))
                     .catch((err) => console.error("Failed to refresh availability:", err));
                 }}
-                disabled={!formData.date || availableTimes.length === 0}
+                disabled={
+                  !formData.date || 
+                  availableTimes.length === 0 ||
+                  formData.date === today.toISOString().slice(0, 10)
+                }
               >
                 <option value="">Select a time</option>
                 {availableTimes.map((time) => {
@@ -294,7 +299,9 @@ export default function BookingForm({
                   }}
                   onChange={handleModalInputChange}
                   disabled={
-                    !updatedForm.date || modalAvailableTimes.length === 0
+                    !updatedForm.date || 
+                    modalAvailableTimes.length === 0 ||
+                    updatedForm.date === today.toISOString().slice(0, 10)
                   }
                 >
                   <option value="">Select a time</option>
