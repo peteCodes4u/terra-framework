@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Form, Button, Modal } from "react-bootstrap";
+import { Form, Button, Modal, Alert } from "react-bootstrap";
 import { useStyle } from "../../StyleContext";
 import { parseISO, format } from "date-fns";
 
@@ -21,6 +21,7 @@ export default function BookingForm({
   });
   const [availableTimes, setAvailableTimes] = useState([]);
   const [loadingTimes, setLoadingTimes] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   // === Modal state ===
   const [updatedForm, setUpdatedForm] = useState({
@@ -104,18 +105,23 @@ export default function BookingForm({
       date: formData.date,
     };
 
-    await onBookingCreated(payload);
-
-    // Remove booked time from local availableTimes immediately
-    setAvailableTimes((prev) => prev.filter((time) => time !== formData.time));
-
-    fetch(`/api/availability?date=${formData.date}`)
+    try {
+      const response = await onBookingCreated(payload);
+      if (response && response.status === 400) {
+        // Conflict error from backend
+        setErrorMessage("We're Sorry, you just missed it, This time slot has now been taken, please select a new time and try again thank you!.");
+        return;
+      }
+      setErrorMessage(""); // Clear error on success
+      setAvailableTimes((prev) => prev.filter((time) => time !== formData.time));
+      fetch(`/api/availability?date=${formData.date}`)
       .then((res) => res.json())
       .then((data) => setAvailableTimes(data.availableTimes || []))
       .catch((err) => console.error("Failed to refresh availability:", err));
-
-    // Reset form but keep the selected date
-    setFormData({ name: "", email: "", date: formData.date, time: "" });
+      setFormData({ name: "", email: "", date: formData.date, time: "" });
+    } catch (err) {
+      setErrorMessage("Failed to create booking. Please try again.");
+    }
   };
 
   // === Submit for modal update ===
@@ -154,6 +160,11 @@ export default function BookingForm({
   return (
     <>
       {/* New Booking Form */}
+      {errorMessage && (
+        <Alert variant="danger" onClose={() => setErrorMessage("")} dismissible>
+          {errorMessage}
+        </Alert>
+      )}
       <Form className={`${activeStyle}-booking-form`} onSubmit={handleSubmit}>
         <div className={`${activeStyle}-form-container`}>
           <div className={`${activeStyle}-form-group`}>

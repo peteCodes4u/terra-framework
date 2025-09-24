@@ -26,6 +26,7 @@ export default function BookingPage() {
     const token = Auth.getToken();
     const response = await createBooking(formData, token);
     if (response.ok) fetchBookings();
+    return response;
   };
 
   const handleDeleteBooking = async (id) => {
