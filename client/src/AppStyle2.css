@@ -250,6 +250,7 @@ body.app-style2 .app-style2-profile-page p {
 
 .app-style2-booking-records-container {
   display: flex;
+  flex-direction: column;
   height: 100%;
 }
 
