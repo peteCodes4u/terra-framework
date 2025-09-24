@@ -43,12 +43,13 @@ export default function BookingForm({
       const formattedDate = new Date(initialData.date)
         .toISOString()
         .slice(0, 10);
+      const startDate = new Date(initialData.start);
       setUpdatedForm({
         name: initialData.name || "",
         email: initialData.email || "",
         phoneNumber: initialData.phoneNumber || "",
         date: formattedDate,
-        time: initialData.time || "",
+        time: format(startDate, "HH:mm:ss"),
       });
 
     }
@@ -83,11 +84,21 @@ export default function BookingForm({
     fetch(`/api/availability?date=${updatedForm.date}`)
       .then((res) => res.json())
       .then((data) => {
-        setModalAvailableTimes(data.availableTimes || []);
+        let times = data.availableTimes || [];
+        // Ensure current booking time is in the list
+        if (
+          updatedForm.time &&
+          !times.includes(updatedForm.time)
+        ) {
+          times = [updatedForm.time, ...times];
+        }
+        setModalAvailableTimes(times);
       })
       .catch((err) => {
         console.error("Failed to fetch modal availability:", err);
-        setModalAvailableTimes([]);
+        setModalAvailableTimes(
+          updatedForm.time ? [updatedForm.time] : []
+        );
       })
       .finally(() => setLoadingModalTimes(false));
   }, [updatedForm.date]);
@@ -210,7 +221,7 @@ export default function BookingForm({
               id="name"
               name="name"
               required
-              value={formData.name}
+              value={formData.name || ""}
               onChange={handleInputChange}
             />
           </div>
@@ -221,7 +232,7 @@ export default function BookingForm({
               id="email"
               name="email"
               required
-              value={formData.email}
+              value={formData.email || ""}
               onChange={handleInputChange}
             />
           </div>
@@ -233,7 +244,7 @@ export default function BookingForm({
               name="phoneNumber"
               pattern="^\+?[1-9]\d{1,14}$"
               required
-              value={formData.phoneNumber}
+              value={formData.phoneNumber || ""}
               onChange={handleInputChange}
               placeholder="+15551234567"
               onInvalid={(e) =>
@@ -249,7 +260,7 @@ export default function BookingForm({
               id="date"
               name="date"
               required
-              value={formData.date}
+              value={formData.date || ""}
               onChange={handleInputChange}
             />
           </div>
@@ -262,7 +273,7 @@ export default function BookingForm({
                 id="time"
                 name="time"
                 required
-                value={formData.time}
+                value={formData.time || ""}
                 onChange={handleInputChange}
                 onClick={() => {
                   if (!formData.date) return;
@@ -307,25 +318,25 @@ export default function BookingForm({
               <Form.Control
                 type="text"
                 name="name"
-                value={updatedForm.name}
+                value={updatedForm.name || ""}
                 onChange={handleModalInputChange}
               />
             </Form.Group>
             <Form.Group>
-                <Form.Label>Email</Form.Label>
-                <Form.Control
-                  type="email"
-                  name="email"
-                  value={updatedForm.email}
-                  onChange={handleModalInputChange}
-                />
+              <Form.Label>Email</Form.Label>
+              <Form.Control
+                type="email"
+                name="email"
+                value={updatedForm.email || ""}
+                onChange={handleModalInputChange}
+              />
             </Form.Group>
             <Form.Group>
               <Form.Label>Phone Number</Form.Label>
-              <Form.Control 
+              <Form.Control
                 type="tel"
                 name="phoneNumber"
-                value={updatedForm.phoneNumber}
+                value={updatedForm.phoneNumber || ""}
                 onChange={handleModalInputChange}
               />
             </Form.Group>
@@ -334,7 +345,7 @@ export default function BookingForm({
               <Form.Control
                 type="date"
                 name="date"
-                value={updatedForm.date}
+                value={updatedForm.date || ""}
                 onChange={handleModalInputChange}
               />
             </Form.Group>
@@ -346,7 +357,7 @@ export default function BookingForm({
                 <Form.Control
                   as="select"
                   name="time"
-                  value={updatedForm.time}
+                  value={updatedForm.time || ""}
                   onClick={() => {
                     if (!updatedForm.date) return;
                     fetch(`/api/availability?date=${updatedForm.date}`)
