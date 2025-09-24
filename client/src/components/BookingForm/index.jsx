@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Form, Button, Modal, Alert } from "react-bootstrap";
+import { Form, Button, Modal } from "react-bootstrap";
 import { useStyle } from "../../StyleContext";
 import { parseISO, format } from "date-fns";
 
@@ -22,6 +22,7 @@ export default function BookingForm({
   const [availableTimes, setAvailableTimes] = useState([]);
   const [loadingTimes, setLoadingTimes] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [showErrorModal, setShowErrorModal] = useState(false);
 
   // === Modal state ===
   const [updatedForm, setUpdatedForm] = useState({
@@ -109,15 +110,16 @@ export default function BookingForm({
       const response = await onBookingCreated(payload);
       if (response && response.status === 400) {
         // Conflict error from backend
-        setErrorMessage("We're Sorry, you just missed it, This time slot has now been taken, please select a new time and try again thank you!.");
+        setErrorMessage("We're Sorry, you just missed it, While you were deciding, someone else just booked this time slot, please select a new time and try again thank you!");
+        setShowErrorModal(true);
         return;
       }
-      setErrorMessage(""); // Clear error on success
+      setErrorMessage("");
       setAvailableTimes((prev) => prev.filter((time) => time !== formData.time));
       fetch(`/api/availability?date=${formData.date}`)
-      .then((res) => res.json())
-      .then((data) => setAvailableTimes(data.availableTimes || []))
-      .catch((err) => console.error("Failed to refresh availability:", err));
+        .then((res) => res.json())
+        .then((data) => setAvailableTimes(data.availableTimes || []))
+        .catch((err) => console.error("Failed to refresh availability:", err));
       setFormData({ name: "", email: "", date: formData.date, time: "" });
     } catch (err) {
       setErrorMessage("Failed to create booking. Please try again.");
@@ -133,38 +135,56 @@ export default function BookingForm({
     const startDate = new Date(`${updatedForm.date}T${updatedForm.time}`);
     const endDate = new Date(startDate.getTime() + 30 * 60 * 1000);
 
-    await onBookingUpdated({
-      ...initialData,
-      start: startDate.toISOString(),
-      end: endDate.toISOString(),
-      date: updatedForm.date,
-    });
+    try {
+      const response = await onBookingUpdated({
+        ...initialData,
+        start: startDate.toISOString(),
+        end: endDate.toISOString(),
+        date: updatedForm.date,
+      });
 
-    // Remove booked time from modal availableTimes immediately
-    setModalAvailableTimes((prev) =>
-      prev.filter((time) => time !== updatedForm.time)
-    );
+      // Check for conflict error (status 400)
+      if (response && response.status === 400) {
+        setErrorMessage("We're Sorry, this time slot is no longer available. Please select a new time and try again.");
+        setShowErrorModal(true);
+        return;
+      }
 
-    fetch(`/api/availability?date=${updatedForm.date}`)
-      .then((res) => res.json())
-      .then((data) => setModalAvailableTimes(data.availableTimes || []))
-      .catch((err) => console.error("Failed to refresh modal availability:", err));
-
-    // Reset modal form but keep the selected date
-    setUpdatedForm({ date: updatedForm.date, time: "" });
-
-    if (onClose) onClose();
+      // Success: reset modal state and close
+      setErrorMessage("");
+      setModalAvailableTimes((prev) =>
+        prev.filter((time) => time !== updatedForm.time)
+      );
+      fetch(`/api/availability?date=${updatedForm.date}`)
+        .then((res) => res.json())
+        .then((data) => setModalAvailableTimes(data.availableTimes || []))
+        .catch((err) => console.error("Failed to refresh modal availability:", err));
+      setUpdatedForm({ date: updatedForm.date, time: "" });
+      if (onClose) onClose();
+    } catch (err) {
+      setErrorMessage("Failed to update booking. Please try again.");
+      setShowErrorModal(true);
+    }
   };
 
   // === Render ===
   return (
     <>
+      {/* error pop up modal */}
+      <Modal show={showErrorModal} onHide={() => setShowErrorModal(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Booking Error</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p>{errorMessage}</p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowErrorModal(false)}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
       {/* New Booking Form */}
-      {errorMessage && (
-        <Alert variant="danger" onClose={() => setErrorMessage("")} dismissible>
-          {errorMessage}
-        </Alert>
-      )}
       <Form className={`${activeStyle}-booking-form`} onSubmit={handleSubmit}>
         <div className={`${activeStyle}-form-container`}>
           <div className={`${activeStyle}-form-group`}>
@@ -278,14 +298,14 @@ export default function BookingForm({
                   }
                 >
                   <option value="">Select a time</option>
-                {availableTimes.map((time) => {
-                  const parsed = parseISO(`${formData.date}T${time}`);
-                  return (
-                    <option key={time} value={time}>
-                      {format(parsed, "h:mm a")}
-                    </option>
-                  )
-                })}
+                  {availableTimes.map((time) => {
+                    const parsed = parseISO(`${formData.date}T${time}`);
+                    return (
+                      <option key={time} value={time}>
+                        {format(parsed, "h:mm a")}
+                      </option>
+                    )
+                  })}
                 </Form.Control>
               )}
             </Form.Group>

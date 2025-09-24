@@ -37,8 +37,9 @@ export default function BookingPage() {
 
   const handleUpdateBooking = async (id, updatedData) => {
     const token = Auth.getToken();
-    await updateBooking(id, updatedData, token);
-    fetchBookings();
+    const response = await updateBooking(id, updatedData, token);
+    if (response.ok) fetchBookings();
+    return response;
   };
 
   const handleUpdate = (id, booking) => {
