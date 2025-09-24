@@ -299,7 +299,7 @@ export default function BookingForm({
                 >
                   <option value="">Select a time</option>
                   {modalAvailableTimes.map((time) => {
-                    const parsed = parseISO(`${formData.date}T${time}`);
+                    const parsed = parseISO(`${updatedForm.date}T${time}`);
                     return (
                       <option key={time} value={time}>
                         {format(parsed, "h:mm a")}
