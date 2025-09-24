@@ -54,7 +54,7 @@ export default function BookingPage() {
 
 const handleModalSubmit = async (updatedData) => {
   if (bookingToEdit && bookingToEdit._id) {
-    await handleUpdateBooking(bookingToEdit._id, updatedData);
+   return await handleUpdateBooking(bookingToEdit._id, updatedData);
   }
   setShowModal(false);
   setBookingToEdit(null);

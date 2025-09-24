@@ -298,7 +298,7 @@ export default function BookingForm({
                   }
                 >
                   <option value="">Select a time</option>
-                  {availableTimes.map((time) => {
+                  {modalAvailableTimes.map((time) => {
                     const parsed = parseISO(`${formData.date}T${time}`);
                     return (
                       <option key={time} value={time}>
