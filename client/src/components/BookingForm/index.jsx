@@ -145,7 +145,7 @@ export default function BookingForm({
 
       // Check for conflict error (status 400)
       if (response && response.status === 400) {
-        setErrorMessage("We're Sorry, this time slot is no longer available. Please select a new time and try again.");
+        setErrorMessage("We're Sorry, you just missed it, While you were deciding, someone else just booked this time slot, please select a new time and try again thank you!");
         setShowErrorModal(true);
         return;
       }
