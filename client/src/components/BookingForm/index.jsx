@@ -10,13 +10,14 @@ export default function BookingForm({
   initialData = {},
   onBookingUpdated,
 }) {
-  const today = new Date(); 
+  const today = new Date();
   const { activeStyle } = useStyle();
 
   // === Form state ===
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    phoneNumber: "",
     date: "",
     time: "",
   });
@@ -102,6 +103,7 @@ export default function BookingForm({
     const payload = {
       name: formData.name,
       email: formData.email,
+      phoneNumber: formData.phoneNumber,
       start: startDate.toISOString(),
       end: endDate.toISOString(),
       date: formData.date,
@@ -121,7 +123,7 @@ export default function BookingForm({
         .then((res) => res.json())
         .then((data) => setAvailableTimes(data.availableTimes || []))
         .catch((err) => console.error("Failed to refresh availability:", err));
-      setFormData({ name: "", email: "", date: formData.date, time: "" });
+      setFormData({ name: "", email: "", phoneNumber: "", date: formData.date, time: "" });
     } catch (err) {
       setErrorMessage("Failed to create booking. Please try again.");
     }
@@ -211,15 +213,21 @@ export default function BookingForm({
             />
           </div>
           <div className={`${activeStyle}-form-group`}>
-          <label>Phone Number:</label>
-          <input
-            type="text"
-            id="phoneNumber"
-            name="phoneNumber"
-            required
-            value={formData.phoneNumber}
-            onChange={handleInputChange}
-          />
+            <label>Phone Number:</label>
+            <input
+              type="tel"
+              id="phoneNumber"
+              name="phoneNumber"
+              pattern="^\+?[1-9]\d{1,14}$"
+              required
+              value={formData.phoneNumber}
+              onChange={handleInputChange}
+              placeholder="+15551234567"
+              onInvalid={(e) =>
+                e.target.setCustomValidity("Please enter a valid phone number, e.g. +15551234567")
+              }
+              onInput={(e) => e.target.setCustomValidity("")}
+            />
           </div>
           <div className={`${activeStyle}-form-group`}>
             <label htmlFor="date">Date:</label>
@@ -251,7 +259,7 @@ export default function BookingForm({
                     .catch((err) => console.error("Failed to refresh availability:", err));
                 }}
                 disabled={
-                  !formData.date || 
+                  !formData.date ||
                   availableTimes.length === 0 ||
                   formData.date === today.toISOString().slice(0, 10)
                 }
@@ -310,7 +318,7 @@ export default function BookingForm({
                   }}
                   onChange={handleModalInputChange}
                   disabled={
-                    !updatedForm.date || 
+                    !updatedForm.date ||
                     modalAvailableTimes.length === 0 ||
                     updatedForm.date === today.toISOString().slice(0, 10)
                   }

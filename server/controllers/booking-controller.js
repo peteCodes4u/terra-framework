@@ -5,7 +5,7 @@ module.exports = {
   // Create a new booking
   async createBooking(req, res) {
     try {
-      const { start, end, name, email } = req.body;
+      const { start, end, name, email, phoneNumber } = req.body;
 
       if (!start || !end) {
         return res.status(400).json({ message: "Start and end times are required" });
@@ -21,11 +21,11 @@ module.exports = {
       const existingBookings = await Booking.find({ date: dateStr });
 
       const conflict = existingBookings.some((b) => {
-        const bufferStart = addMinutes(new Date(b.start), -30);
-        const bufferEnd = addMinutes(new Date(b.end), 30);
+      const bufferStart = addMinutes(new Date(b.start), -30);
+      const bufferEnd = addMinutes(new Date(b.end), 30);
 
-        // New booking overlaps or too close to an existing one
-        return startDate < bufferEnd && endDate > bufferStart;
+      // New booking overlaps or too close to an existing one
+      return startDate < bufferEnd && endDate > bufferStart;
       });
 
       if (conflict) {
@@ -38,6 +38,7 @@ module.exports = {
       const booking = await Booking.create({
         name,
         email,
+        phoneNumber,
         start: startDate,
         end: endDate,
         date: dateStr,

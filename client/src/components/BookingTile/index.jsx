@@ -29,7 +29,7 @@ export default function BookingTile({ booking, onDelete, onUpdate }) {
       <div className={`${activeStyle}-booking-tile-info`}>
       <p>Contact: {booking.name}</p>
       <p>Email: {booking.email}</p>
-      <p>Phone:{booking.phoneNumber}</p>
+      <p>Phone: {booking.phoneNumber}</p>
       <p>Date: {formatDate(booking.start)}</p>
       <p>
         Time: {formatTime(booking.start)} - {formatTime(booking.end)}

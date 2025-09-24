@@ -13,6 +13,11 @@ const bookingSchema = new Schema(
       required: true,
       match: [/.+@.+\..+/, "Must use a valid email address"],
     },
+    phoneNumber: {
+      type: String,
+      required: true,
+      match: [/^\+?[1-9]\d{1,14}$/, "Must use a valid phone number"],
+    },
     date: {
       type: String,
       required: true,
