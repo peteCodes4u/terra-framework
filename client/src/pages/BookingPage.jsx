@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import BookingForm from '../components/BookingForm';
 import BookingTile from '../components/BookingTile';
-import {getAllBookings, createBooking, deleteBooking, updateBooking} from '../utils/API'
+import { getAllBookings, createBooking, deleteBooking, updateBooking } from '../utils/API'
 import Auth from '../utils/auth';
 import { useStyle } from '../StyleContext';
 
@@ -20,9 +20,9 @@ export default function BookingPage() {
     setBookings(data);
   };
 
-  useEffect(() => {fetchBookings(); }, []);
+  useEffect(() => { fetchBookings(); }, []);
 
-    const handleCreateBooking = async (formData) => {
+  const handleCreateBooking = async (formData) => {
     const token = Auth.getToken();
     const response = await createBooking(formData, token);
     if (response.ok) fetchBookings();
@@ -52,37 +52,37 @@ export default function BookingPage() {
     setBookingToEdit(null);
   };
 
-const handleModalSubmit = async (updatedData) => {
-  if (bookingToEdit && bookingToEdit._id) {
-   return await handleUpdateBooking(bookingToEdit._id, updatedData);
-  }
-  setShowModal(false);
-  setBookingToEdit(null);
-};
+  const handleModalSubmit = async (updatedData) => {
+    if (bookingToEdit && bookingToEdit._id) {
+      return await handleUpdateBooking(bookingToEdit._id, updatedData);
+    }
+    setShowModal(false);
+    setBookingToEdit(null);
+  };
 
   return (
     <section className={`${activeStyle}-booking`}>
       <div className={`${activeStyle}-booking-page-header`}>
-      <h2>Book an Appointment</h2>
-      <h2>Your Bookings</h2>
+        <h2>Book an Appointment</h2>
+        <h2>Your Bookings</h2>
       </div>
       <div className={`${activeStyle}-booking-feature`}>
-        <BookingForm 
+        <BookingForm
           onBookingCreated={handleCreateBooking}
           showModal={showModal}
           onClose={handleModalClose}
           initialData={bookingToEdit}
           onBookingUpdated={handleModalSubmit}
         />
-      <div className={`${activeStyle}-booking-records-container`}>
-                {bookings.map(b => (
-          <BookingTile
-            key={b._id}
-            booking={b}
-            onDelete={handleDeleteBooking}
-            onUpdate={handleUpdate}
-          />
-        ))}
+        <div className={`${activeStyle}-booking-records-container`}>
+          {bookings.map(b => (
+            <BookingTile
+              key={b._id}
+              booking={b}
+              onDelete={handleDeleteBooking}
+              onUpdate={handleUpdate}
+            />
+          ))}
         </div>
       </div>
     </section>

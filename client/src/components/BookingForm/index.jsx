@@ -211,6 +211,17 @@ export default function BookingForm({
             />
           </div>
           <div className={`${activeStyle}-form-group`}>
+          <label>Phone Number:</label>
+          <input
+            type="text"
+            id="phoneNumber"
+            name="phoneNumber"
+            required
+            value={formData.phoneNumber}
+            onChange={handleInputChange}
+          />
+          </div>
+          <div className={`${activeStyle}-form-group`}>
             <label htmlFor="date">Date:</label>
             <input
               type="date"

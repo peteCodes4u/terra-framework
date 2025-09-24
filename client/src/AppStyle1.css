@@ -252,6 +252,11 @@ body.app-style1 .app-style1-profile-page p {
   height: 40%; 
 }
 
+.app-style1-booking-records-container {
+  display: flex;
+  height: 100%;
+}
+
 .app-style1-booking-tile {
   background-color:#fff;
   border-radius: 1rem;
@@ -260,7 +265,13 @@ body.app-style1 .app-style1-profile-page p {
   margin-bottom: 2rem;
   max-width: 400px;
   width: 100%;
-  height: 205px; 
+  height: 100%; 
+}
+
+.app-style1-booking-tile-buttons {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 }
 
 .app-style1-form-container {
