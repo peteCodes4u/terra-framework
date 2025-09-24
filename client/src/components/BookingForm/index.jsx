@@ -37,24 +37,6 @@ export default function BookingForm({
   const [modalAvailableTimes, setModalAvailableTimes] = useState([]);
   const [loadingModalTimes, setLoadingModalTimes] = useState(false);
 
-  // === Initialize modal form with initialData ===
-  useEffect(() => {
-    if (initialData?.date) {
-      const formattedDate = new Date(initialData.date)
-        .toISOString()
-        .slice(0, 10);
-      const startDate = new Date(initialData.start);
-      setUpdatedForm({
-        name: initialData.name || "",
-        email: initialData.email || "",
-        phoneNumber: initialData.phoneNumber || "",
-        date: formattedDate,
-        time: format(startDate, "HH:mm:ss"),
-      });
-
-    }
-  }, [initialData]);
-
   // === Fetch available times for main form ===
   useEffect(() => {
     if (!formData.date) {
@@ -74,34 +56,38 @@ export default function BookingForm({
       .finally(() => setLoadingTimes(false));
   }, [formData.date]);
 
-  // === Fetch available times for modal form ===
+  // === Initialize modal form whenever modal opens ===
   useEffect(() => {
-    if (!updatedForm.date) {
-      setModalAvailableTimes([]);
-      return;
-    }
+    if (!showModal || !initialData?.date) return;
+
+    const formattedDate = new Date(initialData.date).toISOString().slice(0, 10);
+    const startDate = new Date(initialData.start);
+    const currentTime = format(startDate, "HH:mm:ss");
+
+    setUpdatedForm({
+      name: initialData.name || "",
+      email: initialData.email || "",
+      phoneNumber: initialData.phoneNumber || "",
+      date: formattedDate,
+      time: currentTime,
+    });
+
     setLoadingModalTimes(true);
-    fetch(`/api/availability?date=${updatedForm.date}`)
+    fetch(`/api/availability?date=${formattedDate}`)
       .then((res) => res.json())
       .then((data) => {
         let times = data.availableTimes || [];
-        // Ensure current booking time is in the list
-        if (
-          updatedForm.time &&
-          !times.includes(updatedForm.time)
-        ) {
-          times = [updatedForm.time, ...times];
+        if (!times.includes(currentTime)) {
+          times = [currentTime, ...times];
         }
         setModalAvailableTimes(times);
       })
       .catch((err) => {
         console.error("Failed to fetch modal availability:", err);
-        setModalAvailableTimes(
-          updatedForm.time ? [updatedForm.time] : []
-        );
+        setModalAvailableTimes([currentTime]);
       })
       .finally(() => setLoadingModalTimes(false));
-  }, [updatedForm.date]);
+  }, [showModal, initialData]);
 
   // === Handlers ===
   const handleInputChange = (e) => {
@@ -117,7 +103,6 @@ export default function BookingForm({
   // === Submit for new booking ===
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     const startDate = new Date(`${formData.date}T${formData.time}`);
     const endDate = new Date(startDate.getTime() + 30 * 60 * 1000);
 
@@ -133,8 +118,9 @@ export default function BookingForm({
     try {
       const response = await onBookingCreated(payload);
       if (response && response.status === 400) {
-        // Conflict error from backend
-        setErrorMessage("We're Sorry, you just missed it, While you were deciding, someone else just booked this time slot, please select a new time and try again thank you!");
+        setErrorMessage(
+          "We're Sorry, you just missed it. Someone else booked this time slot. Please select a new time."
+        );
         setShowErrorModal(true);
         return;
       }
@@ -153,7 +139,6 @@ export default function BookingForm({
   // === Submit for modal update ===
   const handleModalSubmit = async (e) => {
     e.preventDefault();
-
     if (!onBookingUpdated) return;
 
     const startDate = new Date(`${updatedForm.date}T${updatedForm.time}`);
@@ -170,23 +155,27 @@ export default function BookingForm({
         date: updatedForm.date,
       });
 
-      // Check for conflict error (status 400)
       if (response && response.status === 400) {
-        setErrorMessage("We're Sorry, you just missed it, While you were deciding, someone else just booked this time slot, please select a new time and try again thank you!");
+        setErrorMessage(
+          "We're Sorry, you just missed it. Someone else booked this time slot. Please select a new time."
+        );
         setShowErrorModal(true);
         return;
       }
 
-      // Success: reset modal state and close
       setErrorMessage("");
-      setModalAvailableTimes((prev) =>
-        prev.filter((time) => time !== updatedForm.time)
-      );
+      // Refresh modal available times after update
       fetch(`/api/availability?date=${updatedForm.date}`)
         .then((res) => res.json())
-        .then((data) => setModalAvailableTimes(data.availableTimes || []))
+        .then((data) => {
+          let times = data.availableTimes || [];
+          if (!times.includes(updatedForm.time)) {
+            times = [updatedForm.time, ...times];
+          }
+          setModalAvailableTimes(times);
+        })
         .catch((err) => console.error("Failed to refresh modal availability:", err));
-      setUpdatedForm({ date: updatedForm.date, time: "" });
+
       if (onClose) onClose();
     } catch (err) {
       setErrorMessage("Failed to update booking. Please try again.");
@@ -197,7 +186,7 @@ export default function BookingForm({
   // === Render ===
   return (
     <>
-      {/* error pop up modal */}
+      {/* Error Modal */}
       <Modal show={showErrorModal} onHide={() => setShowErrorModal(false)} centered>
         <Modal.Header closeButton>
           <Modal.Title>Booking Error</Modal.Title>
@@ -211,30 +200,17 @@ export default function BookingForm({
           </Button>
         </Modal.Footer>
       </Modal>
+
       {/* New Booking Form */}
       <Form className={`${activeStyle}-booking-form`} onSubmit={handleSubmit}>
         <div className={`${activeStyle}-form-container`}>
           <div className={`${activeStyle}-form-group`}>
             <label htmlFor="name">Name:</label>
-            <input
-              type="text"
-              id="name"
-              name="name"
-              required
-              value={formData.name || ""}
-              onChange={handleInputChange}
-            />
+            <input type="text" id="name" name="name" required value={formData.name || ""} onChange={handleInputChange} />
           </div>
           <div className={`${activeStyle}-form-group`}>
             <label htmlFor="email">Email:</label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              required
-              value={formData.email || ""}
-              onChange={handleInputChange}
-            />
+            <input type="email" id="email" name="email" required value={formData.email || ""} onChange={handleInputChange} />
           </div>
           <div className={`${activeStyle}-form-group`}>
             <label>Phone Number:</label>
@@ -247,22 +223,13 @@ export default function BookingForm({
               value={formData.phoneNumber || ""}
               onChange={handleInputChange}
               placeholder="+15551234567"
-              onInvalid={(e) =>
-                e.target.setCustomValidity("Please enter a valid phone number, e.g. +15551234567")
-              }
+              onInvalid={(e) => e.target.setCustomValidity("Please enter a valid phone number, e.g. +15551234567")}
               onInput={(e) => e.target.setCustomValidity("")}
             />
           </div>
           <div className={`${activeStyle}-form-group`}>
             <label htmlFor="date">Date:</label>
-            <input
-              type="date"
-              id="date"
-              name="date"
-              required
-              value={formData.date || ""}
-              onChange={handleInputChange}
-            />
+            <input type="date" id="date" name="date" required value={formData.date || ""} onChange={handleInputChange} />
           </div>
           <div className={`${activeStyle}-form-group`}>
             <label htmlFor="time">Time:</label>
@@ -275,18 +242,7 @@ export default function BookingForm({
                 required
                 value={formData.time || ""}
                 onChange={handleInputChange}
-                onClick={() => {
-                  if (!formData.date) return;
-                  fetch(`/api/availability?date=${formData.date}`)
-                    .then((res) => res.json())
-                    .then((data) => setAvailableTimes(data.availableTimes || []))
-                    .catch((err) => console.error("Failed to refresh availability:", err));
-                }}
-                disabled={
-                  !formData.date ||
-                  availableTimes.length === 0 ||
-                  formData.date === today.toISOString().slice(0, 10)
-                }
+                disabled={!formData.date || availableTimes.length === 0 || formData.date === today.toISOString().slice(0, 10)}
               >
                 <option value="">Select a time</option>
                 {availableTimes.map((time) => {
@@ -295,7 +251,7 @@ export default function BookingForm({
                     <option key={time} value={time}>
                       {format(parsed, "h:mm a")}
                     </option>
-                  )
+                  );
                 })}
               </select>
             )}
@@ -315,65 +271,26 @@ export default function BookingForm({
           <Form onSubmit={handleModalSubmit}>
             <Form.Group controlId="formName">
               <Form.Label>Name</Form.Label>
-              <Form.Control
-                type="text"
-                name="name"
-                value={updatedForm.name || ""}
-                onChange={handleModalInputChange}
-              />
+              <Form.Control type="text" name="name" value={updatedForm.name || ""} onChange={handleModalInputChange} />
             </Form.Group>
             <Form.Group>
               <Form.Label>Email</Form.Label>
-              <Form.Control
-                type="email"
-                name="email"
-                value={updatedForm.email || ""}
-                onChange={handleModalInputChange}
-              />
+              <Form.Control type="email" name="email" value={updatedForm.email || ""} onChange={handleModalInputChange} />
             </Form.Group>
             <Form.Group>
               <Form.Label>Phone Number</Form.Label>
-              <Form.Control
-                type="tel"
-                name="phoneNumber"
-                value={updatedForm.phoneNumber || ""}
-                onChange={handleModalInputChange}
-              />
+              <Form.Control type="tel" name="phoneNumber" value={updatedForm.phoneNumber || ""} onChange={handleModalInputChange} />
             </Form.Group>
             <Form.Group controlId="formDate">
               <Form.Label>Date</Form.Label>
-              <Form.Control
-                type="date"
-                name="date"
-                value={updatedForm.date || ""}
-                onChange={handleModalInputChange}
-              />
+              <Form.Control type="date" name="date" value={updatedForm.date || ""} onChange={handleModalInputChange} />
             </Form.Group>
             <Form.Group controlId="formTime">
               <Form.Label>Time</Form.Label>
               {loadingModalTimes ? (
                 <p>Loading available times...</p>
               ) : (
-                <Form.Control
-                  as="select"
-                  name="time"
-                  value={updatedForm.time || ""}
-                  onClick={() => {
-                    if (!updatedForm.date) return;
-                    fetch(`/api/availability?date=${updatedForm.date}`)
-                      .then((res) => res.json())
-                      .then((data) => setModalAvailableTimes(data.availableTimes || []))
-                      .catch((err) =>
-                        console.error("Failed to refresh availability:", err)
-                      );
-                  }}
-                  onChange={handleModalInputChange}
-                  disabled={
-                    !updatedForm.date ||
-                    modalAvailableTimes.length === 0 ||
-                    updatedForm.date === today.toISOString().slice(0, 10)
-                  }
-                >
+                <Form.Control as="select" name="time" value={updatedForm.time || ""} onChange={handleModalInputChange}>
                   <option value="">Select a time</option>
                   {modalAvailableTimes.map((time) => {
                     const parsed = parseISO(`${updatedForm.date}T${time}`);
@@ -381,16 +298,12 @@ export default function BookingForm({
                       <option key={time} value={time}>
                         {format(parsed, "h:mm a")}
                       </option>
-                    )
+                    );
                   })}
                 </Form.Control>
               )}
             </Form.Group>
-            <Button
-              variant="primary"
-              type="submit"
-              disabled={!updatedForm.date || !updatedForm.time}
-            >
+            <Button variant="primary" type="submit" disabled={!updatedForm.date || !updatedForm.time}>
               Update Booking
             </Button>
           </Form>
