@@ -248,6 +248,16 @@ body.app-style4 .app-style4-profile-page p {
   width: 100%;
   height: 40%; 
 }
+.app-style4-booking-records-container {
+  display: flex;
+  height: 100%;
+}
+
+.app-style4-booking-tile-buttons {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
 
 .app-style4-booking-tile {
   background-color:#24f643;
@@ -257,7 +267,7 @@ body.app-style4 .app-style4-profile-page p {
   margin-bottom: 2rem;
   max-width: 400px;
   width: 100%;
-  height: 205px; 
+  height: 100%; 
 }
 
 .app-style4-form-container {
