@@ -75,6 +75,7 @@ export default function BookingForm({
       .then((data) => {
         setAvailableTimes(data.availableTimes || []);
         if (data.callLengthMinutes) setCallLengthMinutes(data.callLengthMinutes);
+        if (data.bufferMinutes) console.log("Buffer applied:", data.bufferMinutes);
       })
       .catch((err) => {
         console.error("Failed to fetch availability:", err);

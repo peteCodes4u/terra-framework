@@ -2,6 +2,7 @@ const { TokenExpiredError } = require("jsonwebtoken");
 const { Booking } = require("../models");
 const { addMinutes } = require("date-fns");
 const { signToken } = require("../utils/auth");
+const calendarData = require("../calendarData.json");
 
 module.exports = {
   // Create a new booking
@@ -22,9 +23,11 @@ module.exports = {
       // Conflict check: find existing bookings on the same day
       const existingBookings = await Booking.find({ date: dateStr });
 
+      const bufferMinutes = calendarData.bufferMinutes || 0;
+
       const conflict = existingBookings.some((b) => {
-        const bufferStart = addMinutes(new Date(b.start), -30);
-        const bufferEnd = addMinutes(new Date(b.end), 30);
+        const bufferStart = addMinutes(new Date(b.start), -bufferMinutes);
+        const bufferEnd = addMinutes(new Date(b.end), bufferMinutes);
 
         // New booking overlaps or too close to an existing one
         return startDate < bufferEnd && endDate > bufferStart;

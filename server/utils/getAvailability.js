@@ -34,6 +34,8 @@ function getAvailability(dateStr, bookedEvents = []) {
     };
   }
 
+  const bufferMinutes = calendarData.bufferMinutes || 0;
+
   // Only block slots that overlap with events
   const conflictFree = slots.filter((slot) => {
     const slotStart = parseISO(slot);
@@ -43,7 +45,11 @@ function getAvailability(dateStr, bookedEvents = []) {
     return !events.some((ev) => {
       const evStart = parseISO(ev.start);
       const evEnd = parseISO(ev.end);
-      return slotStart < evEnd && slotEnd > evStart;
+
+      const bufferStart = addMinutes(evStart, -bufferMinutes);
+      const bufferEnd = addMinutes(evEnd, bufferMinutes);
+
+      return slotStart < bufferEnd && slotEnd > bufferStart;
     });
   });
 
@@ -53,7 +59,8 @@ function getAvailability(dateStr, bookedEvents = []) {
     date: dateStr,
     availableTimes: conflictFree.map((s) => format(parseISO(s), "HH:mm")),
     unavailableTimes: unavailableTimes.map((s) => format(parseISO(s), "HH:mm")),
-    callLengthMinutes: calendarData.callLengthMinutes
+    callLengthMinutes: calendarData.callLengthMinutes,
+    bufferMinutes: calendarData.bufferMinutes
   };
 }
 
