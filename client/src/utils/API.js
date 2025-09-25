@@ -70,12 +70,16 @@ export const updateBooking = async(bookingId, userData, token) => {
   return response.json();
 };
 // Route to delete a booking by its ID
-export const deleteBooking = (bookingId, token) => {
-  return fetch(`/api/booking/${bookingId}`, {
+export const deleteBooking = async (bookingId, token) => {
+  const response = await fetch(`/api/booking/${bookingId}`, {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",
       authorization: `Bearer ${token}`,
     },
   });
+  const result = await response.json();
+  if(result.token) {
+    localStorage.setItem("id_token", result.token);
+  }
 };

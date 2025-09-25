@@ -72,7 +72,8 @@ module.exports = {
       if (!booking) {
         return res.status(404).json({ message: "Booking not found" });
       }
-      res.status(200).json({ message: "Booking deleted successfully" });
+      const token = signToken(req.user);
+      res.status(200).json({ sucess: true, token, user: req.user });
     } catch (err) {
       res.status(500).json(err);
     }
