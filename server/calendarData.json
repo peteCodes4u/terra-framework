@@ -1,5 +1,6 @@
 {
   "slotLengthMinutes": 60,
+  "callLengthMinutes": 45,
   "unavailableDates": [
     "2025-09-12",
     "2025-09-18",

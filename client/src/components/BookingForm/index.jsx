@@ -37,6 +37,15 @@ export default function BookingForm({
   const [modalAvailableTimes, setModalAvailableTimes] = useState([]);
   const [loadingModalTimes, setLoadingModalTimes] = useState(false);
 
+  const [callLengthMinutes, setCallLengthMinutes] = useState(30);
+
+  useEffect(() => {
+    fetch("/api/availability")
+      .then((res) => res.json())
+      .then((data) => setCallLengthMinutes(data.callLengthMinutes || 30))
+      .catch(() => setCallLengthMinutes(30));
+  }, []);
+
   // === Initialize modal form with initialData ===
   useEffect(() => {
     if (initialData?.date) {
@@ -65,6 +74,7 @@ export default function BookingForm({
       .then((res) => res.json())
       .then((data) => {
         setAvailableTimes(data.availableTimes || []);
+        if (data.callLengthMinutes) setCallLengthMinutes(data.callLengthMinutes);
       })
       .catch((err) => {
         console.error("Failed to fetch availability:", err);
@@ -108,14 +118,15 @@ export default function BookingForm({
     e.preventDefault();
 
     const startDate = new Date(`${formData.date}T${formData.time}`);
-    const endDate = new Date(startDate.getTime() + 30 * 60 * 1000);
+    // const endDate = new Date(startDate.getTime() + 30 * 60 * 1000);
 
     const payload = {
       name: formData.name,
       email: formData.email,
       phoneNumber: formData.phoneNumber,
       start: startDate.toISOString(),
-      end: endDate.toISOString(),
+      // end: endDate.toISOString(),
+      end: new Date(startDate.getTime() + callLengthMinutes * 60 * 1000).toISOString(),
       date: formData.date,
     };
 
@@ -124,11 +135,11 @@ export default function BookingForm({
       const response = await onBookingCreated(payload);
 
       // when the backend sends a new token, update localStorage
-      if(response && response.token) {
+      if (response && response.token) {
         localStorage.setItem("id_token", response.token);
       }
 
-      if (response && (response.status === 400 || response.error === "Conflict" )) {
+      if (response && (response.status === 400 || response.error === "Conflict")) {
         // Conflict error from backend
         setErrorMessage(response.message || "Conflict Error");
         setShowErrorModal(true);
@@ -151,7 +162,7 @@ export default function BookingForm({
     e.preventDefault();
 
     if (!onBookingUpdated) return;
-    
+
     // Use the original time if the user did not change it
     const timeToUse = updatedForm.time || (initialData.time || format(new Date(initialData.start), "HH:mm"));
     const dateToUse = updatedForm.date;
@@ -171,12 +182,12 @@ export default function BookingForm({
       });
 
       // when the backend sends a new token, update localStorage
-      if(response && response.token) {
+      if (response && response.token) {
         localStorage.setItem("id_token", response.token);
       }
 
       // Check for conflict error (status 400)
-        if (response && (response.status === 400 || response.error === "Conflict" )) {
+      if (response && (response.status === 400 || response.error === "Conflict")) {
         // Conflict error from backend
         setErrorMessage(response.message || "Conflict Error");
         setShowErrorModal(true);
@@ -200,16 +211,16 @@ export default function BookingForm({
     }
   };
 
-function isUpdateEnabled() {
-  const safeInitial = initialData || {};
-  return (
-    updatedForm.name !== (safeInitial.name || "") ||
-    updatedForm.email !== (safeInitial.email || "") ||
-    updatedForm.phoneNumber !== (safeInitial.phoneNumber || "") ||
-    updatedForm.date !== (safeInitial.date ? safeInitial.date.slice(0, 10) : "") ||
-    updatedForm.time !== (safeInitial.time || "")
-  );
-}
+  function isUpdateEnabled() {
+    const safeInitial = initialData || {};
+    return (
+      updatedForm.name !== (safeInitial.name || "") ||
+      updatedForm.email !== (safeInitial.email || "") ||
+      updatedForm.phoneNumber !== (safeInitial.phoneNumber || "") ||
+      updatedForm.date !== (safeInitial.date ? safeInitial.date.slice(0, 10) : "") ||
+      updatedForm.time !== (safeInitial.time || "")
+    );
+  }
 
   // === Render ===
   return (
@@ -340,17 +351,17 @@ function isUpdateEnabled() {
               />
             </Form.Group>
             <Form.Group>
-                <Form.Label>Email</Form.Label>
-                <Form.Control
-                  type="email"
-                  name="email"
-                  value={updatedForm.email ?? ""}
-                  onChange={handleModalInputChange}
-                />
+              <Form.Label>Email</Form.Label>
+              <Form.Control
+                type="email"
+                name="email"
+                value={updatedForm.email ?? ""}
+                onChange={handleModalInputChange}
+              />
             </Form.Group>
             <Form.Group>
               <Form.Label>Phone Number</Form.Label>
-              <Form.Control 
+              <Form.Control
                 type="tel"
                 name="phoneNumber"
                 value={updatedForm.phoneNumber ?? ""}
