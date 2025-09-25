@@ -1,5 +1,5 @@
 const calendarData = require("../calendarData.json");
-const { addMinutes, isBefore, isAfter, parseISO, format } = require("date-fns");
+const { addMinutes, isBefore, isAfter, parseISO, format, getDay } = require("date-fns");
 const { normalizeCalendarData } = require("./normalizeCalendar");
 
 /**
@@ -12,8 +12,11 @@ function getAvailability(dateStr, bookedEvents = []) {
   const events = [...normalizeCalendarData(), ...bookedEvents];
   const businessHours = calendarData.businessHours;
   const slotLength = calendarData.slotLengthMinutes || 30;
-  const date = new Date(dateStr);
-  const dayOfWeek = date.toLocaleDateString("en-US", { weekday: "long" }).toLowerCase();
+  const date = parseISO(dateStr);
+  const dayIndex = getDay(date);
+  const days = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+  const dayOfWeek = days[dayIndex];
+  
   const hours = businessHours[dayOfWeek];
   if (!hours) {
     return { date: dateStr, availableTimes: [], unavailableTimes: [] };
