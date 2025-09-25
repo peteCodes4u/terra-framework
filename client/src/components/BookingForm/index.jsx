@@ -120,7 +120,14 @@ export default function BookingForm({
     };
 
     try {
+      // Call API and get the response
       const response = await onBookingCreated(payload);
+
+      // when the backend sends a new token, update localStorage
+      if(response && response.token) {
+        localStorage.setItem("id_token", response.token);
+      }
+
       if (response && response.status === 400) {
         // Conflict error from backend
         setErrorMessage("We're Sorry, you just missed it, While you were deciding, someone else just booked this time slot, please select a new time and try again thank you!");

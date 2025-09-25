@@ -35,8 +35,8 @@ export const loginUser = (userData) => {
 };
 
 // route to book an appointment
-export const createBooking = (formData, token) => {
-  return fetch("/api/booking", {
+export const createBooking = async (formData, token) => {
+  const response = await fetch("/api/booking", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -44,6 +44,7 @@ export const createBooking = (formData, token) => {
     },
     body: JSON.stringify(formData),
   });
+  return response.json();
 };
 
 // route to get all bookings

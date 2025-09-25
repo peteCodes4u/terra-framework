@@ -1,5 +1,7 @@
+const { TokenExpiredError } = require("jsonwebtoken");
 const { Booking } = require("../models");
 const { addMinutes } = require("date-fns");
+const { signToken } = require("../utils/auth");
 
 module.exports = {
   // Create a new booking
@@ -44,8 +46,8 @@ module.exports = {
         date: dateStr,
         user: req.user._id,
       });
-
-      res.status(200).json(booking);
+      const token = signToken(req.user)
+      res.status(200).json({booking, token, user: req.user});
     } catch (err) {
       console.error("Error creating booking:", err);
       res.status(500).json({ message: "Server error", error: err.message });
