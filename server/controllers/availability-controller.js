@@ -8,10 +8,6 @@ const Booking = require("../models/Booking");
 async function checkAvailability(req, res) {
   const { date } = req.query;
 
-  if (!date) {
-    return res.status(400).json({ error: "Missing required query param: date" });
-  }
-
   try {
     // Fetch bookings for this date from DB
     const bookings = await Booking.find({ date });
