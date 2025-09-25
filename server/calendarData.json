@@ -1,7 +1,7 @@
 {
-  "slotLengthMinutes": 60,
+  "slotLengthMinutes": 45,
   "callLengthMinutes": 30,
-  "bufferMinutes": 30,
+  "bufferMinutes": 15,
   "unavailableDates": [
     "2025-09-12",
     "2025-09-18",
