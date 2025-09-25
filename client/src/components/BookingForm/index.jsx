@@ -334,7 +334,7 @@ function isUpdateEnabled() {
               <Form.Control
                 type="text"
                 name="name"
-                value={updatedForm.name}
+                value={updatedForm.name ?? ""}
                 onChange={handleModalInputChange}
               />
             </Form.Group>
@@ -343,7 +343,7 @@ function isUpdateEnabled() {
                 <Form.Control
                   type="email"
                   name="email"
-                  value={updatedForm.email}
+                  value={updatedForm.email ?? ""}
                   onChange={handleModalInputChange}
                 />
             </Form.Group>
@@ -352,7 +352,7 @@ function isUpdateEnabled() {
               <Form.Control 
                 type="tel"
                 name="phoneNumber"
-                value={updatedForm.phoneNumber}
+                value={updatedForm.phoneNumber ?? ""}
                 onChange={handleModalInputChange}
               />
             </Form.Group>
@@ -361,7 +361,7 @@ function isUpdateEnabled() {
               <Form.Control
                 type="date"
                 name="date"
-                value={updatedForm.date}
+                value={updatedForm.date ?? ""}
                 onChange={handleModalInputChange}
               />
             </Form.Group>
@@ -373,7 +373,7 @@ function isUpdateEnabled() {
                 <Form.Control
                   as="select"
                   name="time"
-                  value={updatedForm.time}
+                  value={updatedForm.time ?? ""}
                   onClick={() => {
                     if (!updatedForm.date) return;
                     fetch(`/api/availability?date=${updatedForm.date}`)
