@@ -144,8 +144,12 @@ export default function BookingForm({
     e.preventDefault();
 
     if (!onBookingUpdated) return;
+    
+    // Use the original time if the user did not change it
+    const timeToUse = updatedForm.time || (initialData.time || format(new Date(initialData.start), "HH:mm"));
+    const dateToUse = updatedForm.date;
 
-    const startDate = new Date(`${updatedForm.date}T${updatedForm.time}`);
+    const startDate = new Date(`${dateToUse}T${timeToUse}`);
     const endDate = new Date(startDate.getTime() + 30 * 60 * 1000);
 
     try {
@@ -182,6 +186,17 @@ export default function BookingForm({
       setShowErrorModal(true);
     }
   };
+
+function isUpdateEnabled() {
+  const safeInitial = initialData || {};
+  return (
+    updatedForm.name !== (safeInitial.name || "") ||
+    updatedForm.email !== (safeInitial.email || "") ||
+    updatedForm.phoneNumber !== (safeInitial.phoneNumber || "") ||
+    updatedForm.date !== (safeInitial.date ? safeInitial.date.slice(0, 10) : "") ||
+    updatedForm.time !== (safeInitial.time || "")
+  );
+}
 
   // === Render ===
   return (
@@ -378,7 +393,7 @@ export default function BookingForm({
             <Button
               variant="primary"
               type="submit"
-              disabled={!updatedForm.date || !updatedForm.time}
+              disabled={!isUpdateEnabled()}
             >
               Update Booking
             </Button>
