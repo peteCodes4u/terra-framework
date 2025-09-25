@@ -18,6 +18,7 @@ function getAvailability(dateStr, bookedEvents = []) {
   const dayOfWeek = days[dayIndex];
   const hours = businessHours[dayOfWeek];
   if (!hours) {
+    // No business hours for this day, so no available times
     return { date: dateStr, availableTimes: [], unavailableTimes: [] };
   }
 

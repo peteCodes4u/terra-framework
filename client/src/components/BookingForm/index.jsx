@@ -60,7 +60,13 @@ export default function BookingForm({
   useEffect(() => {
     if (!showModal || !initialData?.date) return;
 
-    const formattedDate = new Date(initialData.date).toISOString().slice(0, 10);
+    // If initialData.date is already 'YYYY-MM-DD', use it directly
+    let formattedDate = initialData.date;
+    // If it's an ISO string, extract the date portion
+    if (formattedDate.includes("T")) {
+      formattedDate = formattedDate.split("T")[0];
+    }
+
     const startDate = new Date(initialData.start);
     const currentTime = format(startDate, "HH:mm:ss");
 
@@ -77,35 +83,32 @@ export default function BookingForm({
       .then((res) => res.json())
       .then((data) => {
         let times = data.availableTimes || [];
-        if (!times.includes(currentTime)) {
-          times = [currentTime, ...times];
-        }
         setModalAvailableTimes(times);
       })
       .catch((err) => {
         console.error("Failed to fetch modal availability:", err);
-        setModalAvailableTimes([currentTime]);
+        setModalAvailableTimes([]);
       })
       .finally(() => setLoadingModalTimes(false));
   }, [showModal, initialData]);
 
   // === Handlers ===
-const handleInputChange = (e) => {
-  const { name, value } = e.target;
-  setFormData((prev) => ({
-    ...prev,
-    [name]: value,
-    ...(name === "date" ? { time: "" } : {})
-  }));
-};
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+      ...(name === "date" ? { time: "" } : {})
+    }));
+  };
 
   const handleModalInputChange = (e) => {
     const { name, value } = e.target;
     setUpdatedForm((prev) => ({
-    ...prev,
-    [name]: value,
-    ...(name === "date" ? { time: "" } : {})
-  }));
+      ...prev,
+      [name]: value,
+      ...(name === "date" ? { time: "" } : {})
+    }));
   };
 
   // === Submit for new booking ===
@@ -149,6 +152,22 @@ const handleInputChange = (e) => {
     e.preventDefault();
     if (!onBookingUpdated) return;
 
+    const originalTime = format(new Date(initialData.start), "HH:mm:ss");
+    const originalDate = initialData.date.includes("T")
+      ? initialData.date.split("T")[0]
+      : initialData.date;
+
+    // Check if date/time was changed
+    const dateChanged = updatedForm.date !== originalDate;
+    const timeChanged = updatedForm.time !== originalTime;
+
+    // If user changed date/time, enforce availability
+    if ((dateChanged || timeChanged) && !modalAvailableTimes.includes(updatedForm.time)) {
+      setErrorMessage("This time is not available. Please select a valid slot.");
+      setShowErrorModal(true);
+      return;
+    }
+
     const startDate = new Date(`${updatedForm.date}T${updatedForm.time}`);
     const endDate = new Date(startDate.getTime() + 30 * 60 * 1000);
 
@@ -165,27 +184,22 @@ const handleInputChange = (e) => {
 
       if (response && response.status === 400) {
         setErrorMessage(
-          "We're Sorry, you just missed it. Someone else booked this time slot. Please select a new time."
+          "We're sorry, that slot was just booked. Please select another time."
         );
         setShowErrorModal(true);
         return;
       }
 
       setErrorMessage("");
-      // Refresh modal available times after update
+      // Refresh modal available times
       fetch(`/api/availability?date=${updatedForm.date}`)
         .then((res) => res.json())
-        .then((data) => {
-          let times = data.availableTimes || [];
-          if (!times.includes(updatedForm.time)) {
-            times = [updatedForm.time, ...times];
-          }
-          setModalAvailableTimes(times);
-        })
+        .then((data) => setModalAvailableTimes(data.availableTimes || []))
         .catch((err) => console.error("Failed to refresh modal availability:", err));
 
       if (onClose) onClose();
     } catch (err) {
+      console.error("Error updating booking:", err);
       setErrorMessage("Failed to update booking. Please try again.");
       setShowErrorModal(true);
     }
@@ -298,7 +312,12 @@ const handleInputChange = (e) => {
               {loadingModalTimes ? (
                 <p>Loading available times...</p>
               ) : (
-                <Form.Control as="select" name="time" value={updatedForm.time || ""} onChange={handleModalInputChange}>
+                <Form.Control
+                  as="select"
+                  name="time"
+                  value={updatedForm.time || ""}
+                  onChange={handleModalInputChange}
+                >
                   <option value="">Select a time</option>
                   {modalAvailableTimes.map((time) => {
                     const parsed = parseISO(`${updatedForm.date}T${time}`);
