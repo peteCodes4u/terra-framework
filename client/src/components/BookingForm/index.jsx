@@ -118,14 +118,12 @@ export default function BookingForm({
     e.preventDefault();
 
     const startDate = new Date(`${formData.date}T${formData.time}`);
-    // const endDate = new Date(startDate.getTime() + 30 * 60 * 1000);
 
     const payload = {
       name: formData.name,
       email: formData.email,
       phoneNumber: formData.phoneNumber,
       start: startDate.toISOString(),
-      // end: endDate.toISOString(),
       end: new Date(startDate.getTime() + callLengthMinutes * 60 * 1000).toISOString(),
       date: formData.date,
     };
@@ -168,7 +166,6 @@ export default function BookingForm({
     const dateToUse = updatedForm.date;
 
     const startDate = new Date(`${dateToUse}T${timeToUse}`);
-    const endDate = new Date(startDate.getTime() + 30 * 60 * 1000);
 
     try {
       const response = await onBookingUpdated({
@@ -177,7 +174,7 @@ export default function BookingForm({
         email: updatedForm.email,
         phoneNumber: updatedForm.phoneNumber,
         start: startDate.toISOString(),
-        end: endDate.toISOString(),
+        end: new Date(startDate.getTime() + callLengthMinutes * 60 * 1000).toISOString(),
         date: updatedForm.date,
       });
 
