@@ -107,7 +107,9 @@ module.exports = {
 
       await booking.save();
 
-      res.status(200).json(booking);
+      const token = signToken(req.user)
+      res.status(200).json({booking, token, user: req.user});
+      
     } catch (err) {
       console.error("Error updating booking:", err);
       res.status(400).json({ message: "Error updating booking", error: err.message });

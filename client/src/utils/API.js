@@ -58,8 +58,8 @@ export const getAllBookings = (token) => {
 };
 
 // Route to update a booking by its ID
-export const updateBooking = (bookingId, userData, token) => {
-  return fetch(`/api/booking/${bookingId}`, {
+export const updateBooking = async(bookingId, userData, token) => {
+  const response = await fetch(`/api/booking/${bookingId}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -67,6 +67,7 @@ export const updateBooking = (bookingId, userData, token) => {
     },
     body: JSON.stringify(userData),
   });
+  return response.json();
 };
 // Route to delete a booking by its ID
 export const deleteBooking = (bookingId, token) => {

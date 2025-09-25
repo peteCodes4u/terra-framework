@@ -170,6 +170,11 @@ export default function BookingForm({
         date: updatedForm.date,
       });
 
+      // when the backend sends a new token, update localStorage
+      if(response && response.token) {
+        localStorage.setItem("id_token", response.token);
+      }
+
       // Check for conflict error (status 400)
       if (response && response.status === 400) {
         setErrorMessage("We're Sorry, you just missed it, While you were deciding, someone else just booked this time slot, please select a new time and try again thank you!");
