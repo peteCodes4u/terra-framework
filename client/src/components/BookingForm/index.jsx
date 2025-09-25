@@ -90,14 +90,22 @@ export default function BookingForm({
   }, [showModal, initialData]);
 
   // === Handlers ===
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
+const handleInputChange = (e) => {
+  const { name, value } = e.target;
+  setFormData((prev) => ({
+    ...prev,
+    [name]: value,
+    ...(name === "date" ? { time: "" } : {})
+  }));
+};
 
   const handleModalInputChange = (e) => {
     const { name, value } = e.target;
-    setUpdatedForm((prev) => ({ ...prev, [name]: value }));
+    setUpdatedForm((prev) => ({
+    ...prev,
+    [name]: value,
+    ...(name === "date" ? { time: "" } : {})
+  }));
   };
 
   // === Submit for new booking ===
