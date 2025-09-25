@@ -48,13 +48,14 @@ export const createBooking = async (formData, token) => {
 };
 
 // route to get all bookings
-export const getAllBookings = (token) => {
-  return fetch("/api/booking", {
+export const getAllBookings = async (token) => {
+  const response = await fetch("/api/booking", {
     headers: {
       "Content-Type": "application/json",
       authorization: `Bearer ${token}`,
     },
   });
+  return response.json();
 };
 
 // Route to update a booking by its ID

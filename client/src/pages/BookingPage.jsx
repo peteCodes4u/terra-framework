@@ -14,19 +14,21 @@ export default function BookingPage() {
   const fetchBookings = async () => {
     const token = Auth.getToken();
     if (!token) return;
-    const response = await getAllBookings(token);
-    if (!response.ok) return;
-    const data = await response.json();
-    setBookings(data);
+    const data = await getAllBookings(token);
+    if (Array.isArray(data)) {
+      setBookings(data);
+    }
   };
 
   useEffect(() => { fetchBookings(); }, []);
 
   const handleCreateBooking = async (formData) => {
     const token = Auth.getToken();
-    const response = await createBooking(formData, token);
-    if (response.ok) fetchBookings();
-    return response;
+    const result = await createBooking(formData, token);
+    if (result && result.booking) {
+      fetchBookings();
+    }
+    return result;
   };
 
   const handleDeleteBooking = async (id) => {
@@ -37,9 +39,9 @@ export default function BookingPage() {
 
   const handleUpdateBooking = async (id, updatedData) => {
     const token = Auth.getToken();
-    const response = await updateBooking(id, updatedData, token);
-    if (response.ok) fetchBookings();
-    return response;
+    const result = await updateBooking(id, updatedData, token);
+    if (result && result.booking) { fetchBookings() };
+    return result;
   };
 
   const handleUpdate = (id, booking) => {
