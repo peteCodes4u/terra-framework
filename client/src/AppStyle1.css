@@ -219,81 +219,94 @@ body.app-style1 .app-style1-profile-page p {
   font-size: 1.2rem;
 }
 /* Profile Page styles - END */
-
-/* Booking page starts */
-
-body.app-style1 .app-style1-booking-page {
-  background: #f8f9fa;
-  min-height: 25vh;
-  padding: 2rem 0;
+/* Booking Page */
+.app-style1-booking {
+  background-color: #9dadbd;
 }
 
-body.app-style1 .app-style1-booking-page h1 {
-  color: #0d6efd;
-}
-
-body.app-style1 .app-style1-booking-page p {
-  color: #222;
-  font-size: 1.2rem;
-}
-
-/* Booking page ends */
-
-/* Booking Tile starts */
-
-body.app-style1 .booking-form-container {
+.app-style1-booking-page-header {
   display: flex;
-  justify-content: flex-end;
-  align-items: flex-start;
-  gap: 2rem;
-
+  flex-direction: row;
+  justify-content: space-between;
+  margin-left: 5%;
+  margin-right: 5%;
+  padding: 2%
 }
 
-body.app-style1 .booking-form-left {
-  flex: 1;
-}
-
-body.app-style1 .booking-form-right {
-  flex: 1;
+.app-style1-booking-feature {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  padding-top: 2rem;
-  padding-right: 2rem;
-  min-width: 350px;
+  flex-direction: row;
+  justify-content: space-between;
+  padding-left: 10%;
+  padding-right: 10%;
 }
 
-body.app-style1 .booking-form-right .booking-tile {
-  background: #fff;
-  border-radius: 24px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-  padding: 1.5rem 2rem;
-  margin-bottom: 1.5rem;
-  width: 100%;
+.app-style1-booking-form {
+  background-color:#fff;
+  border-radius: 1rem;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  padding: 2rem;
+  margin-bottom: 2rem;
   max-width: 400px;
+  width: 100%;
+  height: 40%; 
+}
+
+.app-style1-booking-records-container {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  border: 1px solid #e1e1e1;
-  transition: box-shadow 0.2s;
+  height: 100%;
 }
 
-body.app-style1 .booking-form-right .booking-tile p {
-  font-size: 1.1rem;
-  color: #222;
-  margin-bottom: 0.5rem 0;
+.app-style1-booking-tile {
+  background-color:#fff;
+  border-radius: 1rem;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  padding: 2rem;
+  margin-bottom: 2rem;
+  max-width: 400px;
+  width: 100%;
+  height: 100%; 
 }
 
-body.app-style1 .booking-form-right .booking-tile h3 {
-  font-size: 1.5rem;
-  color: #0d6efd;
+.app-style1-booking-tile-buttons {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.app-style1-form-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.app-style1-form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1.25rem;
+}
+
+.app-style1-form-group label {
   margin-bottom: 0.5rem;
+  font-weight: 500;
 }
 
-body.app-style1 .booking-form-right .booking-tile:hover {
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.15);
-  border-color: #0d6efd;
+.app-style1-form-group input,
+.app-style1-form-group select,
+.app-style1-form-group textarea {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  box-sizing: border-box;
 }
+
+.app-style1-booking-form button[type="submit"] {
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
 /* Media Query to ensure that the layout is responsive via mobile */
 @media (max-width: 600px) {
   body.app-style1 .booking-form-container {

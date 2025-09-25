@@ -8,13 +8,9 @@ export default function ProfilePage({ toggleStylesheet }) {
   const { activeStyle } = useStyle();
 
   return (
-
     <div className={`${activeStyle}-profile-page`}>
       <h1>🛸 Welcome to your Profile Page! 🛸</h1>
       <p>your userId is: {id}</p>
-      <BookingTile />
     </div>
-
-
   );
 };

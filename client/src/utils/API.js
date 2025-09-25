@@ -35,8 +35,8 @@ export const loginUser = (userData) => {
 };
 
 // route to book an appointment
-export const createBooking = (formData, token) => {
-  return fetch("/api/booking", {
+export const createBooking = async (formData, token) => {
+  const response = await fetch("/api/booking", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -44,21 +44,23 @@ export const createBooking = (formData, token) => {
     },
     body: JSON.stringify(formData),
   });
+  return response.json();
 };
 
 // route to get all bookings
-export const getAllBookings = (token) => {
-  return fetch("/api/booking", {
+export const getAllBookings = async (token) => {
+  const response = await fetch("/api/booking", {
     headers: {
       "Content-Type": "application/json",
       authorization: `Bearer ${token}`,
     },
   });
+  return response.json();
 };
 
 // Route to update a booking by its ID
-export const updateBooking = (bookingId, userData, token) => {
-  return fetch(`/api/booking/${bookingId}`, {
+export const updateBooking = async(bookingId, userData, token) => {
+  const response = await fetch(`/api/booking/${bookingId}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -66,14 +68,19 @@ export const updateBooking = (bookingId, userData, token) => {
     },
     body: JSON.stringify(userData),
   });
+  return response.json();
 };
 // Route to delete a booking by its ID
-export const deleteBooking = (bookingId, token) => {
-  return fetch(`/api/booking/${bookingId}`, {
+export const deleteBooking = async (bookingId, token) => {
+  const response = await fetch(`/api/booking/${bookingId}`, {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",
       authorization: `Bearer ${token}`,
     },
   });
+  const result = await response.json();
+  if(result.token) {
+    localStorage.setItem("id_token", result.token);
+  }
 };

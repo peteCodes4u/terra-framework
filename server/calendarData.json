@@ -1,0 +1,40 @@
+{
+  "slotLengthMinutes": 60,
+  "unavailableDates": [
+    "2025-09-12",
+    "2025-09-18",
+    "2025-10-01"
+  ],
+  "businessHours": {
+    "monday":   { "start": "09:00", "end": "17:00" },
+    "tuesday":  { "start": "09:00", "end": "17:00" },
+    "wednesday":{ "start": "09:00", "end": "17:00" },
+    "thursday": { "start": "09:00", "end": "17:00" },
+    "friday":   { "start": "09:00", "end": "17:00" },
+    "saturday": null,
+    "sunday":   null
+  },
+  "mockEvents": [
+    {
+      "id": "evt-1",
+      "title": "Client Consultation",
+      "start": "2025-09-10T10:00:00-04:00",
+      "end":   "2025-09-10T11:00:00-04:00",
+      "source": "google"
+    },
+    {
+      "id": "evt-2",
+      "title": "Team Workshop",
+      "start": "2025-09-10T14:00:00-04:00",
+      "end":   "2025-09-10T15:30:00-04:00",
+      "source": "google"
+    },
+    {
+      "id": "evt-3",
+      "title": "Office Closed",
+      "start": "2025-09-18T00:00:00-04:00",
+      "end":   "2025-09-18T23:59:59-04:00",
+      "source": "homebrew"
+    }
+  ]
+}

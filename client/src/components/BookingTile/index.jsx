@@ -1,34 +1,48 @@
 import Button from 'react-bootstrap/Button';
+import { useStyle } from '../../StyleContext';
 
-// Function that formats time from 24-hour to 12-hour format
-function formatTime24to12(time24) {
-    if (!time24) return 'N/A';
-    const [hourStr, minute] = time24.split(':');
-    let hour = parseInt(hourStr, 10);
-    const convert = hour >= 12 ? 'PM' : 'AM';
-    hour = hour % 12 || 12; // Convert 0 to 12 for midnight
-    return `${hour}:${minute} ${convert}`;
+// Format ISO date string to 12-hour time
+function formatTime(dateStr) {
+  if (!dateStr) return 'N/A';
+  const date = new Date(dateStr);
+  const hours = date.getHours();
+  const minutes = date.getMinutes();
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  const hour12 = hours % 12 || 12;
+  const minuteStr = minutes.toString().padStart(2, '0');
+  return `${hour12}:${minuteStr} ${ampm}`;
 }
 
-// Function that formats date to include month day and year only
+// Format ISO date string to Month Day, Year
 function formatDate(dateStr) {
-    if (!dateStr) return 'N/A';
-    const date = new Date(dateStr);
-    return date.toLocaleDateString('en-US');
+  if (!dateStr) return 'N/A';
+  const date = new Date(dateStr);
+  return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
 }
 
-// Export function that renders a booking tile when a booking is created
+// Render a booking tile
 export default function BookingTile({ booking, onDelete, onUpdate }) {
-    console.log('BookingTile received booking', booking);
-    if (!booking) {
-        return <div className='booking-tile'>No booking data available.</div>;
-    }
-    return (
-        <div className="booking-tile">
-            <p>Date: {formatDate(booking.date)}</p>
-            <p>Time: {formatTime24to12(booking.time)}</p>
-            <Button variant="primary" onClick={() => onUpdate && onUpdate(booking._id, booking)}>Update</Button>
-            <Button variant="danger" onClick={() => onDelete && onDelete(booking._id)}>Cancel</Button>
-        </div>
-    );
+  const { activeStyle } = useStyle();
+
+  return (
+    <section className={`${activeStyle}-booking-tile`}>
+      <div className={`${activeStyle}-booking-tile-info`}>
+      <p>Contact: {booking.name}</p>
+      <p>Email: {booking.email}</p>
+      <p>Phone: {booking.phoneNumber}</p>
+      <p>Date: {formatDate(booking.start)}</p>
+      <p>
+        Time: {formatTime(booking.start)} - {formatTime(booking.end)}
+      </p>
+      </div>
+      <div className={`${activeStyle}-booking-tile-buttons`}>
+      <Button variant="primary" onClick={() => onUpdate && onUpdate(booking._id, booking)}>
+        Update
+      </Button>
+      <Button variant="danger" onClick={() => onDelete && onDelete(booking._id)}>
+        Cancel
+      </Button>
+      </div>
+    </section>
+  );
 }
