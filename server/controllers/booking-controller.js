@@ -32,7 +32,8 @@ module.exports = {
 
       if (conflict) {
         return res.status(400).json({
-          message: "This slot is already booked or too close to another booking",
+          error: "Conflict",
+          message: "We're Sorry, you just missed it, While you were deciding, someone else just booked this time slot, please select a new time and try again thank you!",
         });
       }
 
@@ -80,7 +81,6 @@ module.exports = {
   },
 
   // Update a booking
-  // Update a booking
   async updateBooking(req, res) {
     try {
       const { name, email, phoneNumber, start, end } = req.body;
@@ -91,20 +91,41 @@ module.exports = {
         return res.status(404).json({ message: "Booking not found" });
       }
 
+      // If start and end are provided, check for conflicts
+      if (start && end) {
+        const startDate = new Date(start);
+        const endDate = new Date(end);
+        const dateStr = startDate.toISOString().split("T")[0];
+
+        // Find all bookings for the same date, excluding the current booking
+        const existingBookings = await Booking.find({ 
+          date: dateStr,
+          _id: { $ne: booking._id }
+        });
+
+        const conflict = existingBookings.some((b) => {
+          const bufferStart = addMinutes(new Date(b.start), -30);
+          const bufferEnd = addMinutes(new Date(b.end), 30);
+          return startDate < bufferEnd && endDate > bufferStart;
+        });
+
+        if (conflict) {
+          return res.status(400).json({
+            error: "Conflict",
+            message: "We're Sorry, you just missed it, While you were deciding, someone else just booked this time slot, please select a new time and try again thank you!",
+          });
+        }
+
+        // Update time fields if no conflict
+        booking.start = startDate;
+        booking.end = endDate;
+        booking.date = dateStr;
+      }
+
       // Update allowed fields
       if (name !== undefined) booking.name = name;
       if (email !== undefined) booking.email = email;
       if (phoneNumber !== undefined) booking.phoneNumber = phoneNumber;
-
-      if (start && end) {
-        const startDate = new Date(start);
-        const endDate = new Date(end);
-
-        // Recompute the date string (YYYY-MM-DD)
-        booking.start = startDate;
-        booking.end = endDate;
-        booking.date = startDate.toISOString().split("T")[0];
-      }
 
       await booking.save();
 

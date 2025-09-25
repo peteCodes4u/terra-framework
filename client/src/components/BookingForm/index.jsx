@@ -128,9 +128,9 @@ export default function BookingForm({
         localStorage.setItem("id_token", response.token);
       }
 
-      if (response && response.status === 400) {
+      if (response && (response.status === 400 || response.error === "Conflict" )) {
         // Conflict error from backend
-        setErrorMessage("We're Sorry, you just missed it, While you were deciding, someone else just booked this time slot, please select a new time and try again thank you!");
+        setErrorMessage(response.message || "Conflict Error");
         setShowErrorModal(true);
         return;
       }
@@ -176,8 +176,9 @@ export default function BookingForm({
       }
 
       // Check for conflict error (status 400)
-      if (response && response.status === 400) {
-        setErrorMessage("We're Sorry, you just missed it, While you were deciding, someone else just booked this time slot, please select a new time and try again thank you!");
+        if (response && (response.status === 400 || response.error === "Conflict" )) {
+        // Conflict error from backend
+        setErrorMessage(response.message || "Conflict Error");
         setShowErrorModal(true);
         return;
       }
