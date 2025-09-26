@@ -3,8 +3,8 @@
   "callLengthMinutes": 30,
   "bufferMinutes": 15,
   "unavailableDates": [
-    "2025-09-12",
-    "2025-09-18",
+    "2025-10-07",
+    "2025-12-25",
     "2025-10-01"
   ],
   "businessHours": {

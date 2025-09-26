@@ -114,99 +114,101 @@ export default function BookingForm({
   };
 
   // === Submit for new booking ===
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    const startDate = new Date(`${formData.date}T${formData.time}`);
+  if (!formData.date || !formData.time) {
+    setErrorMessage("Please select a valid date and time.");
+    setShowErrorModal(true);
+    return;
+  }
 
-    const payload = {
-      name: formData.name,
-      email: formData.email,
-      phoneNumber: formData.phoneNumber,
-      start: startDate.toISOString(),
-      end: new Date(startDate.getTime() + callLengthMinutes * 60 * 1000).toISOString(),
-      date: formData.date,
-    };
+  const start = new Date(`${formData.date}T${formData.time}`);
+  const end = new Date(start.getTime() + callLengthMinutes * 60000);
 
-    try {
-      // Call API and get the response
-      const response = await onBookingCreated(payload);
-
-      // when the backend sends a new token, update localStorage
-      if (response && response.token) {
-        localStorage.setItem("id_token", response.token);
-      }
-
-      if (response && (response.status === 400 || response.error === "Conflict")) {
-        // Conflict error from backend
-        setErrorMessage(response.message || "Conflict Error");
-        setShowErrorModal(true);
-        return;
-      }
-      setErrorMessage("");
-      setAvailableTimes((prev) => prev.filter((time) => time !== formData.time));
-      fetch(`/api/availability?date=${formData.date}`)
-        .then((res) => res.json())
-        .then((data) => setAvailableTimes(data.availableTimes || []))
-        .catch((err) => console.error("Failed to refresh availability:", err));
-      setFormData({ name: "", email: "", phoneNumber: "", date: formData.date, time: "" });
-    } catch (err) {
-      setErrorMessage("Failed to create booking. Please try again.");
-    }
+  const payload = {
+    ...formData,
+    start: start.toISOString(),
+    end: end.toISOString(),
   };
+
+  try {
+    const response = await onBookingCreated(payload);
+
+    if (response && (response.status === 400 || response.error === "Conflict")) {
+      setErrorMessage(response.message || "Conflict Error");
+      setShowErrorModal(true);
+      return;
+    }
+
+    if (response && response.status === 200) {
+      setFormData({
+        name: "",
+        email: "",
+        phoneNumber: "",
+        date: "",
+        time: "",
+      });
+      setAvailableTimes([]);
+    }
+  } catch (error) {
+    console.error("Error creating booking:", error);
+    setErrorMessage("An error occurred while creating the booking.");
+    setShowErrorModal(true);
+  }
+};
+
+
 
   // === Submit for modal update ===
-  const handleModalSubmit = async (e) => {
-    e.preventDefault();
+const handleModalSubmit = async (e) => {
+  e.preventDefault();
 
-    if (!onBookingUpdated) return;
+  if (!updatedForm.date || !updatedForm.time) {
+    setErrorMessage("Please select a valid date and time.");
+    setShowErrorModal(true);
+    return;
+  }
 
-    // Use the original time if the user did not change it
-    const timeToUse = updatedForm.time || (initialData.time || format(new Date(initialData.start), "HH:mm"));
-    const dateToUse = updatedForm.date;
+  const start = new Date(`${updatedForm.date}T${updatedForm.time}`);
+  const end = new Date(start.getTime() + callLengthMinutes * 60000);
 
-    const startDate = new Date(`${dateToUse}T${timeToUse}`);
-
-    try {
-      const response = await onBookingUpdated({
-        _id: initialData._id,
-        name: updatedForm.name,
-        email: updatedForm.email,
-        phoneNumber: updatedForm.phoneNumber,
-        start: startDate.toISOString(),
-        end: new Date(startDate.getTime() + callLengthMinutes * 60 * 1000).toISOString(),
-        date: updatedForm.date,
-      });
-
-      // when the backend sends a new token, update localStorage
-      if (response && response.token) {
-        localStorage.setItem("id_token", response.token);
-      }
-
-      // Check for conflict error (status 400)
-      if (response && (response.status === 400 || response.error === "Conflict")) {
-        // Conflict error from backend
-        setErrorMessage(response.message || "Conflict Error");
-        setShowErrorModal(true);
-        return;
-      }
-
-      // Success: reset modal state and close
-      setErrorMessage("");
-      setModalAvailableTimes((prev) =>
-        prev.filter((time) => time !== updatedForm.time)
-      );
-      fetch(`/api/availability?date=${updatedForm.date}`)
-        .then((res) => res.json())
-        .then((data) => setModalAvailableTimes(data.availableTimes || []))
-        .catch((err) => console.error("Failed to refresh modal availability:", err));
-      setUpdatedForm({ date: updatedForm.date, time: "" });
-      if (onClose) onClose();
-    } catch (err) {
-      setErrorMessage("Failed to update booking. Please try again.");
-      setShowErrorModal(true);
-    }
+  const payload = {
+    _id: initialData._id,
+    name: updatedForm.name,
+    email: updatedForm.email,
+    phoneNumber: updatedForm.phoneNumber,
+    start: start.toISOString(),
+    end: end.toISOString(),
+    date: updatedForm.date,
   };
+
+  try {
+    const response = await onBookingUpdated(payload);
+
+    if (response && (response.status === 400 || response.error === "Conflict")) {
+      setErrorMessage(response.message || "Conflict Error");
+      setShowErrorModal(true);
+      return;
+    }
+
+    if (response && response.status === 200) {
+      setUpdatedForm({
+        name: "",
+        email: "",
+        phoneNumber: "",
+        date: "",
+        time: "",
+      });
+      setModalAvailableTimes([]);
+      if (onClose) onClose();
+    }
+  } catch (error) {
+    console.error("Error updating booking:", error);
+    setErrorMessage("An error occurred while updating the booking.");
+    setShowErrorModal(true);
+  }
+};
 
   function isUpdateEnabled() {
     const safeInitial = initialData || {};

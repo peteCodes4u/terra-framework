@@ -44,7 +44,8 @@ export const createBooking = async (formData, token) => {
     },
     body: JSON.stringify(formData),
   });
-  return response.json();
+  const data = await response.json().catch(() => ({}));
+  return { status: response.status, ...data };
 };
 
 // route to get all bookings
@@ -68,7 +69,8 @@ export const updateBooking = async(bookingId, userData, token) => {
     },
     body: JSON.stringify(userData),
   });
-  return response.json();
+  const data = await response.json().catch(() => ({}));
+  return { status: response.status, ...data };
 };
 // Route to delete a booking by its ID
 export const deleteBooking = async (bookingId, token) => {
