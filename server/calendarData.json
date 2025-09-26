@@ -1,4 +1,5 @@
 {
+  "timeZone":"America/New_York",
   "slotLengthMinutes": 45,
   "callLengthMinutes": 30,
   "bufferMinutes": 15,
