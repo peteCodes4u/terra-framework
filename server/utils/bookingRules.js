@@ -4,16 +4,27 @@ const calendarData = require("../calendarData.json");
 function validateBooking(startDate, endDate, existingBookings = []) {
   const dateStr = startDate.toISOString().split("T")[0];
 
-  // 1. Unavailable Dates
+  // 1. Enforce Unavailable Dates
   if (calendarData.unavailableDates.includes(dateStr)) {
     return { valid: false, message: "We'er sorry, This date is unavailable. Please select another and try again, thank you." };
   }
 
-  // 2. Business Hours
+  // 2. Enforce Business Hours
   const day = startDate.toLocaleDateString("en-US", { weekday: "long" }).toLowerCase();
   const hours = calendarData.businessHours[day];
   if (!hours) {
     return { valid: false, message: "We'er sorry, This time is outside of our business hours." };
+  }
+
+  // 3. Restrict same day booking
+  const todayStr = new Date().toISOString().split("T")[0];
+  if(dateStr === todayStr) {
+    return { valid: false, message: "we're sorry, same day booking is not permitted by the organization at this time"}
+  }
+
+  // 4. Restrict past date booking
+  if(dateStr < todayStr) {
+    return { valid: false, message: "we're sorry, That is a past date. Past dates are not valid booking dates."}
   }
 
   const [startH, startM] = hours.start.split(":").map(Number);
@@ -29,7 +40,7 @@ function validateBooking(startDate, endDate, existingBookings = []) {
     return { valid: false, message: "We'er sorry, this Booking is outside of our business hours." };
   }
 
-  // 3. Slot Length + Call Length
+  // 5. Slot Length + Call Length
   const duration = (endDate - startDate) / (1000 * 60);
   if (duration !== calendarData.callLengthMinutes) {
     return { valid: false, message: `Sorry, Times are restricted by the organization limit of ${calendarData.callLengthMinutes} minutes.` };
@@ -50,7 +61,7 @@ function validateBooking(startDate, endDate, existingBookings = []) {
     return { valid: false, message: "We're Sorry, you just missed it, While you were deciding, someone else just booked this time slot, please select a new time and try again thank you!" };
   }
 
-  // ✅ Passed all rules
+  // Passed all rules
   return { valid: true };
 }
 
