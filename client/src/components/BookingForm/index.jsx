@@ -166,26 +166,37 @@ const handleSubmit = async (e) => {
 const handleModalSubmit = async (e) => {
   e.preventDefault();
 
-  if (!updatedForm.date || !updatedForm.time) {
+  // Determine if the date/time changed
+  const dateChanged = updatedForm.date !== (initialData.date?.slice(0,10) || "");
+  const timeChanged = updatedForm.time !== (initialData.time || "");
+
+  if ((!dateChanged && !timeChanged) && 
+      !updatedForm.name && !updatedForm.email && !updatedForm.phoneNumber) {
+    setErrorMessage("Nothing to update.");
+    setShowErrorModal(true);
+    return;
+  }
+
+  if ((dateChanged || timeChanged) && (!updatedForm.date || !updatedForm.time)) {
     setErrorMessage("Please select a valid date and time.");
     setShowErrorModal(true);
     return;
   }
 
   try {
-    // updatedForm.time is already a UTC ISO string from modalAvailableTimes
-    const start = parseISO(updatedForm.time);
-    const end = addMinutes(start, callLengthMinutes);
+    // If date/time didn't change, reuse original start/end
+    let startIso = updatedForm.time || initialData.start;
+    let endIso = updatedForm.time ? addMinutes(parseISO(updatedForm.time), callLengthMinutes).toISOString() : initialData.end;
 
     const payload = {
       _id: initialData._id,
       name: updatedForm.name,
       email: updatedForm.email,
       phoneNumber: updatedForm.phoneNumber,
-      slotIso: updatedForm.time,
-      start: start.toISOString(),
-      end: end.toISOString(),
-      date: updatedForm.date,
+      slotIso: updatedForm.time || initialData.slotIso,
+      start: startIso,
+      end: endIso,
+      date: updatedForm.date || initialData.date.slice(0, 10),
     };
 
     const response = await onBookingUpdated(payload);
