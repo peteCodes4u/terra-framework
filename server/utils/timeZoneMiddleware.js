@@ -1,4 +1,5 @@
 const { zonedTimeToUtc, utcToZonedTime } = require("date-fns-tz");
+const { addMinutes } = require("date-fns");
 const calendarData = require("../calendarData.json");
 
 const defaultOrgTZ = calendarData.timeZone;
@@ -10,11 +11,27 @@ function timeZoneMiddleware(orgTZ = defaultOrgTZ) {
       if (!date || !time) return next();
 
       const localString = `${date}T${time}`;
-      const utcDate = zonedTimeToUtc(localString, orgTZ);
+
+      // Start time in UTC
+      const normalizedUtcStart = zonedTimeToUtc(localString, orgTZ);
+
+      // Add call length + buffer from config
+      const callLength = calendarData.callLengthMinutes || 30;
+      const buffer = calendarData.bufferMinutes || 0;
+      const normalizedUtcEnd = addMinutes(
+        normalizedUtcStart,
+        callLength + buffer
+      );
+
+      // Org-local versions
+      const startOrgLocal = utcToZonedTime(normalizedUtcStart, orgTZ);
+      const endOrgLocal = utcToZonedTime(normalizedUtcEnd, orgTZ);
 
       req.booking = {
-        normalizedUtc: utcDate,
-        orgLocal: utcToZonedTime(utcDate, orgTZ),
+        normalizedUtcStart,
+        normalizedUtcEnd,
+        startOrgLocal,
+        endOrgLocal,
       };
 
       next();

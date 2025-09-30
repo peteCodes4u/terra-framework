@@ -14,8 +14,7 @@ async function checkAvailability(req, res) {
 
     // Convert bookings into event objects for getAvailability
     const bookedEvents = bookings.map(b => ({
-      start: new Date(b.start).toISOString(),
-      end: new Date(b.end).toISOString(),
+      normalizedUtc: new Date(b.start).toISOString(),
     }));
 
     // Merge DB bookings with business rules

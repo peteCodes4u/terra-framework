@@ -2,32 +2,40 @@ const { Booking } = require("../models");
 const { signToken } = require("../utils/auth");
 const calendarData = require("../calendarData.json");
 const { validateBooking } = require("../utils/bookingRules");
+const { utcToZonedTime, zonedTimeToUtc } = require("date-fns-tz");
+const { addMinutes } = require("date-fns");
+
+const orgTZ = calendarData.timeZone;
 
 module.exports = {
   // Create a new booking
   async createBooking(req, res) {
     try {
-      const { name, email, phoneNumber } = req.body;
+      const { name, email, phoneNumber, slotIso, end } = req.body;
 
-      if (!req.booking?.normalizedUtc) {
+      if (!slotIso) {
         return res.status(400).json({ message: "Booking time is required" });
       }
 
-      // Always use normalized UTC from middleware
-      const startDate = req.booking.normalizedUtc;
+      // Start time is sent as UTC ISO
+      const normalizedUtcStart = new Date(slotIso);
 
-      // Use end from request or fallback to callLengthMinutes
-      const endDate = req.body.end
-        ? new Date(req.body.end)
-        : new Date(startDate.getTime() + calendarData.callLengthMinutes * 60000);
+      // End time either sent explicitly or calculated from callLengthMinutes
+      const normalizedUtcEnd = end
+        ? new Date(end)
+        : addMinutes(normalizedUtcStart, calendarData.callLengthMinutes);
 
-      const dateStr = startDate.toISOString().split("T")[0];
+      // Convert to org local times for validation
+      const startOrgLocal = utcToZonedTime(normalizedUtcStart, orgTZ);
+      const endOrgLocal = utcToZonedTime(normalizedUtcEnd, orgTZ);
+
+      const dateStr = normalizedUtcStart.toISOString().slice(0, 10);
 
       // Fetch all bookings for that date
       const existingBookings = await Booking.find({ date: dateStr });
 
-      // Run validation
-      const validation = validateBooking(startDate, endDate, existingBookings);
+      // Validate using org-local times
+      const validation = validateBooking(startOrgLocal, endOrgLocal, existingBookings);
       if (!validation.valid) {
         return res.status(400).json({
           error: "conflict",
@@ -35,13 +43,13 @@ module.exports = {
         });
       }
 
-      // Create booking
+      // Create booking in DB with UTC normalized times
       const booking = await Booking.create({
         name,
         email,
         phoneNumber,
-        start: startDate,
-        end: endDate,
+        start: normalizedUtcStart,
+        end: normalizedUtcEnd,
         date: dateStr,
         user: req.user._id,
       });
@@ -51,6 +59,62 @@ module.exports = {
     } catch (err) {
       console.error("Error creating booking:", err);
       res.status(500).json({ message: "Server error", error: err.message });
+    }
+  },
+
+  // Update a booking
+  async updateBooking(req, res) {
+    try {
+      const { name, email, phoneNumber, slotIso, end } = req.body;
+
+      const booking = await Booking.findById(req.params.id);
+      if (!booking) {
+        return res.status(404).json({ message: "Booking not found" });
+      }
+
+      let normalizedUtcStart = booking.start;
+      let normalizedUtcEnd = booking.end;
+
+      if (slotIso) {
+        normalizedUtcStart = new Date(slotIso);
+        normalizedUtcEnd = end
+          ? new Date(end)
+          : addMinutes(normalizedUtcStart, calendarData.callLengthMinutes);
+      }
+
+      // Org local times for validation
+      const startOrgLocal = utcToZonedTime(normalizedUtcStart, orgTZ);
+      const endOrgLocal = utcToZonedTime(normalizedUtcEnd, orgTZ);
+      const dateStr = normalizedUtcStart.toISOString().slice(0, 10);
+
+      const existingBookings = await Booking.find({
+        date: dateStr,
+        _id: { $ne: booking._id },
+      });
+
+      const validation = validateBooking(startOrgLocal, endOrgLocal, existingBookings);
+      if (!validation.valid) {
+        return res.status(400).json({
+          error: "conflict",
+          message: validation.message,
+        });
+      }
+
+      // Update booking
+      booking.start = normalizedUtcStart;
+      booking.end = normalizedUtcEnd;
+      booking.date = dateStr;
+      if (name !== undefined) booking.name = name;
+      if (email !== undefined) booking.email = email;
+      if (phoneNumber !== undefined) booking.phoneNumber = phoneNumber;
+
+      await booking.save();
+
+      const token = signToken(req.user);
+      res.status(200).json({ booking, token, user: req.user });
+    } catch (err) {
+      console.error("Error updating booking:", err);
+      res.status(400).json({ message: "Error updating booking", error: err.message });
     }
   },
 
@@ -69,71 +133,12 @@ module.exports = {
   async deleteBooking(req, res) {
     try {
       const booking = await Booking.findByIdAndDelete(req.params.id);
-      if (!booking) {
-        return res.status(404).json({ message: "Booking not found" });
-      }
+      if (!booking) return res.status(404).json({ message: "Booking not found" });
+
       const token = signToken(req.user);
       res.status(200).json({ success: true, token, user: req.user });
     } catch (err) {
-      res.status(500).json(err);
-    }
-  },
-
-  // Update a booking
-  async updateBooking(req, res) {
-    try {
-      const { name, email, phoneNumber } = req.body;
-
-      // Ensure booking exists
-      const booking = await Booking.findById(req.params.id);
-      if (!booking) {
-        return res.status(404).json({ message: "Booking not found" });
-      }
-
-      // If middleware normalized new start time, use it
-      const startDate = req.booking?.normalizedUtc || booking.start;
-
-      // Use new end if provided, else keep old
-      const endDate = req.body.end
-        ? new Date(req.body.end)
-        : booking.end;
-
-      const dateStr = startDate.toISOString().split("T")[0];
-
-      // Validate against other bookings if start/end changed
-      if (req.booking?.normalizedUtc || req.body.end) {
-        const existingBookings = await Booking.find({
-          date: dateStr,
-          _id: { $ne: booking._id }, // exclude self
-        });
-
-        const validation = validateBooking(startDate, endDate, existingBookings);
-        if (!validation.valid) {
-          return res.status(400).json({
-            error: "conflict",
-            message: validation.message,
-          });
-        }
-
-        booking.start = startDate;
-        booking.end = endDate;
-        booking.date = dateStr;
-      }
-
-      // Update other allowed fields
-      if (name !== undefined) booking.name = name;
-      if (email !== undefined) booking.email = email;
-      if (phoneNumber !== undefined) booking.phoneNumber = phoneNumber;
-
-      await booking.save();
-
-      const token = signToken(req.user);
-      res.status(200).json({ booking, token, user: req.user });
-    } catch (err) {
-      console.error("Error updating booking:", err);
-      res
-        .status(400)
-        .json({ message: "Error updating booking", error: err.message });
+      res.status(500).json({ message: "Error deleting booking", error: err.message });
     }
   },
 };

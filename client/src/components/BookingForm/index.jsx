@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { Form, Button, Modal } from "react-bootstrap";
 import { useStyle } from "../../StyleContext";
-import { parseISO, format } from "date-fns";
+import { parseISO, format, addMinutes } from "date-fns";
+import { formatInTimeZone } from "date-fns-tz";
 
 export default function BookingForm({
   onBookingCreated,
@@ -123,16 +124,18 @@ const handleSubmit = async (e) => {
     return;
   }
 
-  const start = new Date(`${formData.date}T${formData.time}`);
-  const end = new Date(start.getTime() + callLengthMinutes * 60000);
-
-  const payload = {
-    ...formData,
-    start: start.toISOString(),
-    end: end.toISOString(),
-  };
-
   try {
+    // formData.time is already a UTC ISO string from availableTimes
+    const start = parseISO(formData.time);
+    const end = addMinutes(start, callLengthMinutes);
+
+    const payload = {
+      ...formData,
+      slotIso: formData.time,
+      start: start.toISOString(),
+      end: end.toISOString(),
+    };
+
     const response = await onBookingCreated(payload);
 
     if (response && (response.status === 400 || response.error === "Conflict")) {
@@ -142,6 +145,7 @@ const handleSubmit = async (e) => {
     }
 
     if (response && response.status === 200) {
+      // reset form
       setFormData({
         name: "",
         email: "",
@@ -158,8 +162,6 @@ const handleSubmit = async (e) => {
   }
 };
 
-
-
   // === Submit for modal update ===
 const handleModalSubmit = async (e) => {
   e.preventDefault();
@@ -170,20 +172,22 @@ const handleModalSubmit = async (e) => {
     return;
   }
 
-  const start = new Date(`${updatedForm.date}T${updatedForm.time}`);
-  const end = new Date(start.getTime() + callLengthMinutes * 60000);
-
-  const payload = {
-    _id: initialData._id,
-    name: updatedForm.name,
-    email: updatedForm.email,
-    phoneNumber: updatedForm.phoneNumber,
-    start: start.toISOString(),
-    end: end.toISOString(),
-    date: updatedForm.date,
-  };
-
   try {
+    // updatedForm.time is already a UTC ISO string from modalAvailableTimes
+    const start = parseISO(updatedForm.time);
+    const end = addMinutes(start, callLengthMinutes);
+
+    const payload = {
+      _id: initialData._id,
+      name: updatedForm.name,
+      email: updatedForm.email,
+      phoneNumber: updatedForm.phoneNumber,
+      slotIso: updatedForm.time,
+      start: start.toISOString(),
+      end: end.toISOString(),
+      date: updatedForm.date,
+    };
+
     const response = await onBookingUpdated(payload);
 
     if (response && (response.status === 400 || response.error === "Conflict")) {
@@ -302,13 +306,6 @@ const handleModalSubmit = async (e) => {
                 required
                 value={formData.time}
                 onChange={handleInputChange}
-                onClick={() => {
-                  if (!formData.date) return;
-                  fetch(`/api/availability?date=${formData.date}`)
-                    .then((res) => res.json())
-                    .then((data) => setAvailableTimes(data.availableTimes || []))
-                    .catch((err) => console.error("Failed to refresh availability:", err));
-                }}
                 disabled={
                   !formData.date ||
                   availableTimes.length === 0 ||
@@ -316,11 +313,12 @@ const handleModalSubmit = async (e) => {
                 }
               >
                 <option value="">Select a time</option>
-                {availableTimes.map((time) => {
-                  const parsed = parseISO(`${formData.date}T${time}`);
+                {availableTimes.map((slotIso) => {
+                  const userTZ = Intl.DateTimeFormat().resolvedOptions().timeZone;
+                  const renderedSlot = formatInTimeZone(parseISO(slotIso), userTZ, "h:mm a");
                   return (
-                    <option key={time} value={time}>
-                      {format(parsed, "h:mm a")}
+                    <option key={slotIso} value={slotIso}>
+                      {renderedSlot}
                     </option>
                   )
                 })}
@@ -385,15 +383,6 @@ const handleModalSubmit = async (e) => {
                   as="select"
                   name="time"
                   value={updatedForm.time ?? ""}
-                  onClick={() => {
-                    if (!updatedForm.date) return;
-                    fetch(`/api/availability?date=${updatedForm.date}`)
-                      .then((res) => res.json())
-                      .then((data) => setModalAvailableTimes(data.availableTimes || []))
-                      .catch((err) =>
-                        console.error("Failed to refresh availability:", err)
-                      );
-                  }}
                   onChange={handleModalInputChange}
                   disabled={
                     !updatedForm.date ||
@@ -402,11 +391,13 @@ const handleModalSubmit = async (e) => {
                   }
                 >
                   <option value="">Select a time</option>
-                  {modalAvailableTimes.map((time) => {
-                    const parsed = parseISO(`${updatedForm.date}T${time}`);
+                  {modalAvailableTimes.map((slotIso) => {
+                    const parsed = parseISO(slotIso);
+                    const userTZ = Intl.DateTimeFormat().resolvedOptions().timeZone;
+                    const renderedSlot = formatInTimeZone(parsed, userTZ, "h:mm a");
                     return (
-                      <option key={time} value={time}>
-                        {format(parsed, "h:mm a")}
+                      <option key={slotIso} value={slotIso}>
+                        {renderedSlot}
                       </option>
                     )
                   })}
