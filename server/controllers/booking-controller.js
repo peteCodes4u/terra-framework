@@ -7,16 +7,20 @@ module.exports = {
   // Create a new booking
   async createBooking(req, res) {
     try {
-      const { start, end, name, email, phoneNumber } = req.body;
+      const { name, email, phoneNumber } = req.body;
 
-      if (!start || !end) {
-        return res
-          .status(400)
-          .json({ message: "Start and end times are required" });
+      if (!req.booking?.normalizedUtc) {
+        return res.status(400).json({ message: "Booking time is required" });
       }
 
-      const startDate = new Date(start);
-      const endDate = new Date(end);
+      // Always use normalized UTC from middleware
+      const startDate = req.booking.normalizedUtc;
+
+      // Use end from request or fallback to callLengthMinutes
+      const endDate = req.body.end
+        ? new Date(req.body.end)
+        : new Date(startDate.getTime() + calendarData.callLengthMinutes * 60000);
+
       const dateStr = startDate.toISOString().split("T")[0];
 
       // Fetch all bookings for that date
@@ -26,8 +30,8 @@ module.exports = {
       const validation = validateBooking(startDate, endDate, existingBookings);
       if (!validation.valid) {
         return res.status(400).json({
-          error: 'conflict',
-          message: validation.message
+          error: "conflict",
+          message: validation.message,
         });
       }
 
@@ -46,9 +50,7 @@ module.exports = {
       res.status(200).json({ booking, token, user: req.user });
     } catch (err) {
       console.error("Error creating booking:", err);
-      res
-        .status(500)
-        .json({ message: "Server error", error: err.message });
+      res.status(500).json({ message: "Server error", error: err.message });
     }
   },
 
@@ -80,7 +82,7 @@ module.exports = {
   // Update a booking
   async updateBooking(req, res) {
     try {
-      const { name, email, phoneNumber, start, end } = req.body;
+      const { name, email, phoneNumber } = req.body;
 
       // Ensure booking exists
       const booking = await Booking.findById(req.params.id);
@@ -88,23 +90,24 @@ module.exports = {
         return res.status(404).json({ message: "Booking not found" });
       }
 
-      // If start/end provided, run validation
-      if (start && end) {
-        const startDate = new Date(start);
-        const endDate = new Date(end);
-        const dateStr = startDate.toISOString().split("T")[0];
+      // If middleware normalized new start time, use it
+      const startDate = req.booking?.normalizedUtc || booking.start;
 
-        // Exclude current booking when checking conflicts
+      // Use new end if provided, else keep old
+      const endDate = req.body.end
+        ? new Date(req.body.end)
+        : booking.end;
+
+      const dateStr = startDate.toISOString().split("T")[0];
+
+      // Validate against other bookings if start/end changed
+      if (req.booking?.normalizedUtc || req.body.end) {
         const existingBookings = await Booking.find({
           date: dateStr,
-          _id: { $ne: booking._id },
+          _id: { $ne: booking._id }, // exclude self
         });
 
-        const validation = validateBooking(
-          startDate,
-          endDate,
-          existingBookings
-        );
+        const validation = validateBooking(startDate, endDate, existingBookings);
         if (!validation.valid) {
           return res.status(400).json({
             error: "conflict",

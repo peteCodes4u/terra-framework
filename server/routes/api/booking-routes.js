@@ -8,18 +8,23 @@ const {
     updateBooking
 } = require('../../controllers/booking-controller');
 
+const calendarData = require('../../calendarData.json');
+const defaultOrgTZ = calendarData.timeZone;
+
 // import needed middleware from utils/auth
 const { authMiddleware } = require('../../utils/auth');
 
+const { timeZoneMiddleware } = require('../../utils/timeZoneMiddleware');
+
 // create and get Bookings
 // POST to create a booking and GET to retrieve all bookings
-router.route('/').post(authMiddleware, createBooking).get(authMiddleware, getAllBookings);
+router.route('/').post(authMiddleware, timeZoneMiddleware(defaultOrgTZ), createBooking).get(authMiddleware, getAllBookings);
 
 
 // Update and Delete Bookings
 router
     .route('/:id')
-    .put(authMiddleware, updateBooking)
+    .put(authMiddleware, timeZoneMiddleware(defaultOrgTZ), updateBooking)
     .delete(authMiddleware, deleteBooking);
 
 module.exports = router;
