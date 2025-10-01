@@ -1,4 +1,5 @@
 const { addMinutes, isBefore, isAfter } = require("date-fns");
+const {formatInTimeZone} = require('date-fns-tz');
 const calendarData = require("../calendarData.json");
 
 function validateBooking(startDate, endDate, existingBookings = []) {
@@ -17,8 +18,11 @@ function validateBooking(startDate, endDate, existingBookings = []) {
   }
 
   // 3. Restrict same day booking
-  const todayStr = new Date().toISOString().split("T")[0];
-  if(dateStr === todayStr) {
+  const orgTZ = calendarData.timeZone;
+  const todayStr = formatInTimeZone(new Date(), orgTZ, "yyyy-MM-dd");
+  const sameDayBookingPermitted = calendarData.sameDayBookingPermitted;
+
+  if(sameDayBookingPermitted === false && dateStr === todayStr) {
     return { valid: false, message: "we're sorry, same day booking is not permitted by the organization at this time"}
   }
 

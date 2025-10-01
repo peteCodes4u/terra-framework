@@ -3,15 +3,16 @@
   "slotLengthMinutes": 45,
   "callLengthMinutes": 30,
   "bufferMinutes": 15,
+  "sameDayBookingPermitted": false,
   "unavailableDates": [
     "2025-10-07",
     "2025-12-25",
-    "2025-10-01"
+    "2025-11-01"
   ],
   "businessHours": {
     "monday":   { "start": "09:00", "end": "17:00" },
     "tuesday":  { "start": "09:00", "end": "17:00" },
-    "wednesday":{ "start": "09:00", "end": "17:00" },
+    "wednesday":{ "start": "13:00", "end": "17:00" },
     "thursday": { "start": "09:00", "end": "17:00" },
     "friday":   { "start": "09:00", "end": "17:00" },
     "saturday": null,
