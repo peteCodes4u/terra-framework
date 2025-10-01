@@ -1,6 +1,6 @@
 // server/utils/getAvailability.js
 const { addMinutes, isBefore, isAfter, parseISO, format } = require("date-fns");
-const { zonedTimeToUtc } = require("date-fns-tz");
+const { zonedTimeToUtc, utcToZonedTime } = require("date-fns-tz");
 const calendarData = require("../calendarData.json");
 
 /**
@@ -51,10 +51,8 @@ function getAvailability(dateStr, bookings = []) {
   }
 
   // Determine day of week in org TZ
-  const dayOfWeek = new Date(dateStr).toLocaleDateString("en-US", {
-    weekday: "long",
-    timeZone,
-  }).toLowerCase();
+  const orgDate = utcToZonedTime(dateStr, timeZone);
+  const dayOfWeek = orgDate.toLocaleDateString("en-US", { weekday: "long", timeZone }).toLowerCase();
 
   const hours = businessHours[dayOfWeek];
   if (!hours) {
