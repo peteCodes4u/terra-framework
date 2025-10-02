@@ -7,86 +7,78 @@ import calendarData from "../../../../server/calendarData.json";
 
 export default function BookingForm({
   onBookingCreated,
+  onBookingUpdated,
   showModal = false,
   onClose,
   initialData = {},
-  onBookingUpdated,
 }) {
   const { activeStyle } = useStyle();
+  const orgTZ = calendarData.timeZone;
+  const userTZ = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
+  // --- Form state ---
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     phoneNumber: "",
     date: "",
-    time: "",
+    slotIso: "", // ISO-based slot
   });
-  const [availableTimes, setAvailableTimes] = useState([]);
-  const [loadingTimes, setLoadingTimes] = useState(false);
+  const [availableSlots, setAvailableSlots] = useState([]);
+  const [loadingSlots, setLoadingSlots] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [showErrorModal, setShowErrorModal] = useState(false);
 
+  // --- Modal form state ---
   const [updatedForm, setUpdatedForm] = useState({
     name: "",
     email: "",
     phoneNumber: "",
     date: "",
-    time: "",
+    slotIso: "",
   });
-  const [modalAvailableTimes, setModalAvailableTimes] = useState([]);
-  const [loadingModalTimes, setLoadingModalTimes] = useState(false);
+  const [modalSlots, setModalSlots] = useState([]);
+  const [loadingModalSlots, setLoadingModalSlots] = useState(false);
 
-  const [callLengthMinutes, setCallLengthMinutes] = useState(
-    calendarData.callLengthMinutes || 30
-  );
+  const callLengthMinutes = calendarData.callLengthMinutes || 30;
 
-  // === Load availability ===
-  const fetchAvailability = async (dateStr, setTimes) => {
-    if (!dateStr) return setTimes([]);
+  // --- Fetch slots for a date ---
+  const fetchSlots = async (dateStr, setSlots) => {
+    if (!dateStr) return setSlots([]);
+    setSlots([]);
     try {
       const res = await fetch(`/api/availability?date=${dateStr}`);
       const data = await res.json();
-      if (data.callLengthMinutes) setCallLengthMinutes(data.callLengthMinutes);
-      setTimes(data.availableTimes || []);
+      setSlots(data.availableTimes || []);
     } catch (err) {
       console.error("Failed to fetch availability:", err);
-      setTimes([]);
+      setSlots([]);
     }
   };
 
-  // === Initialize modal form from initialData ===
+  // --- Initialize modal form for updates ---
   useEffect(() => {
     if (initialData?.date) {
-      const formattedDate = new Date(initialData.date)
-        .toISOString()
-        .slice(0, 10);
       setUpdatedForm({
         name: initialData.name || "",
         email: initialData.email || "",
         phoneNumber: initialData.phoneNumber || "",
-        date: formattedDate,
-        time: initialData.time || "",
+        date: initialData.date?.slice(0, 10) || "",
+        slotIso: initialData.slotIso || "",
       });
     }
   }, [initialData]);
 
-  // === Main form availability ===
+  // --- Fetch available slots when date changes ---
   useEffect(() => {
-    setLoadingTimes(true);
-    fetchAvailability(formData.date, setAvailableTimes).finally(() =>
-      setLoadingTimes(false)
-    );
+    fetchSlots(formData.date, setAvailableSlots);
   }, [formData.date]);
 
-  // === Modal availability ===
   useEffect(() => {
-    setLoadingModalTimes(true);
-    fetchAvailability(updatedForm.date, setModalAvailableTimes).finally(() =>
-      setLoadingModalTimes(false)
-    );
+    fetchSlots(updatedForm.date, setModalSlots);
   }, [updatedForm.date]);
 
-  // === Input handlers ===
+  // --- Input handlers ---
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -96,61 +88,39 @@ export default function BookingForm({
     setUpdatedForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  // === Create payload helper ===
-const createPayload = (data, original) => {
-  const dateChanged = data.date && data.date !== original?.date?.slice(0, 10);
-  const timeChanged = data.time && data.time !== original?.time;
-
-  // If neither date nor time changed, return original start/end
-  if (!dateChanged && !timeChanged) {
-    return {
+  // --- Payload creation ---
+  const createPayload = (data, original) => {
+    const payload = {
       ...original,
-      name: data.name ?? original.name,
-      email: data.email ?? original.email,
-      phoneNumber: data.phoneNumber ?? original.phoneNumber,
+      name: data.name ?? original?.name,
+      email: data.email ?? original?.email,
+      phoneNumber: data.phoneNumber ?? original?.phoneNumber,
+      date: data.date,
+      slotIso: data.slotIso,
+      start: data.slotIso,
+      end: data.slotIso ? addMinutes(parseISO(data.slotIso), callLengthMinutes).toISOString() : undefined,
+      _id: original?._id,
     };
-  }
-
-  // Determine the final date/time
-  const finalDate = data.date || original?.date?.slice(0, 10);
-  const finalTime = data.time || original?.time;
-
-  // Parse start ISO safely
-  const startIso = finalTime ? parseISO(finalTime) : parseISO(original.time);
-  const endIso = addMinutes(startIso, callLengthMinutes).toISOString();
-
-  return {
-    ...original,
-    name: data.name ?? original.name,
-    email: data.email ?? original.email,
-    phoneNumber: data.phoneNumber ?? original.phoneNumber,
-    date: finalDate,
-    time: finalTime,
-    slotIso: finalTime,
-    start: startIso.toISOString(),
-    end: endIso,
-    _id: original?._id,
+    return payload;
   };
-};
 
-
+  // --- Submit handlers ---
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.date || !formData.time) {
+    if (!formData.date || !formData.slotIso) {
       setErrorMessage("Please select a valid date and time.");
       return setShowErrorModal(true);
     }
     try {
       const payload = createPayload(formData);
       const response = await onBookingCreated(payload);
-      if (response?.status === 400 || response?.error === "Conflict") {
+      if (response?.status === 400 || response?.error) {
         setErrorMessage(response.message || "Conflict Error");
         return setShowErrorModal(true);
       }
-      if (response?.status === 200) {
-        setFormData({ name: "", email: "", phoneNumber: "", date: "", time: "" });
-        setAvailableTimes([]);
-      }
+      // Reset form
+      setFormData({ name: "", email: "", phoneNumber: "", date: "", slotIso: "" });
+      setAvailableSlots([]);
     } catch (err) {
       console.error(err);
       setErrorMessage("Error creating booking.");
@@ -160,26 +130,15 @@ const createPayload = (data, original) => {
 
   const handleModalSubmit = async (e) => {
     e.preventDefault();
-
-    // Only require time if date changed
-    const dateChanged = updatedForm.date !== initialData.date?.slice(0, 10);
-    if (dateChanged && !updatedForm.time) {
-      setErrorMessage("Please select a valid time for the new date.");
-      return setShowErrorModal(true);
-    }
-
+    const payload = createPayload(updatedForm, initialData);
     try {
-      const payload = createPayload(updatedForm, initialData);
       const response = await onBookingUpdated(payload);
-      if (response?.status === 400 || response?.error === "Conflict") {
+      if (response?.status === 400 || response?.error) {
         setErrorMessage(response.message || "Conflict Error");
         return setShowErrorModal(true);
       }
-      if (response?.status === 200) {
-        setUpdatedForm({ name: "", email: "", phoneNumber: "", date: "", time: "" });
-        setModalAvailableTimes([]);
-        if (onClose) onClose();
-      }
+      setModalSlots([]);
+      if (onClose) onClose();
     } catch (err) {
       console.error(err);
       setErrorMessage("Error updating booking.");
@@ -187,30 +146,18 @@ const createPayload = (data, original) => {
     }
   };
 
-  // === Render helper for slot times ===
-  const renderSlots = (slots) => {
-    const userTZ = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    const orgTZ = calendarData.timeZone;
-    const sameDayBookingPermitted = calendarData.sameDayBookingPermitted;
-    const todayStr = formatInTimeZone(new Date(), orgTZ, "yyyy-MM-dd");
-
-    // Use updatedForm.date if rendering modal slots
-    const compareDate = slots === modalAvailableTimes ? updatedForm.date : formData.date;
-
-    if (sameDayBookingPermitted === false && compareDate === todayStr) {
-      return <option>Sameday booking is not permitted</option>;
-    }
-
-    return slots.map((slotIso) => {
-      const rendered = formatInTimeZone(parseISO(slotIso), userTZ, "h:mm a");
+  // --- Render helper ---
+  const renderSlotOptions = (slots) =>
+    slots.map((slot) => {
+      const readable = formatInTimeZone(parseISO(slot), userTZ, "h:mm a");
       return (
-        <option key={slotIso} value={slotIso}>
-          {rendered}
+        <option key={slot} value={slot}>
+          {readable}
         </option>
       );
     });
-  };
 
+  // --- Modal update check ---
   const isUpdateEnabled = () => {
     const safeInitial = initialData || {};
     return (
@@ -218,12 +165,13 @@ const createPayload = (data, original) => {
       updatedForm.email !== (safeInitial.email || "") ||
       updatedForm.phoneNumber !== (safeInitial.phoneNumber || "") ||
       updatedForm.date !== (safeInitial.date?.slice(0, 10) || "") ||
-      updatedForm.time !== (safeInitial.time || "")
+      updatedForm.slotIso !== (safeInitial.slotIso || "")
     );
   };
 
   return (
     <>
+      {/* Error Modal */}
       <Modal show={showErrorModal} onHide={() => setShowErrorModal(false)} centered>
         <Modal.Header closeButton>
           <Modal.Title>Booking Error</Modal.Title>
@@ -238,11 +186,11 @@ const createPayload = (data, original) => {
         </Modal.Footer>
       </Modal>
 
-      {/* Main Form */}
+      {/* Main Booking Form */}
       <Form className={`${activeStyle}-booking-form`} onSubmit={handleSubmit}>
         <div className={`${activeStyle}-form-container`}>
           <div className={`${activeStyle}-form-group`}>
-            <label htmlFor="name">Name:</label>
+            <label>Name:</label>
             <input type="text" name="name" value={formData.name} onChange={handleInputChange} required />
           </div>
           <div className={`${activeStyle}-form-group`}>
@@ -259,14 +207,20 @@ const createPayload = (data, original) => {
           </div>
           <div className={`${activeStyle}-form-group`}>
             <label>Time:</label>
-            {loadingTimes ? <p>Loading...</p> : (
-              <select name="time" value={formData.time} onChange={handleInputChange} required disabled={!formData.date || availableTimes.length === 0}>
-                <option value="">Select a time</option>
-                {renderSlots(availableTimes)}
-              </select>
-            )}
+            <select
+              name="slotIso"
+              value={formData.slotIso}
+              onChange={handleInputChange}
+              disabled={!formData.date || loadingSlots || availableSlots.length === 0}
+              required
+            >
+              <option value="">Select a time</option>
+              {renderSlotOptions(availableSlots)}
+            </select>
           </div>
-          <Button type="submit" disabled={!formData.date || !formData.time}>Book Now</Button>
+          <Button type="submit" disabled={!formData.date || !formData.slotIso}>
+            Book Now
+          </Button>
         </div>
       </Form>
 
@@ -295,14 +249,20 @@ const createPayload = (data, original) => {
             </Form.Group>
             <Form.Group>
               <Form.Label>Time</Form.Label>
-              {loadingModalTimes ? <p>Loading...</p> : (
-                <Form.Control as="select" name="time" value={updatedForm.time} onChange={handleModalInputChange} disabled={!updatedForm.date || modalAvailableTimes.length === 0}>
-                  <option value="">Select a time</option>
-                  {renderSlots(modalAvailableTimes)}
-                </Form.Control>
-              )}
+              <Form.Control
+                as="select"
+                name="slotIso"
+                value={updatedForm.slotIso}
+                onChange={handleModalInputChange}
+                disabled={!updatedForm.date || loadingModalSlots || modalSlots.length === 0}
+              >
+                <option value="">Select a time</option>
+                {renderSlotOptions(modalSlots)}
+              </Form.Control>
             </Form.Group>
-            <Button type="submit" disabled={!isUpdateEnabled()}>Update Booking</Button>
+            <Button type="submit" disabled={!isUpdateEnabled()}>
+              Update Booking
+            </Button>
           </Form>
         </Modal.Body>
       </Modal>
