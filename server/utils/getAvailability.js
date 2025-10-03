@@ -1,46 +1,41 @@
-// server/utils/getAvailability.js
-const { addMinutes, isBefore, isAfter, parseISO, format } = require("date-fns");
+// utils/getAvailability.js
+const { addMinutes, isBefore, isAfter, parseISO } = require("date-fns");
 const { zonedTimeToUtc, utcToZonedTime } = require("date-fns-tz");
 const calendarData = require("../calendarData.json");
 
 /**
- * Build UTC slots for a single day based on org-local business hours
+ * Convert a YYYY-MM-DD string into start/end of that day in orgTZ
  */
-function buildSlots(dateStr, startTime, endTime, slotLength) {
-  const slots = [];
-  const orgTZ = calendarData.timeZone;
-
-  const startOrgLocal = new Date(`${dateStr}T${startTime}:00`);
-  const endOrgLocal = new Date(`${dateStr}T${endTime}:00`);
-
-  let current = zonedTimeToUtc(startOrgLocal, orgTZ);
-  const endUtc = zonedTimeToUtc(endOrgLocal, orgTZ);
-
-  while (isBefore(current, endUtc)) {
-    slots.push(current.toISOString());
-    current = addMinutes(current, slotLength);
-  }
-
-  return slots;
+function getDayBounds(dateStr, orgTZ) {
+  const startOfDayUtc = zonedTimeToUtc(`${dateStr}T00:00:00`, orgTZ);
+  const endOfDayUtc = addMinutes(startOfDayUtc, 24 * 60);
+  return { startOfDayUtc, endOfDayUtc };
 }
 
 /**
- * Get availability for a given date
- * @param {string} dateStr 'YYYY-MM-DD'
- * @param {Array} bookings existing bookings [{ normalizedUtc }]
+ * Generate availability slots for a given date.
+ * @param {string} dateStr - date in YYYY-MM-DD format (user selection).
+ * @param {Array<{ normalizedUtc: string }>} bookedEvents - booked times in UTC.
  */
-function getAvailability(dateStr, bookings = []) {
+function getAvailability(dateStr, bookedEvents = []) {
   const {
+    orgTimeZone,
     businessHours,
-    slotLengthMinutes,
     callLengthMinutes,
     bufferMinutes,
-    timeZone,
-    unavailableDates = [],
+    slotLengthMinutes,
   } = calendarData;
 
-  // Closed dates
-  if (unavailableDates.includes(dateStr)) {
+  const { startOfDayUtc } = getDayBounds(dateStr, orgTimeZone);
+
+  // Day of week string in orgTZ
+  const dayInOrgTZ = utcToZonedTime(startOfDayUtc, orgTimeZone);
+  const weekdayName = dayInOrgTZ
+    .toLocaleDateString("en-US", { weekday: "long", timeZone: orgTimeZone })
+    .toLowerCase(); // e.g. "monday"
+
+  const hours = businessHours[weekdayName];
+  if (!hours || !hours.start || !hours.end) {
     return {
       date: dateStr,
       availableTimes: [],
@@ -50,48 +45,48 @@ function getAvailability(dateStr, bookings = []) {
     };
   }
 
-  // Determine day of week in org TZ
-  const orgDate = utcToZonedTime(dateStr, timeZone);
-  const dayOfWeek = orgDate.toLocaleDateString("en-US", { weekday: "long", timeZone }).toLowerCase();
+  // Build business window in UTC
+  const businessStartUtc = zonedTimeToUtc(
+    `${dateStr}T${hours.start}:00`,
+    orgTimeZone
+  );
+  const businessEndUtc = zonedTimeToUtc(
+    `${dateStr}T${hours.end}:00`,
+    orgTimeZone
+  );
 
-  const hours = businessHours[dayOfWeek];
-  if (!hours) {
-    return {
-      date: dateStr,
-      availableTimes: [],
-      unavailableTimes: [],
-      callLengthMinutes,
-      bufferMinutes,
-    };
+  // Generate slots
+  let slots = [];
+  let cursor = businessStartUtc;
+  while (isBefore(addMinutes(cursor, callLengthMinutes), businessEndUtc)) {
+    slots.push(cursor);
+    cursor = addMinutes(cursor, slotLengthMinutes);
   }
 
-  // Build all slots in UTC
-  let slots = buildSlots(dateStr, hours.start, hours.end, slotLengthMinutes);
+  // Remove booked/unavailable slots
+  const unavailableTimes = [];
+  bookedEvents.forEach(({ normalizedUtc }) => {
+    const bookedStart = parseISO(normalizedUtc);
+    const bookedEnd = addMinutes(bookedStart, callLengthMinutes + bufferMinutes);
 
-  // Filter out past slots
-  slots = slots.filter((slotIso) => isAfter(parseISO(slotIso), new Date()));
-
-  // Apply booking conflicts
-  const availableSlots = slots.filter((slotIso) => {
-    const slotStart = parseISO(slotIso);
-    const slotEnd = addMinutes(slotStart, callLengthMinutes);
-
-    return !bookings.some((booking) => {
-      const bookedStart = parseISO(booking.normalizedUtc);
-      const bookedEnd = addMinutes(bookedStart, callLengthMinutes + bufferMinutes);
-      return slotStart < bookedEnd && slotEnd > bookedStart;
+    slots = slots.filter((slot) => {
+      const slotEnd = addMinutes(slot, callLengthMinutes);
+      const overlaps =
+        isBefore(slot, bookedEnd) && isAfter(slotEnd, bookedStart);
+      if (overlaps) {
+        unavailableTimes.push(slot.toISOString());
+      }
+      return !overlaps;
     });
   });
 
-  const unavailableSlots = slots.filter((s) => !availableSlots.includes(s));
-
   return {
     date: dateStr,
-    availableTimes: availableSlots,
-    unavailableTimes: unavailableSlots,
+    availableTimes: slots.map((s) => s.toISOString()),
+    unavailableTimes,
     callLengthMinutes,
     bufferMinutes,
   };
 }
 
-module.exports = { getAvailability };
+module.exports = { getAvailability, getDayBounds };

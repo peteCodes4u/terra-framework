@@ -147,15 +147,16 @@ export default function BookingForm({
   };
 
   // --- Render helper ---
-  const renderSlotOptions = (slots) =>
-    slots.map((slot) => {
-      const readable = formatInTimeZone(parseISO(slot), userTZ, "h:mm a");
-      return (
-        <option key={slot} value={slot}>
-          {readable}
-        </option>
-      );
-    });
+const renderSlotOptions = (slots) =>
+  slots.map((slot) => {
+    // Always display in orgTZ (not userTZ)
+    const readable = formatInTimeZone(parseISO(slot), userTZ, "h:mm a");
+    return (
+      <option key={slot} value={slot}>
+        {readable}
+      </option>
+    );
+  });
 
   // --- Modal update check ---
   const isUpdateEnabled = () => {

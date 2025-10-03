@@ -1,5 +1,8 @@
-const { getAvailability } = require('../utils/getAvailability');
+// controllers/availability-controller.js
+const { getAvailability } = require("../utils/getAvailability");
+const { getDayBounds } = require("../utils/getAvailability"); // expose helper
 const Booking = require("../models/Booking");
+const calendarData = require("../calendarData.json");
 
 /**
  * Controller: check availability for a given date
@@ -9,11 +12,18 @@ async function checkAvailability(req, res) {
   const { date } = req.query;
 
   try {
-    // Fetch bookings for this date from DB
-    const bookings = await Booking.find({ date });
+    const orgTZ = calendarData.orgTimeZone;
+
+    // Get day bounds for orgTZ
+    const { startOfDayUtc, endOfDayUtc } = getDayBounds(date, orgTZ);
+
+    // Fetch bookings for this orgTZ day
+    const bookings = await Booking.find({
+      start: { $gte: startOfDayUtc, $lt: endOfDayUtc },
+    });
 
     // Convert bookings into event objects for getAvailability
-    const bookedEvents = bookings.map(b => ({
+    const bookedEvents = bookings.map((b) => ({
       normalizedUtc: new Date(b.start).toISOString(),
     }));
 
@@ -23,7 +33,9 @@ async function checkAvailability(req, res) {
     res.json(availability);
   } catch (err) {
     console.error("Error getting availability:", err);
-    res.status(500).json({ error: "Failed to fetch availability" });
+    res.status(500).json({
+      error: "Failed to fetch availability from availability-controller",
+    });
   }
 }
 
