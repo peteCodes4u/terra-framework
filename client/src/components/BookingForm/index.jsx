@@ -69,6 +69,21 @@ export default function BookingForm({
     }
   }, [initialData]);
 
+  // reset time selection on open modal
+  useEffect(() => {
+  if (showModal && initialData?.date) {
+    setUpdatedForm({
+      name: initialData.name || "",
+      email: initialData.email || "",
+      phoneNumber: initialData.phoneNumber || "",
+      date: initialData.date?.slice(0, 10) || "",
+      slotIso: initialData.slotIso || "",
+    });
+
+    fetchSlots(initialData.date.slice(0, 10), setModalSlots);
+  }
+}, [showModal, initialData]);
+
   // --- Fetch available slots when date changes ---
   useEffect(() => {
     fetchSlots(formData.date, setAvailableSlots);
