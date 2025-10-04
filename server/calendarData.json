@@ -1,5 +1,5 @@
 {
-  "timeZone":"America/Los_Angeles",
+  "timeZone":"America/New_York",
   "slotLengthMinutes": 45,
   "callLengthMinutes": 30,
   "bufferMinutes": 15,
@@ -12,7 +12,7 @@
   "businessHours": {
     "monday":   { "start": "12:00", "end": "17:00" },
     "tuesday":  { "start": "09:00", "end": "17:00" },
-    "wednesday":{ "start": "09:00", "end": "17:00" },
+    "wednesday": { "start": "09:00", "end": "17:00" },
     "thursday": { "start": "09:00", "end": "17:00" },
     "friday":   { "start": "09:00", "end": "12:00" },
     "saturday": null,
