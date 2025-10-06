@@ -52,7 +52,7 @@ function validateBooking(startDate, endDate, existingBookings = []) {
     };
   }
 
-  // 🔑 Build business hours windows in orgTZ
+  // Build business hours windows in orgTZ
   const [startH, startM] = hours.start.split(":").map(Number);
   const [endH, endM] = hours.end.split(":").map(Number);
 
@@ -70,7 +70,7 @@ function validateBooking(startDate, endDate, existingBookings = []) {
   }
 
   // 5. Slot Length + Call Length
-  const duration = (endDate - startDate) / (1000 * 60); // still safe in UTC
+  const duration = (endDate - startDate) / (1000 * 60);
   if (duration !== calendarData.callLengthMinutes) {
     return {
       valid: false,

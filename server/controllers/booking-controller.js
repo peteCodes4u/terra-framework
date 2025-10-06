@@ -23,7 +23,7 @@ async createBooking(req, res) {
         return res.status(400).json({ message: "Booking time is required" });
       }
 
-      normalizedUtcStart = new Date(slotIso); // assume slotIso is UTC
+      normalizedUtcStart = new Date(slotIso);
       normalizedUtcEnd = end
         ? new Date(end)
         : addMinutes(normalizedUtcStart, calendarData.callLengthMinutes);

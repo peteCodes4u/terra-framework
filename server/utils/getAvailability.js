@@ -106,7 +106,7 @@ function getAvailability(dateStr, bookedEvents = []) {
   });
 
   // --- NEW: remove slots that are already in the past (slotEnd <= now)
-  const nowUtc = new Date();
+  const nowUtc = zonedTimeToUtc(new Date(), orgTZ);
   const pastSlots = [];
   slots = slots.filter((slot) => {
     const slotEnd = addMinutes(slot, callLengthMinutes);
