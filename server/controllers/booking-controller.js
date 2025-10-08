@@ -23,10 +23,15 @@ async createBooking(req, res) {
         return res.status(400).json({ message: "Booking time is required" });
       }
 
-      normalizedUtcStart = new Date(slotIso);
-      normalizedUtcEnd = end
-        ? new Date(end)
-        : addMinutes(normalizedUtcStart, calendarData.callLengthMinutes);
+      const slotUtc = slotIso.endsWith("Z")
+        ? new Date(slotIso)
+        : zonedTimeToUtc(slotIso, orgTZ);
+      
+      normalizedUtcStart = slotUtc;
+
+    normalizedUtcEnd = end
+      ? (end.endsWith("Z") ? new Date(end) : zonedTimeToUtc(end, orgTZ))
+      : addMinutes(normalizedUtcStart, calendarData.callLengthMinutes);
 
       startOrgLocal = utcToZonedTime(normalizedUtcStart, orgTZ);
       endOrgLocal = utcToZonedTime(normalizedUtcEnd, orgTZ);
