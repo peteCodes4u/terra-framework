@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Form, Button, Modal } from "react-bootstrap";
 import { useStyle } from "../../StyleContext";
 import { parseISO, addMinutes, format } from "date-fns";
-import { formatInTimeZone } from "date-fns-tz";
+import { zonedTimeToUtc, utcToZonedTime, formatInTimeZone } from "date-fns-tz";
 import calendarData from "../../../../server/calendarData.json";
 
 export default function BookingForm({
@@ -15,109 +15,139 @@ export default function BookingForm({
   const { activeStyle } = useStyle();
   const orgTZ = calendarData.timeZone;
   const userTZ = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const callLengthMinutes = calendarData.callLengthMinutes || 30;
 
   // --- Form state ---
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     phoneNumber: "",
-    date: "",
-    slotIso: "", // ISO-based slot
+    date: "",    // user-selected date
+    slotIso: "", // UTC slot selected
   });
   const [availableSlots, setAvailableSlots] = useState([]);
-  const [loadingSlots, setLoadingSlots] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [showErrorModal, setShowErrorModal] = useState(false);
 
-  // --- Modal form state ---
-  const [updatedForm, setUpdatedForm] = useState({
-    name: "",
-    email: "",
-    phoneNumber: "",
-    date: "",
-    slotIso: "",
-  });
+  // --- Modal state ---
+  const [updatedForm, setUpdatedForm] = useState({ ...formData });
   const [modalSlots, setModalSlots] = useState([]);
-  const [loadingModalSlots, setLoadingModalSlots] = useState(false);
 
-  const callLengthMinutes = calendarData.callLengthMinutes || 30;
+  // --- slot fetch ---
+const fetchSlots = async (orgDateStr, setSlots) => {
+  if (!orgDateStr) return setSlots([]);
+  try {
+    const res = await fetch(`/api/availability?date=${orgDateStr}`);
+    const data = await res.json();
 
-  // --- Fetch slots for a date ---
-  const fetchSlots = async (dateStr, setSlots) => {
-    if (!dateStr) return setSlots([]);
+    // --- LOG for verification ---
+    console.group(`AVAILABILITY DEBUG → ${orgDateStr}`);
+    console.log("Available slots (raw UTC):", data.availableTimes);
+    console.log(
+      "Available slots (orgTZ view):",
+      data.availableTimes.map(s => formatInTimeZone(parseISO(s), orgTZ, "yyyy-MM-dd HH:mm:ss"))
+    );
+    console.log(
+      "Available slots (userTZ view):",
+      data.availableTimes.map(s => formatInTimeZone(parseISO(s), userTZ, "yyyy-MM-dd HH:mm:ss"))
+    );
+    console.log("Unavailable slots:", data.unavailableTimes);
+    console.groupEnd();
+
+    setSlots(data.availableTimes || []);
+  } catch (err) {
+    console.error("Failed to fetch availability:", err);
     setSlots([]);
-    try {
-      const res = await fetch(`/api/availability?date=${dateStr}`);
-      const data = await res.json();
-      setSlots(data.availableTimes || []);
-    } catch (err) {
-      console.error("Failed to fetch availability:", err);
-      setSlots([]);
-    }
-  };
-
-  // --- Initialize modal form for updates ---
-  useEffect(() => {
-    if (initialData?.date) {
-      setUpdatedForm({
-        name: initialData.name || "",
-        email: initialData.email || "",
-        phoneNumber: initialData.phoneNumber || "",
-        date: initialData.date?.slice(0, 10) || "",
-        slotIso: initialData.slotIso || "",
-      });
-    }
-  }, [initialData]);
-
-  // reset time selection on open modal
-  useEffect(() => {
-  if (showModal && initialData?.date) {
-    setUpdatedForm({
-      name: initialData.name || "",
-      email: initialData.email || "",
-      phoneNumber: initialData.phoneNumber || "",
-      date: initialData.date?.slice(0, 10) || "",
-      slotIso: initialData.slotIso || "",
-    });
-
-    fetchSlots(initialData.date.slice(0, 10), setModalSlots);
   }
-}, [showModal, initialData]);
+};
 
-  // --- Fetch available slots when date changes ---
-  useEffect(() => {
-    fetchSlots(formData.date, setAvailableSlots);
-  }, [formData.date]);
-
-  useEffect(() => {
-    fetchSlots(updatedForm.date, setModalSlots);
-  }, [updatedForm.date]);
-
-  // --- Input handlers ---
+  // --- Handle input changes ---
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
+
   const handleModalInputChange = (e) => {
     const { name, value } = e.target;
     setUpdatedForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  // --- Payload creation ---
-  const createPayload = (data, original) => {
-    const payload = {
-      ...original,
-      name: data.name ?? original?.name,
-      email: data.email ?? original?.email,
-      phoneNumber: data.phoneNumber ?? original?.phoneNumber,
-      date: data.date,
-      slotIso: data.slotIso,
-      start: data.slotIso,
-      end: data.slotIso ? addMinutes(parseISO(data.slotIso), callLengthMinutes).toISOString() : undefined,
-      _id: original?._id,
-    };
-    return payload;
-  };
+  // --- Hook: user date → org date mapping ---
+useEffect(() => {
+  if (!formData.date) {
+    setAvailableSlots([]);
+    return;
+  }
+
+  console.group("TZ DEBUG - Main Form");
+  console.log("User selected date:", formData.date);
+  console.log("userTZ:", userTZ, "orgTZ:", orgTZ);
+
+  // --- Treat the selected date as org date directly ---
+  const orgDateStr = formData.date;
+
+  console.log({ orgDateStr });
+
+  // Fetch slots for that exact org date
+  fetchSlots(orgDateStr, setAvailableSlots);
+
+  // Reset selected slot
+  setFormData((prev) => ({ ...prev, slotIso: "" }));
+}, [formData.date]);
+
+
+  // --- Modal date hook ---
+useEffect(() => {
+  if (!updatedForm.date) {
+    setModalSlots([]);
+    return;
+  }
+
+  console.group("TZ DEBUG - Modal Form");
+  console.log("Modal selected date:", updatedForm.date);
+
+  const orgDateStr = updatedForm.date;
+  console.log({ orgDateStr });
+
+  fetchSlots(orgDateStr, setModalSlots);
+
+  setUpdatedForm((prev) => ({ ...prev, slotIso: "" }));
+}, [updatedForm.date]);
+
+  // --- Render slots in user TZ ---
+  // const renderSlotOptions = (slots) =>
+  //   slots.map((slot) => {
+  //     const readable = formatInTimeZone(parseISO(slot), userTZ, "h:mm a");
+  //     return (
+  //       <option key={slot} value={slot}>
+  //         {readable}
+  //       </option>
+  //     );
+  //   });
+const renderSlotOptions = (slots) =>
+  slots.map((slot) => {
+    const userView = formatInTimeZone(parseISO(slot), userTZ, "h:mm a");
+    return (
+      <option key={slot} value={slot}>
+        {userView}
+      </option>
+    );
+  });
+
+  // --- Build payload for API ---
+  const createPayload = (data, original = {}) => ({
+    ...original,
+    name: data.name ?? original?.name,
+    email: data.email ?? original?.email,
+    phoneNumber: data.phoneNumber ?? original?.phoneNumber,
+    date: data.date,
+    slotIso: data.slotIso,
+    start: data.slotIso,
+    end: data.slotIso
+      ? addMinutes(parseISO(data.slotIso), callLengthMinutes).toISOString()
+      : undefined,
+    _id: original?._id,
+  });
 
   // --- Submit handlers ---
   const handleSubmit = async (e) => {
@@ -133,7 +163,6 @@ export default function BookingForm({
         setErrorMessage(response.message || "Conflict Error");
         return setShowErrorModal(true);
       }
-      // Reset form
       setFormData({ name: "", email: "", phoneNumber: "", date: "", slotIso: "" });
       setAvailableSlots([]);
     } catch (err) {
@@ -161,19 +190,6 @@ export default function BookingForm({
     }
   };
 
-  // --- Render helper ---
-const renderSlotOptions = (slots) =>
-  slots.map((slot) => {
-    // Always display in orgTZ (not userTZ)
-    const readable = formatInTimeZone(parseISO(slot), userTZ, "h:mm a");
-    return (
-      <option key={slot} value={slot}>
-        {readable}
-      </option>
-    );
-  });
-
-  // --- Modal update check ---
   const isUpdateEnabled = () => {
     const safeInitial = initialData || {};
     return (
@@ -227,7 +243,7 @@ const renderSlotOptions = (slots) =>
               name="slotIso"
               value={formData.slotIso}
               onChange={handleInputChange}
-              disabled={!formData.date || loadingSlots || availableSlots.length === 0}
+              disabled={!formData.date || availableSlots.length === 0}
               required
             >
               <option value="">Select a time</option>
@@ -270,7 +286,7 @@ const renderSlotOptions = (slots) =>
                 name="slotIso"
                 value={updatedForm.slotIso}
                 onChange={handleModalInputChange}
-                disabled={!updatedForm.date || loadingModalSlots || modalSlots.length === 0}
+                disabled={!updatedForm.date || modalSlots.length === 0}
               >
                 <option value="">Select a time</option>
                 {renderSlotOptions(modalSlots)}

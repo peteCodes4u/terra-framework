@@ -2,16 +2,25 @@ const { addMinutes, isBefore, isAfter } = require("date-fns");
 const { utcToZonedTime, formatInTimeZone } = require("date-fns-tz");
 const calendarData = require("../calendarData.json");
 
+/**
+ * Validate a booking against organization rules
+ * @param {Date} startDate - UTC start time of booking
+ * @param {Date} endDate - UTC end time of booking
+ * @param {Array} existingBookings - Array of existing bookings [{start, end}]
+ * @returns {Object} - { valid: boolean, message?: string }
+ */
 function validateBooking(startDate, endDate, existingBookings = []) {
   const orgTZ = calendarData.timeZone;
 
-  // 🔑 Ensure startDate/endDate are treated in orgTZ
+  // Convert UTC start/end into org time for **all business logic**
   const startLocal = utcToZonedTime(startDate, orgTZ);
   const endLocal = utcToZonedTime(endDate, orgTZ);
 
-  const dateStr = formatInTimeZone(startDate, orgTZ, "yyyy-MM-dd");
+  // --- Organization date & day calculations ---
+  const dateStr = formatInTimeZone(startLocal, orgTZ, "yyyy-MM-dd"); // Org date
+  const day = formatInTimeZone(startLocal, orgTZ, "EEEE").toLowerCase(); // Org day
 
-  // 1. Enforce Unavailable Dates
+  // 1️⃣ Unavailable dates
   if (calendarData.unavailableDates.includes(dateStr)) {
     return {
       valid: false,
@@ -20,8 +29,7 @@ function validateBooking(startDate, endDate, existingBookings = []) {
     };
   }
 
-  // 2. Enforce Business Hours
-  const day = formatInTimeZone(startDate, orgTZ, "EEEE").toLowerCase();
+  // 2️⃣ Business hours check
   const hours = calendarData.businessHours[day];
   if (!hours) {
     return {
@@ -30,29 +38,6 @@ function validateBooking(startDate, endDate, existingBookings = []) {
     };
   }
 
-  // 3. Restrict same day booking
-  const todayStr = formatInTimeZone(new Date(), orgTZ, "yyyy-MM-dd");
-  if (
-    calendarData.sameDayBookingPermitted === false &&
-    dateStr === todayStr
-  ) {
-    return {
-      valid: false,
-      message:
-        "We're sorry, same day booking is not permitted by the organization at this time.",
-    };
-  }
-
-  // 4. Restrict past date booking
-  if (dateStr < todayStr) {
-    return {
-      valid: false,
-      message:
-        "We're sorry, that is a past date. Past dates are not valid booking dates.",
-    };
-  }
-
-  // Build business hours windows in orgTZ
   const [startH, startM] = hours.start.split(":").map(Number);
   const [endH, endM] = hours.end.split(":").map(Number);
 
@@ -69,22 +54,41 @@ function validateBooking(startDate, endDate, existingBookings = []) {
     };
   }
 
-  // 5. Slot Length + Call Length
-  const duration = (endDate - startDate) / (1000 * 60);
-  if (duration !== calendarData.callLengthMinutes) {
+  // 3️⃣ Same-day booking restriction
+  const todayStr = formatInTimeZone(new Date(), orgTZ, "yyyy-MM-dd");
+  if (!calendarData.sameDayBookingPermitted && dateStr === todayStr) {
+    return {
+      valid: false,
+      message:
+        "We're sorry, same day booking is not permitted by the organization at this time.",
+    };
+  }
+
+  // 4️⃣ Past date restriction
+  if (dateStr < todayStr) {
+    return {
+      valid: false,
+      message:
+        "We're sorry, that is a past date. Past dates are not valid booking dates.",
+    };
+  }
+
+  // 5️⃣ Slot length / call length
+  const durationMinutes = (endDate - startDate) / (1000 * 60);
+  if (durationMinutes !== calendarData.callLengthMinutes) {
     return {
       valid: false,
       message: `Sorry, times are restricted by the organization limit of ${calendarData.callLengthMinutes} minutes.`,
     };
   }
-  if (duration > calendarData.slotLengthMinutes) {
+  if (durationMinutes > calendarData.slotLengthMinutes) {
     return {
       valid: false,
       message: `Sorry, this booking exceeds the length of ${calendarData.slotLengthMinutes} minutes as set by the organization.`,
     };
   }
 
-  // 6. Conflict with Existing Bookings + Buffer
+  // 6️⃣ Conflict with existing bookings + buffer
   const buffer = calendarData.bufferMinutes || 0;
   const conflict = existingBookings.some((b) => {
     const bookingStartOrg = utcToZonedTime(b.start, orgTZ);
@@ -92,10 +96,7 @@ function validateBooking(startDate, endDate, existingBookings = []) {
     const bufferStart = addMinutes(bookingStartOrg, -buffer);
     const bufferEnd = addMinutes(bookingEndOrg, buffer);
 
-    const startOrg = utcToZonedTime(startDate, orgTZ);
-    const endOrg = utcToZonedTime(endDate, orgTZ);
-
-    return startOrg < bufferEnd && endOrg > bufferStart;
+    return startLocal < bufferEnd && endLocal > bufferStart;
   });
 
   if (conflict) {
@@ -106,7 +107,7 @@ function validateBooking(startDate, endDate, existingBookings = []) {
     };
   }
 
-  // Passed all rules
+  // ✅ Passed all rules
   return { valid: true };
 }
 

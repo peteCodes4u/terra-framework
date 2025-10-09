@@ -30,9 +30,10 @@ function getAvailability(dateStr, bookedEvents = []) {
 
   // Day of week string in orgTZ
   const dayInOrgTZ = utcToZonedTime(startOfDayUtc, orgTZ);
-  const weekdayName = dayInOrgTZ
-    .toLocaleDateString("en-US", { weekday: "long", timeZone: orgTZ })
-    .toLowerCase();
+  const weekdayName = new Date(`${dateStr}T00:00:00`).toLocaleDateString("en-US", {
+    weekday: "long",
+    timeZone: orgTZ,
+  }).toLowerCase();
 
   // 1. Block completely unavailable dates
   if (Array.isArray(unavailableDates) && unavailableDates.includes(dateStr)) {
