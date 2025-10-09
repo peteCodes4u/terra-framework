@@ -87,9 +87,15 @@ function validateBooking(startDate, endDate, existingBookings = []) {
   // 6. Conflict with Existing Bookings + Buffer
   const buffer = calendarData.bufferMinutes || 0;
   const conflict = existingBookings.some((b) => {
-    const bufferStart = addMinutes(new Date(b.start), -buffer);
-    const bufferEnd = addMinutes(new Date(b.end), buffer);
-    return startDate < bufferEnd && endDate > bufferStart;
+    const bookingStartOrg = utcToZonedTime(b.start, orgTZ);
+    const bookingEndOrg = utcToZonedTime(b.end, orgTZ);
+    const bufferStart = addMinutes(bookingStartOrg, -buffer);
+    const bufferEnd = addMinutes(bookingEndOrg, buffer);
+
+    const startOrg = utcToZonedTime(startDate, orgTZ);
+    const endOrg = utcToZonedTime(endDate, orgTZ);
+
+    return startOrg < bufferEnd && endOrg > bufferStart;
   });
 
   if (conflict) {
