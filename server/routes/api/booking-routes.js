@@ -14,17 +14,17 @@ const defaultOrgTZ = calendarData.timeZone;
 // import needed middleware from utils/auth
 const { authMiddleware } = require('../../utils/auth');
 
-const { timeZoneMiddleware } = require('../../utils/timeZoneMiddleware');
+// const { timeZoneMiddleware } = require('../../utils/timeZoneMiddleware');
 
 // create and get Bookings
 // POST to create a booking and GET to retrieve all bookings
-router.route('/').post(authMiddleware, timeZoneMiddleware(defaultOrgTZ), createBooking).get(authMiddleware, getAllBookings);
+router.route('/').post(authMiddleware, createBooking).get(authMiddleware, getAllBookings);
 
 
 // Update and Delete Bookings
 router
     .route('/:id')
-    .put(authMiddleware, timeZoneMiddleware(defaultOrgTZ), updateBooking)
+    .put(authMiddleware, updateBooking)
     .delete(authMiddleware, deleteBooking);
 
 module.exports = router;

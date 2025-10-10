@@ -1,6 +1,9 @@
+import { useState } from 'react';
 import { formatInTimeZone } from 'date-fns-tz';
 import Button from 'react-bootstrap/Button';
 import { useStyle } from '../../StyleContext';
+import calendarData from '../../../../server/calendarData.json'
+const orgTZ = calendarData.timeZone;
 
 // Use browser-detected user time zone
 const userTZ = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
@@ -17,9 +20,29 @@ function formatDate(dateStr) {
   return formatInTimeZone(dateStr, userTZ, 'MMMM d, yyyy');
 }
 
+// format time for org comparison
+function formatTimeOrg(dateStr) {
+  if (!dateStr) return 'N/A';
+  return formatInTimeZone(dateStr, orgTZ, 'h:mm a');
+}
+
+// format date for org comparison
+function formatDateOrg(dateStr) {
+  if (!dateStr) return 'N/A';
+  return formatInTimeZone(dateStr, orgTZ, 'MMMM d, yyyy');
+}
+
+
+
 // Render a booking tile
 export default function BookingTile({ booking, onDelete, onUpdate }) {
+
+  // style context
   const { activeStyle } = useStyle();
+
+  // expand additional details effect
+  const [ showDetails, setShowDetails ] = useState(false);
+
 
   return (
     <section className={`${activeStyle}-booking-tile`}>
@@ -27,10 +50,31 @@ export default function BookingTile({ booking, onDelete, onUpdate }) {
         <p>Contact: {booking.name}</p>
         <p>Email: {booking.email}</p>
         <p>Phone: {booking.phoneNumber}</p>
-        <p>Date: {formatDate(booking.start)}</p>
+        <p>Local Date : {formatDate(booking.start)}</p>
         <p>
-          Time: {formatTime(booking.start)} - {formatTime(booking.end)}
+          Local Time: {formatTime(booking.start)} - {formatTime(booking.end)}
         </p>
+        <Button
+          variant='link'
+          style={{ padding: 0, fontSize: '0.8em' }}
+          onClick={() => setShowDetails(!showDetails)}
+        >
+          {showDetails ? 'hide additional details ▲' : 'show additional details ▼'}
+        </Button>
+        {showDetails && (
+          <div>
+            <p>----</p>
+            <p className="text-muted" style={{ fontSize: '0.7em' }}>
+              Please join the meeting at <strong>your local time shown above.</strong><br />
+              The organization’s time may appear different depending on your location,
+              but both times refer to the same meeting.
+            </p>
+            <p>---</p>
+            <p className="text-muted" style={{ fontSize: '0.7em' }}>This office is located in: {orgTZ}</p>
+            <p className="text-muted" style={{ fontSize: '0.7em' }}>Your appointment in {orgTZ} is on {formatDateOrg(booking.start)} at {formatTimeOrg(booking.start)} - {formatTimeOrg(booking.end)} </p>
+          </div>
+        )}
+
       </div>
       <div className={`${activeStyle}-booking-tile-buttons`}>
         <Button variant="primary" onClick={() => onUpdate && onUpdate(booking._id, booking)}>

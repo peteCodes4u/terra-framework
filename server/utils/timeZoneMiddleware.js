@@ -8,30 +8,32 @@ const defaultOrgTZ = calendarData.timeZone;
 function timeZoneMiddleware(orgTZ = defaultOrgTZ) {
   return function (req, res, next) {
     try {
-      const { date, time } = req.body;
-
-      // If no date/time provided, skip
-      if (!date || !time) return next();
-
-      // Combine date+time string as if it's in orgTZ
-      const localString = `${date}T${time}`;
-
-      // Always normalize to UTC for storage
-      const normalizedUtcStart = zonedTimeToUtc(localString, orgTZ);
-
-      // Add call length + buffer
+      const { date, time, slotIso } = req.body;
       const callLength = calendarData.callLengthMinutes || 30;
       const buffer = calendarData.bufferMinutes || 0;
-      const normalizedUtcEnd = addMinutes(
-        normalizedUtcStart,
-        callLength + buffer
-      );
 
-      // Convert back to org local (for validation / display only)
+      // --- Determine start UTC ---
+      let normalizedUtcStart;
+      if (slotIso) {
+        // Frontend sent UTC directly → use as-is
+        normalizedUtcStart = new Date(slotIso);
+      } else if (date && time) {
+        // Fallback: combine date+time string in orgTZ
+        const localString = `${date}T${time}`;
+        normalizedUtcStart = zonedTimeToUtc(localString, orgTZ);
+      } else {
+        // No date/time provided → skip middleware
+        return next();
+      }
+
+      // --- Compute end UTC with call length + buffer ---
+      const normalizedUtcEnd = addMinutes(normalizedUtcStart, callLength + buffer);
+
+      // --- Compute orgTZ local references for logging/validation ---
       const startOrgLocal = utcToZonedTime(normalizedUtcStart, orgTZ);
       const endOrgLocal = utcToZonedTime(normalizedUtcEnd, orgTZ);
 
-      // Attach only UTC + useful local reference
+      // --- Attach to request ---
       req.bookingTimes = {
         normalizedUtcStart,
         normalizedUtcEnd,
@@ -39,8 +41,19 @@ function timeZoneMiddleware(orgTZ = defaultOrgTZ) {
         endOrgLocal,
       };
 
+      // --- Logging for debug ---
+      console.group("🧭 TIMEZONE MIDDLEWARE TRACE");
+      console.log("Input slotIso:", slotIso);
+      console.log("Input date:", date, "time:", time);
+      console.log("Normalized UTC start:", normalizedUtcStart);
+      console.log("Normalized UTC end:", normalizedUtcEnd);
+      console.log("Start orgTZ local:", startOrgLocal);
+      console.log("End orgTZ local:", endOrgLocal);
+      console.groupEnd();
+
       next();
     } catch (err) {
+      console.error("TimeZoneMiddleware error:", err);
       next(err);
     }
   };
