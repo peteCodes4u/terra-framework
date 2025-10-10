@@ -3,6 +3,13 @@ const { addMinutes, isBefore, isAfter, parseISO } = require("date-fns");
 const { zonedTimeToUtc, utcToZonedTime, formatInTimeZone } = require("date-fns-tz");
 const calendarData = require("../calendarData.json");
 
+/** Parse "HH:mm" -> minutes since midnight */
+function minutesFromTime(timeStr) {
+  const [hh, mm] = (timeStr || "00:00").split(":").map((n) => parseInt(n, 10) || 0);
+  return hh * 60 + mm;
+}
+
+/** Returns startOfDayUtc (orgTZ midnight in UTC) and endOfDayUtc */
 function getDayBounds(dateStr, orgTZ) {
   const startOfDayUtc = zonedTimeToUtc(`${dateStr}T00:00:00`, orgTZ);
   const endOfDayUtc = addMinutes(startOfDayUtc, 24 * 60);
@@ -10,13 +17,12 @@ function getDayBounds(dateStr, orgTZ) {
 }
 
 /**
- * Generate availability slots for a given date.
- * @param {string} dateStr - date in YYYY-MM-DD format (user selection).
- * @param {Array<{ normalizedUtc: string }>} bookedEvents - booked times in UTC.
+ * getAvailability(dateStr, bookedEvents)
+ *  - dateStr: 'YYYY-MM-DD' (user selection)
+ *  - bookedEvents: array of { normalizedUtc: '2025-10-10T16:00:00.000Z' } (UTC ISO)
  */
 function getAvailability(dateStr, bookedEvents = []) {
-  // Use the timezone key that exists in your calendarData
-  const orgTZ = calendarData.orgTZ || calendarData.timeZone || "UTC";
+  const orgTZ = calendarData.timeZone || calendarData.orgTZ || "UTC";
   const {
     businessHours,
     callLengthMinutes,
@@ -26,16 +32,13 @@ function getAvailability(dateStr, bookedEvents = []) {
     sameDayBookingPermitted,
   } = calendarData;
 
+  // Day bounds in UTC for the org date (safe anchor)
   const { startOfDayUtc } = getDayBounds(dateStr, orgTZ);
 
-  // Day of week string in orgTZ
-  const dayInOrgTZ = utcToZonedTime(startOfDayUtc, orgTZ);
-  const weekdayName = new Date(`${dateStr}T00:00:00`).toLocaleDateString("en-US", {
-    weekday: "long",
-    timeZone: orgTZ,
-  }).toLowerCase();
+  // Weekday in orgTZ (derived from the org-midnight UTC anchor)
+  const weekdayName = formatInTimeZone(startOfDayUtc, orgTZ, "EEEE").toLowerCase();
 
-  // 1. Block completely unavailable dates
+  // 1) Block fully unavailable dates
   if (Array.isArray(unavailableDates) && unavailableDates.includes(dateStr)) {
     return {
       date: dateStr,
@@ -46,15 +49,10 @@ function getAvailability(dateStr, bookedEvents = []) {
     };
   }
 
-  // 2. Same-day guard: if same-day booking is disabled, block today (compute correctly in orgTZ)
+  // 2) Same-day guard (computed in orgTZ)
   if (sameDayBookingPermitted === false) {
     const todayStrInOrgTZ = formatInTimeZone(new Date(), orgTZ, "yyyy-MM-dd");
-    // Normalize incoming dateStr into orgTZ before comparing
-    const normalizedDateStr = formatInTimeZone(
-      zonedTimeToUtc(`${dateStr}T00:00:00`, orgTZ),
-      orgTZ,
-      "yyyy-MM-dd"
-    );
+    const normalizedDateStr = formatInTimeZone(startOfDayUtc, orgTZ, "yyyy-MM-dd");
     if (normalizedDateStr === todayStrInOrgTZ) {
       return {
         date: dateStr,
@@ -66,9 +64,10 @@ function getAvailability(dateStr, bookedEvents = []) {
     }
   }
 
-  // 3. Weekday with no hours
+  // 3) Business hours for this day (orgTZ)
   const hours = businessHours[weekdayName];
   if (!hours || !hours.start || !hours.end) {
+    // closed day
     return {
       date: dateStr,
       availableTimes: [],
@@ -78,19 +77,23 @@ function getAvailability(dateStr, bookedEvents = []) {
     };
   }
 
-  // Build business window in UTC
-  const businessStartUtc = zonedTimeToUtc(`${dateStr}T${hours.start}:00`, orgTZ);
-  const businessEndUtc = zonedTimeToUtc(`${dateStr}T${hours.end}:00`, orgTZ);
+  // 4) Build business window in UTC **by offsetting from the org-midnight UTC anchor**
+  //    This avoids ambiguous string parsing that can leak host TZ.
+  const startMinutes = minutesFromTime(hours.start);
+  const endMinutes = minutesFromTime(hours.end);
 
-  // Generate slots
+  const businessStartUtc = addMinutes(startOfDayUtc, startMinutes);
+  const businessEndUtc = addMinutes(startOfDayUtc, endMinutes);
+
+  // 5) Generate candidate slots (cursor is UTC Date objects)
   let slots = [];
-  let cursor = businessStartUtc;
+  let cursor = new Date(businessStartUtc);
   while (isBefore(addMinutes(cursor, callLengthMinutes), businessEndUtc)) {
-    slots.push(cursor);
+    slots.push(new Date(cursor)); // push a copy
     cursor = addMinutes(cursor, slotLengthMinutes);
   }
 
-  // Remove booked/unavailable slots (from actual bookings)
+  // 6) Remove booked slots (bookedEvents expected as UTC-normalized ISO)
   const unavailableTimes = [];
   bookedEvents.forEach(({ normalizedUtc }) => {
     const bookedStart = parseISO(normalizedUtc);
@@ -98,28 +101,27 @@ function getAvailability(dateStr, bookedEvents = []) {
 
     slots = slots.filter((slot) => {
       const slotEnd = addMinutes(slot, callLengthMinutes);
+      // overlap: slot starts before booked end AND slotEnd after booked start
       const overlaps = isBefore(slot, bookedEnd) && isAfter(slotEnd, bookedStart);
-      if (overlaps) {
-        unavailableTimes.push(slot.toISOString());
-      }
+      if (overlaps) unavailableTimes.push(slot.toISOString());
       return !overlaps;
     });
   });
 
-  // --- NEW: remove slots that are already in the past (slotEnd <= now)
-  const nowUtc = zonedTimeToUtc(new Date(), orgTZ);
+  // 7) Remove slots that are already in the past (compare to the real current instant)
+  const now = new Date();
   const pastSlots = [];
   slots = slots.filter((slot) => {
     const slotEnd = addMinutes(slot, callLengthMinutes);
-    if (isBefore(slotEnd, nowUtc) || slotEnd.getTime() === nowUtc.getTime()) {
+    if (isBefore(slotEnd, now) || slotEnd.getTime() === now.getTime()) {
       pastSlots.push(slot.toISOString());
       return false;
     }
     return true;
   });
-  // add past slots to unavailableTimes so caller can see why they were removed
   unavailableTimes.push(...pastSlots);
 
+  // 8) Return normalized result (UTC ISO strings)
   return {
     date: dateStr,
     availableTimes: slots.map((s) => s.toISOString()),
