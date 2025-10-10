@@ -72,6 +72,19 @@ const fetchSlots = async (orgDateStr, setSlots) => {
     setUpdatedForm((prev) => ({ ...prev, [name]: value }));
   };
 
+  // hydrate modal with user data
+  useEffect(() => {
+  if (showModal) {
+    setUpdatedForm({
+      name: initialData.name || "",
+      email: initialData.email || "",
+      phoneNumber: initialData.phoneNumber || "",
+      date: initialData.date?.slice(0, 10) || "",
+      slotIso: initialData.slotIso || "",
+    });
+  }
+}, [showModal, initialData]);
+
   // --- Hook: user date → org date mapping ---
 useEffect(() => {
   if (!formData.date) {
