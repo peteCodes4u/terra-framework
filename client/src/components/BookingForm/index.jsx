@@ -86,6 +86,27 @@ const fetchSlots = async (orgDateStr, setSlots) => {
 }, [showModal, initialData]);
 
   // --- Hook: user date → org date mapping ---
+// useEffect(() => {
+//   if (!formData.date) {
+//     setAvailableSlots([]);
+//     return;
+//   }
+//   console.group("TZ DEBUG - Main Form");
+//   console.log("User selected date:", formData.date);
+//   console.log("userTZ:", userTZ, "orgTZ:", orgTZ);
+
+//   // --- Treat the selected date as org date directly ---
+//   const orgDateStr = formData.date;
+
+//   console.log({ orgDateStr });
+
+//   // Fetch slots for that exact org date
+//   fetchSlots(orgDateStr, setAvailableSlots);
+
+//   // Reset selected slot
+//   setFormData((prev) => ({ ...prev, slotIso: "" }));
+// }, [formData.date]);
+// --- Hook: main form date → org date mapping ---
 useEffect(() => {
   if (!formData.date) {
     setAvailableSlots([]);
@@ -96,12 +117,13 @@ useEffect(() => {
   console.log("User selected date:", formData.date);
   console.log("userTZ:", userTZ, "orgTZ:", orgTZ);
 
-  // --- Treat the selected date as org date directly ---
-  const orgDateStr = formData.date;
+  // --- Treat user-selected date as user-local start of day ---
+  const userDateStart = new Date(`${formData.date}T00:00:00`);
+  const orgDateStart = utcToZonedTime(userDateStart, orgTZ);
+  const orgDateStr = format(orgDateStart, "yyyy-MM-dd");
 
   console.log({ orgDateStr });
 
-  // Fetch slots for that exact org date
   fetchSlots(orgDateStr, setAvailableSlots);
 
   // Reset selected slot
@@ -110,6 +132,23 @@ useEffect(() => {
 
 
   // --- Modal date hook ---
+// useEffect(() => {
+//   if (!updatedForm.date) {
+//     setModalSlots([]);
+//     return;
+//   }
+
+//   console.group("TZ DEBUG - Modal Form");
+//   console.log("Modal selected date:", updatedForm.date);
+
+//   const orgDateStr = updatedForm.date;
+//   console.log({ orgDateStr });
+
+//   fetchSlots(orgDateStr, setModalSlots);
+
+//   setUpdatedForm((prev) => ({ ...prev, slotIso: "" }));
+// }, [updatedForm.date]);
+// --- Hook: modal form date → org date mapping ---
 useEffect(() => {
   if (!updatedForm.date) {
     setModalSlots([]);
@@ -117,13 +156,17 @@ useEffect(() => {
   }
 
   console.group("TZ DEBUG - Modal Form");
-  console.log("Modal selected date:", updatedForm.date);
+  console.log("Modal user-selected date:", updatedForm.date);
 
-  const orgDateStr = updatedForm.date;
+  const userDateStart = new Date(`${updatedForm.date}T00:00:00`);
+  const orgDateStart = utcToZonedTime(userDateStart, orgTZ);
+  const orgDateStr = format(orgDateStart, "yyyy-MM-dd");
+
   console.log({ orgDateStr });
 
   fetchSlots(orgDateStr, setModalSlots);
 
+  // Reset modal slot selection
   setUpdatedForm((prev) => ({ ...prev, slotIso: "" }));
 }, [updatedForm.date]);
 
@@ -148,19 +191,19 @@ const renderSlotOptions = (slots) =>
   });
 
   // --- Build payload for API ---
-  const createPayload = (data, original = {}) => ({
-    ...original,
-    name: data.name ?? original?.name,
-    email: data.email ?? original?.email,
-    phoneNumber: data.phoneNumber ?? original?.phoneNumber,
-    date: data.date,
-    slotIso: data.slotIso,
-    start: data.slotIso,
-    end: data.slotIso
-      ? addMinutes(parseISO(data.slotIso), callLengthMinutes).toISOString()
-      : undefined,
-    _id: original?._id,
-  });
+const createPayload = (data, original = {}) => ({
+  ...original,
+  name: data.name ?? original?.name,
+  email: data.email ?? original?.email,
+  phoneNumber: data.phoneNumber ?? original?.phoneNumber,
+  date: data.date,
+  slotIso: data.slotIso, // already UTC
+  start: data.slotIso,
+  end: data.slotIso
+    ? addMinutes(parseISO(data.slotIso), callLengthMinutes).toISOString()
+    : undefined,
+  _id: original?._id,
+});
 
   // --- Submit handlers ---
   const handleSubmit = async (e) => {

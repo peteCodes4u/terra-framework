@@ -27,20 +27,33 @@ module.exports = {
           ? new Date(slotIso)
           : zonedTimeToUtc(slotIso, orgTZ);
 
-        normalizedUtcStart = slotUtc;
+        // normalizedUtcStart = slotUtc;
 
+        // normalizedUtcEnd = end
+        //   ? (end.endsWith("Z") ? new Date(end) : zonedTimeToUtc(end, orgTZ))
+        //   : addMinutes(normalizedUtcStart, calendarData.callLengthMinutes);
+        
+        // Ensure slotIso is treated as UTC
+        normalizedUtcStart = slotIso.endsWith("Z") ? new Date(slotIso) : new Date(slotIso + "Z");
         normalizedUtcEnd = end
-          ? (end.endsWith("Z") ? new Date(end) : zonedTimeToUtc(end, orgTZ))
-          : addMinutes(normalizedUtcStart, calendarData.callLengthMinutes);
+        ? (end.endsWith("Z") ? new Date(end) : new Date(end + "Z"))
+        : addMinutes(normalizedUtcStart, calendarData.callLengthMinutes);
 
         startOrgLocal = utcToZonedTime(normalizedUtcStart, orgTZ);
         endOrgLocal = utcToZonedTime(normalizedUtcEnd, orgTZ);
       }
 
-      const dateStr = normalizedUtcStart.toISOString().slice(0, 10);
+      const dateStr = startOrgLocal.toISOString().slice(0, 10);
 
       // Fetch all bookings for that date
       const existingBookings = await Booking.find({ date: dateStr });
+
+      console.group("📥 BOOKING CONTROLLER INPUT DEBUG");
+      console.log("Incoming payload:", req.body);
+      console.log("Start (raw):", req.body.start);
+      console.log("End (raw):", req.body.end);
+      console.log("Org TZ:", calendarData.timeZone);
+      console.groupEnd();
 
       // Validate using org-local times
       const validation = validateBooking(startOrgLocal, endOrgLocal, existingBookings);
@@ -85,12 +98,21 @@ module.exports = {
         req.bookingTimes || {};
 
       if (!normalizedUtcStart) {
+
         const { slotIso, end } = req.body;
-        normalizedUtcStart = slotIso
-          ? (slotIso.endsWith("Z") ? new Date(slotIso) : zonedTimeToUtc(slotIso, orgTZ))
-          : booking.start;
+
+        // normalizedUtcStart = slotIso
+        //   ? (slotIso.endsWith("Z") ? new Date(slotIso) : zonedTimeToUtc(slotIso, orgTZ))
+        //   : booking.start;
+
+        //   normalizedUtcEnd = end
+        //   ? (end.endsWith("Z") ? new Date(end) : zonedTimeToUtc(end, orgTZ))
+        //   : addMinutes(normalizedUtcStart, calendarData.callLengthMinutes);
+
+        // Ensure slotIso is treated as UTC
+        normalizedUtcStart = slotIso.endsWith("Z") ? new Date(slotIso) : new Date(slotIso + "Z");
         normalizedUtcEnd = end
-          ? (end.endsWith("Z") ? new Date(end) : zonedTimeToUtc(end, orgTZ))
+          ? (end.endsWith("Z") ? new Date(end) : new Date(end + "Z"))
           : addMinutes(normalizedUtcStart, calendarData.callLengthMinutes);
 
         startOrgLocal = utcToZonedTime(normalizedUtcStart, orgTZ);

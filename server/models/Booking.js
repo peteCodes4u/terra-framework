@@ -1,13 +1,8 @@
 const { Schema, model } = require('mongoose');
 
-// Model will have name, email, date, and time fields
-
 const bookingSchema = new Schema(
   {
-    name: {
-      type: String,
-      required: true,
-    },
+    name: { type: String, required: true },
     email: {
       type: String,
       required: true,
@@ -18,35 +13,30 @@ const bookingSchema = new Schema(
       required: true,
       match: [/^\+?[1-9]\d{1,14}$/, "Must use a valid phone number"],
     },
-    date: {
-      type: String,
-      required: true,
-    },
-    start: {
-      type: Date,
-      required: true,
-    },
-    end: {
-      type: Date,
-      required: true,
-    },
-    user: {
-      type: Schema.Types.ObjectId,
-      ref: 'User',
-      required: true, // Ensure that a booking is always associated with a user
-    }
+    // YYYY-MM-DD in orgTZ
+    date: { type: String, required: true },
+    // UTC
+    start: { type: Date, required: true },
+    end: { type: Date, required: true },
+    user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   },
-  // set to use virtuals if needed
   {
     timestamps: true,
-    toJSON: {
-      virtuals: true,
-    },
+    toJSON: { virtuals: true },
   }
 );
 
-// Prevents duplicate bookings for same start time on same date
+// Prevent duplicate bookings for same start time on same date
 bookingSchema.index({ date: 1, start: 1 }, { unique: true });
+
+// turn on for debug middleware: logs every save
+bookingSchema.pre('save', function (next) {
+  console.log("💾 Booking save trace:");
+  console.log(" - date (orgTZ):", this.date);
+  console.log(" - start (UTC):", this.start.toISOString());
+  console.log(" - end (UTC):", this.end.toISOString());
+  next();
+});
 
 const Booking = model('Booking', bookingSchema);
 module.exports = Booking;
