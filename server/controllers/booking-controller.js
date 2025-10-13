@@ -56,7 +56,8 @@ module.exports = {
       console.groupEnd();
 
       // Validate using org-local times
-      const validation = validateBooking(startOrgLocal, endOrgLocal, existingBookings);
+      // const validation = validateBooking(startOrgLocal, endOrgLocal, existingBookings);
+      const validation = validateBooking(normalizedUtcStart, normalizedUtcEnd, existingBookings);
       if (!validation.valid) {
         return res.status(400).json({
           error: "conflict",
@@ -126,7 +127,9 @@ module.exports = {
         _id: { $ne: booking._id },
       });
 
-      const validation = validateBooking(startOrgLocal, endOrgLocal, existingBookings);
+      // const validation = validateBooking(startOrgLocal, endOrgLocal, existingBookings);
+      const validation = validateBooking(normalizedUtcStart, normalizedUtcEnd, existingBookings);
+
       if (!validation.valid) {
         return res.status(400).json({
           error: "conflict",

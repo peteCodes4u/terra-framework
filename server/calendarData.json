@@ -1,5 +1,5 @@
 {
-  "timeZone":"America/New_York",
+  "timeZone":"America/Los_Angeles",
   "slotLengthMinutes": 45,
   "callLengthMinutes": 30,
   "bufferMinutes": 15,
