@@ -85,27 +85,6 @@ const fetchSlots = async (orgDateStr, setSlots) => {
   }
 }, [showModal, initialData]);
 
-  // --- Hook: user date → org date mapping ---
-// useEffect(() => {
-//   if (!formData.date) {
-//     setAvailableSlots([]);
-//     return;
-//   }
-//   console.group("TZ DEBUG - Main Form");
-//   console.log("User selected date:", formData.date);
-//   console.log("userTZ:", userTZ, "orgTZ:", orgTZ);
-
-//   // --- Treat the selected date as org date directly ---
-//   const orgDateStr = formData.date;
-
-//   console.log({ orgDateStr });
-
-//   // Fetch slots for that exact org date
-//   fetchSlots(orgDateStr, setAvailableSlots);
-
-//   // Reset selected slot
-//   setFormData((prev) => ({ ...prev, slotIso: "" }));
-// }, [formData.date]);
 // --- Hook: main form date → org date mapping ---
 useEffect(() => {
   if (!formData.date) {
@@ -113,97 +92,70 @@ useEffect(() => {
     return;
   }
 
-  console.group("TZ DEBUG - Main Form");
-  console.log("User selected date:", formData.date);
-  console.log("userTZ:", userTZ, "orgTZ:", orgTZ);
+  // --- Diagnostic tool for debugging ---
+  // const userDateStart = new Date(`${formData.date}T00:00:00`);
+  // const orgDateStart = utcToZonedTime(userDateStart, orgTZ);
+  // const orgDateStr = format(orgDateStart, "yyyy-MM-dd");
+  // console.log(`orgDateString: ${ orgDateStr }, userDateStart: ${userDateStart}, orgDateStart: ${orgDateStr}`);
+  // console.group("TZ DEBUG - Main Form");
+  // console.log("User selected date:", formData.date);
+  // console.log("userTZ:", userTZ, "orgTZ:", orgTZ);
 
-  // --- Treat user-selected date as user-local start of day ---
-  const userDateStart = new Date(`${formData.date}T00:00:00`);
-  const orgDateStart = utcToZonedTime(userDateStart, orgTZ);
-  const orgDateStr = format(orgDateStart, "yyyy-MM-dd");
+  // fetch slots based on user time
+  fetchSlots(formData.date, setAvailableSlots);
 
-  console.log({ orgDateStr });
-
-  fetchSlots(orgDateStr, setAvailableSlots);
 
   // Reset selected slot
   setFormData((prev) => ({ ...prev, slotIso: "" }));
 }, [formData.date]);
 
-
-  // --- Modal date hook ---
-// useEffect(() => {
-//   if (!updatedForm.date) {
-//     setModalSlots([]);
-//     return;
-//   }
-
-//   console.group("TZ DEBUG - Modal Form");
-//   console.log("Modal selected date:", updatedForm.date);
-
-//   const orgDateStr = updatedForm.date;
-//   console.log({ orgDateStr });
-
-//   fetchSlots(orgDateStr, setModalSlots);
-
-//   setUpdatedForm((prev) => ({ ...prev, slotIso: "" }));
-// }, [updatedForm.date]);
-// --- Hook: modal form date → org date mapping ---
+// --- Hook: modal form date mapping ---
 useEffect(() => {
   if (!updatedForm.date) {
     setModalSlots([]);
     return;
   }
 
-  console.group("TZ DEBUG - Modal Form");
-  console.log("Modal user-selected date:", updatedForm.date);
+  // --- Diagnostic tools ---
+  // const userDateStart = new Date(`${updatedForm.date}T00:00:00`);
+  // const orgDateStart = utcToZonedTime(userDateStart, orgTZ);
+  // const orgDateStr = format(orgDateStart, "yyyy-MM-dd");
+  // console.log(`returned from modal: { orgDateStr: ${ orgDateStr }, userDateStart: ${userDateStart}, orgDateStart: ${orgDateStart} }`);
+  // console.group("TZ DEBUG - Modal Form");
+  // console.log("Modal user-selected date:", updatedForm.date);
 
-  const userDateStart = new Date(`${updatedForm.date}T00:00:00`);
-  const orgDateStart = utcToZonedTime(userDateStart, orgTZ);
-  const orgDateStr = format(orgDateStart, "yyyy-MM-dd");
-
-  console.log({ orgDateStr });
-
-  fetchSlots(orgDateStr, setModalSlots);
-
+  // fetch slots based on user time
+  fetchSlots(updatedForm.date, setModalSlots  );
+  
   // Reset modal slot selection
   setUpdatedForm((prev) => ({ ...prev, slotIso: "" }));
 }, [updatedForm.date]);
 
   // --- Render slots in user TZ ---
-  // const renderSlotOptions = (slots) =>
-  //   slots.map((slot) => {
-  //     const readable = formatInTimeZone(parseISO(slot), userTZ, "h:mm a");
-  //     return (
-  //       <option key={slot} value={slot}>
-  //         {readable}
-  //       </option>
-  //     );
-  //   });
-const renderSlotOptions = (slots) =>
-  slots.map((slot) => {
-    const userView = formatInTimeZone(parseISO(slot), userTZ, "h:mm a");
-    return (
-      <option key={slot} value={slot}>
-        {userView}
-      </option>
-    );
-  });
+  const renderSlotOptions = (slots) =>
+    slots.map((slot) => {
+      const userView = formatInTimeZone(parseISO(slot), userTZ, "h:mm a");
+      return (
+        <option key={slot} value={slot}>
+          {userView}
+        </option>
+      );
+    });
 
   // --- Build payload for API ---
-const createPayload = (data, original = {}) => ({
-  ...original,
-  name: data.name ?? original?.name,
-  email: data.email ?? original?.email,
-  phoneNumber: data.phoneNumber ?? original?.phoneNumber,
-  date: data.date,
-  slotIso: data.slotIso, // already UTC
-  start: data.slotIso,
-  end: data.slotIso
-    ? addMinutes(parseISO(data.slotIso), callLengthMinutes).toISOString()
-    : undefined,
-  _id: original?._id,
-});
+  const createPayload = (data, original = {}) => ({
+    ...original,
+    name: data.name ?? original?.name,
+    email: data.email ?? original?.email,
+    phoneNumber: data.phoneNumber ?? original?.phoneNumber,
+    date: data.date,
+    slotIso: data.slotIso,
+    start: data.slotIso,
+    end: data.slotIso
+      ? addMinutes(parseISO(data.slotIso), callLengthMinutes).toISOString()
+      : undefined,
+    _id: original?._id,
+  });
 
   // --- Submit handlers ---
   const handleSubmit = async (e) => {

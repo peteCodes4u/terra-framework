@@ -33,7 +33,17 @@ function getAvailability(dateStr, bookedEvents = []) {
   } = calendarData;
 
   // Day bounds in UTC for the org date (safe anchor)
-  const { startOfDayUtc } = getDayBounds(dateStr, orgTZ);
+  // const { startOfDayUtc } = getDayBounds(dateStr, orgTZ);
+  
+  // Force dateStr to be interpreted in orgTZ (not userTZ)
+  const normalizedDateStr = formatInTimeZone(
+    zonedTimeToUtc(`${dateStr}T00:00:00`, orgTZ),
+    orgTZ,
+    "yyyy-MM-dd"
+  );
+
+  const { startOfDayUtc } = getDayBounds(normalizedDateStr, orgTZ);
+
 
   // Weekday in orgTZ (derived from the org-midnight UTC anchor)
   const weekdayName = formatInTimeZone(startOfDayUtc, orgTZ, "EEEE").toLowerCase();

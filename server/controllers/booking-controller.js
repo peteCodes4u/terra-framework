@@ -11,44 +11,40 @@ module.exports = {
   // Create a new booking
   async createBooking(req, res) {
     try {
-      const { name, email, phoneNumber } = req.body;
+      const { name, email, phoneNumber, slotIso, end } = req.body;
 
-      let { normalizedUtcStart, normalizedUtcEnd, startOrgLocal, endOrgLocal } =
-        req.bookingTimes || {};
+      if (!slotIso) {
+        return res.status(400).json({ message: "Booking time is required" });
+      }
 
-      if (!normalizedUtcStart) {
-        const { slotIso, end } = req.body;
-        if (!slotIso) {
-          return res.status(400).json({ message: "Booking time is required" });
-        }
+      // Always interpret incoming slotIso as UTC if it ends with Z, else assume orgTZ
+      let normalizedUtcStart;
+      if (slotIso.endsWith("Z")) {
+        normalizedUtcStart = new Date(slotIso);
+      } else {
+        normalizedUtcStart = zonedTimeToUtc(slotIso, orgTZ);
+      }
 
-        const slotUtc = slotIso.endsWith("Z")
-          ? new Date(slotIso)
-          : zonedTimeToUtc(slotIso, orgTZ);
-
-        normalizedUtcStart = slotIso.endsWith("Z") ? new Date(slotIso) : new Date(slotIso + "Z");
-        normalizedUtcEnd = end
-        ? (end.endsWith("Z") ? new Date(end) : new Date(end + "Z"))
+      const normalizedUtcEnd = end
+        ? (end.endsWith("Z") ? new Date(end) : zonedTimeToUtc(end, orgTZ))
         : addMinutes(normalizedUtcStart, calendarData.callLengthMinutes);
 
-        startOrgLocal = utcToZonedTime(normalizedUtcStart, orgTZ);
-        endOrgLocal = utcToZonedTime(normalizedUtcEnd, orgTZ);
-      }
+      // Derive org-local times for validation
+      const startOrgLocal = utcToZonedTime(normalizedUtcStart, orgTZ);
+      const endOrgLocal = utcToZonedTime(normalizedUtcEnd, orgTZ);
 
       const dateStr = startOrgLocal.toISOString().slice(0, 10);
 
       // Fetch all bookings for that date
       const existingBookings = await Booking.find({ date: dateStr });
 
-      console.group("📥 BOOKING CONTROLLER INPUT DEBUG");
+      console.group("📥 CREATE BOOKING DEBUG");
       console.log("Incoming payload:", req.body);
-      console.log("Start (raw):", req.body.start);
-      console.log("End (raw):", req.body.end);
-      console.log("Org TZ:", calendarData.timeZone);
+      console.log("Org TZ:", orgTZ);
+      console.log("normalizedUtcStart:", normalizedUtcStart);
+      console.log("normalizedUtcEnd:", normalizedUtcEnd);
       console.groupEnd();
 
-      // Validate using org-local times
-      // const validation = validateBooking(startOrgLocal, endOrgLocal, existingBookings);
       const validation = validateBooking(normalizedUtcStart, normalizedUtcEnd, existingBookings);
       if (!validation.valid) {
         return res.status(400).json({
@@ -57,7 +53,6 @@ module.exports = {
         });
       }
 
-      // Store UTC values in DB
       const booking = await Booking.create({
         name,
         email,
@@ -76,93 +71,72 @@ module.exports = {
     }
   },
 
-// Update booking
-async updateBooking(req, res) {
-  try {
-    const { name, email, phoneNumber, slotIso, end } = req.body;
-    const { id } = req.params;
-    const orgTZ = calendarData.timeZone;
-    const callLengthMinutes = calendarData.callLengthMinutes || 30;
 
-    const booking = await Booking.findById(id);
-    if (!booking) {
-      return res.status(404).json({ message: "Booking not found" });
-    }
+  // Update booking
+  async updateBooking(req, res) {
+    try {
+      const { name, email, phoneNumber, slotIso, end } = req.body;
+      const booking = await Booking.findById(req.params.id);
+      if (!booking) {
+        return res.status(404).json({ message: "Booking not found" });
+      }
 
-    // 🧠 Determine if this is an "info-only" update
-    const isInfoOnly = !slotIso && !end;
+      let normalizedUtcStart = booking.start;
+      let normalizedUtcEnd = booking.end;
 
-    if (isInfoOnly) {
-      console.log("🕓 Info-only update — skipping time normalization");
+      // Only recalc times if slotIso is provided (i.e., user changed the time)
+      if (slotIso) {
+        if (slotIso.endsWith("Z")) {
+          normalizedUtcStart = new Date(slotIso);
+        } else {
+          normalizedUtcStart = zonedTimeToUtc(slotIso, orgTZ);
+        }
 
+        normalizedUtcEnd = end
+          ? (end.endsWith("Z") ? new Date(end) : zonedTimeToUtc(end, orgTZ))
+          : addMinutes(normalizedUtcStart, calendarData.callLengthMinutes);
+      }
+
+      const startOrgLocal = utcToZonedTime(normalizedUtcStart, orgTZ);
+      const endOrgLocal = utcToZonedTime(normalizedUtcEnd, orgTZ);
+      const dateStr = startOrgLocal.toISOString().slice(0, 10);
+
+      const existingBookings = await Booking.find({
+        date: dateStr,
+        _id: { $ne: booking._id },
+      });
+
+      // Only revalidate conflicts if time changed
+      if (slotIso) {
+        const validation = validateBooking(normalizedUtcStart, normalizedUtcEnd, existingBookings);
+        if (!validation.valid) {
+          return res.status(400).json({
+            error: "conflict",
+            message: validation.message,
+          });
+        }
+      }
+
+      // Update only fields that were sent
+      if (slotIso) {
+        booking.start = normalizedUtcStart;
+        booking.end = normalizedUtcEnd;
+        booking.date = dateStr;
+      }
       if (name !== undefined) booking.name = name;
       if (email !== undefined) booking.email = email;
       if (phoneNumber !== undefined) booking.phoneNumber = phoneNumber;
 
       await booking.save();
+
       const token = signToken(req.user);
-      return res.status(200).json({ booking, token, user: req.user });
+      res.status(200).json({ booking, token, user: req.user });
+    } catch (err) {
+      console.error("Error updating booking:", err);
+      res.status(400).json({ message: "Error updating booking", error: err.message });
     }
+  },
 
-    // 🧭 Otherwise, handle time-based updates
-    if (!slotIso) {
-      return res.status(400).json({ message: "Missing slotIso for time update." });
-    }
-
-    // --- Normalize times ---
-    const normalizedUtcStart = slotIso.endsWith("Z")
-      ? new Date(slotIso)
-      : new Date(slotIso + "Z");
-
-    if (isNaN(normalizedUtcStart)) {
-      return res.status(400).json({ message: "Invalid start time value." });
-    }
-
-    const normalizedUtcEnd = end
-      ? (end.endsWith("Z") ? new Date(end) : new Date(end + "Z"))
-      : addMinutes(normalizedUtcStart, callLengthMinutes);
-
-    if (isNaN(normalizedUtcEnd)) {
-      return res.status(400).json({ message: "Invalid end time value." });
-    }
-
-    // --- Convert to org local for validation ---
-    const startOrgLocal = utcToZonedTime(normalizedUtcStart, orgTZ);
-    const endOrgLocal = utcToZonedTime(normalizedUtcEnd, orgTZ);
-    const dateStr = normalizedUtcStart.toISOString().slice(0, 10);
-
-    // --- Check for conflicts ---
-    const existingBookings = await Booking.find({
-      date: dateStr,
-      _id: { $ne: booking._id },
-    });
-
-    const validation = validateBooking(normalizedUtcStart, normalizedUtcEnd, existingBookings);
-    if (!validation.valid) {
-      return res.status(400).json({
-        error: "conflict",
-        message: validation.message,
-      });
-    }
-
-    // --- Apply updates ---
-    booking.start = normalizedUtcStart;
-    booking.end = normalizedUtcEnd;
-    booking.date = dateStr;
-
-    if (name !== undefined) booking.name = name;
-    if (email !== undefined) booking.email = email;
-    if (phoneNumber !== undefined) booking.phoneNumber = phoneNumber;
-
-    await booking.save();
-
-    const token = signToken(req.user);
-    res.status(200).json({ booking, token, user: req.user });
-  } catch (err) {
-    console.error("Error updating booking:", err);
-    res.status(400).json({ message: "Error updating booking", error: err.message });
-  }
-},
 
 
   // Get all bookings
