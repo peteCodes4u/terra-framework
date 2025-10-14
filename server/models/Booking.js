@@ -29,14 +29,14 @@ const bookingSchema = new Schema(
 // Prevent duplicate bookings for same start time on same date
 bookingSchema.index({ date: 1, start: 1 }, { unique: true });
 
-// turn on for debug middleware: logs every save
-bookingSchema.pre('save', function (next) {
-  console.log("💾 Booking save trace:");
-  console.log(" - date (orgTZ):", this.date);
-  console.log(" - start (UTC):", this.start.toISOString());
-  console.log(" - end (UTC):", this.end.toISOString());
-  next();
-});
+// turn on for debug: logs every save
+// bookingSchema.pre('save', function (next) {
+//   console.log("💾 Booking save trace:");
+//   console.log(" - date (orgTZ):", this.date);
+//   console.log(" - start (UTC):", this.start.toISOString());
+//   console.log(" - end (UTC):", this.end.toISOString());
+//   next();
+// });
 
 const Booking = model('Booking', bookingSchema);
 module.exports = Booking;

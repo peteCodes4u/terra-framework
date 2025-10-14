@@ -29,7 +29,7 @@ const SignupForm = ({ handleModalClose, activeStyle }) => {
 
     try {
 
-      console.log('Submitting form data:', userFormData);
+      // console.log('Submitting form data:', userFormData);
       const response = await createUser(userFormData);
 
       if (!response.ok) {
@@ -37,7 +37,7 @@ const SignupForm = ({ handleModalClose, activeStyle }) => {
       }
 
       const { token, user } = await response.json();
-      console.log(user);
+      // console.log(user);
       Auth.login(token);
     } catch (err) {
       console.error(err);

@@ -26,20 +26,19 @@ function validateBooking(startDate, endDate, existingBookings = []) {
   const day = formatInTimeZone(startDate, orgTZ, "EEEE").toLowerCase();
 
   // --- Logging
-  console.log("🧭 VALIDATE BOOKING TRACE:");
-  console.log("startDate (org-local):", startDate);
-  console.log("endDate (org-local):", endDate);
-  console.log("orgTZ:", orgTZ);
-  console.log("dateStr (org-local):", dateStr);
-  console.log("day:", day);
-  console.log("existingBookings count:", existingBookings.length);
+  // console.log("🧭 VALIDATE BOOKING TRACE:");
+  // console.log("startDate (org-local):", startDate);
+  // console.log("endDate (org-local):", endDate);
+  // console.log("orgTZ:", orgTZ);
+  // console.log("dateStr (org-local):", dateStr);
+  // console.log("day:", day);
+  // console.log("existingBookings count:", existingBookings.length);
+  // existingBookings.forEach((b, i) =>
+  //   console.log(`Existing booking ${i + 1}: start=${b.start.toISOString()}, end=${b.end.toISOString()}`)
+  // );
+  // console.groupEnd();
 
-  existingBookings.forEach((b, i) =>
-    console.log(`Existing booking ${i + 1}: start=${b.start.toISOString()}, end=${b.end.toISOString()}`)
-  );
-  console.groupEnd();
-
-  // 1️⃣ Unavailable dates
+  // 1 Unavailable dates
   if (calendarData.unavailableDates.includes(dateStr)) {
     return {
       valid: false,
@@ -47,7 +46,7 @@ function validateBooking(startDate, endDate, existingBookings = []) {
     };
   }
 
-  // 2️⃣ Business hours
+  // 2 Business hours
   const hours = calendarData.businessHours[day];
   if (!hours) {
     return {
@@ -68,14 +67,14 @@ function validateBooking(startDate, endDate, existingBookings = []) {
     slotStart = addMinutes(slotStart, slotLength);
   }
 
-    // --- Log computed slots
-  console.group("🗓 Computed slots (UTC)");
-  slots.forEach((s, i) =>
-    console.log(`Slot ${i + 1}: start=${s.start.toISOString()} end=${s.end.toISOString()}`)
-  );
-  console.groupEnd();
+  // --- DEBUG Log computed slots ---
+  // console.group("🗓 Computed slots (UTC)");
+  // slots.forEach((s, i) =>
+  //   console.log(`Slot ${i + 1}: start=${s.start.toISOString()} end=${s.end.toISOString()}`)
+  // );
+  // console.groupEnd();
 
-  // 3️⃣ Check if the booking matches any slot
+  // 3 Check if the booking matches any slot
   let slotMatch = null;
   for (const s of slots) {
     if (startDate.getTime() === s.start.getTime() && endDate.getTime() === s.end.getTime()) {
@@ -85,31 +84,25 @@ function validateBooking(startDate, endDate, existingBookings = []) {
   }
 
   if (!slotMatch) {
-    console.warn("⚠️ Booking rejected: outside business hours boundary check.");
-    console.log("• User selection does not match any valid slot:");
-    console.log(`  - User startDate (UTC): ${startDate.toISOString()}`);
-    console.log(`  - User endDate   (UTC): ${endDate.toISOString()}`);
-    console.log("• Closest slots:");
-    slots.forEach((s, i) =>
-      console.log(`  Slot ${i + 1}: ${s.start.toISOString()} -> ${s.end.toISOString()}`)
-    );
+    // -- Turn on for Debugging --
+    // console.warn("⚠️ Booking rejected: outside business hours boundary check.");
+    // console.log("• User selection does not match any valid slot:");
+    // console.log(`  - User startDate (UTC): ${startDate.toISOString()}`);
+    // console.log(`  - User endDate   (UTC): ${endDate.toISOString()}`);
+    // console.log("• Closest slots:");
+    // slots.forEach((s, i) =>
+    //   console.log(`  Slot ${i + 1}: ${s.start.toISOString()} -> ${s.end.toISOString()}`)
+    // );
     return {
       valid: false,
       message: "We're sorry, this booking is outside of our business hours.",
     };
   }
 
-  console.log("✅ Slot matched:", slotMatch.start.toISOString(), "->", slotMatch.end.toISOString());
+  // --- DEBUG ---
+  // console.log("✅ Slot matched:", slotMatch.start.toISOString(), "->", slotMatch.end.toISOString());
 
-  // 4️⃣ Same-day booking restriction
-  // const todayStr = formatInTimeZone(new Date(), orgTZ, "yyyy-MM-dd");
-  // if (!calendarData.sameDayBookingPermitted && dateStr === todayStr) {
-  //   return {
-  //     valid: false,
-  //     message: "We're sorry, same day booking is not permitted by the organization at this time.",
-  //   };
-  // }
-  // 4️⃣ Same-day booking restriction (orgTZ-safe)
+  // 4 Same-day booking restriction (orgTZ-safe)
   const nowUtc = new Date(); // Always UTC baseline
   const nowOrg = utcToZonedTime(nowUtc, orgTZ);
   const todayStr = formatInTimeZone(nowOrg, orgTZ, "yyyy-MM-dd");
@@ -123,7 +116,7 @@ function validateBooking(startDate, endDate, existingBookings = []) {
     };
   }
 
-  // 5️⃣ Past date restriction
+  // 5 Past date restriction
   if (dateStr < todayStr) {
     return {
       valid: false,
@@ -131,7 +124,7 @@ function validateBooking(startDate, endDate, existingBookings = []) {
     };
   }
 
-  // 6️⃣ Slot length / call length validation
+  // 6 Slot length / call length validation
   const durationMinutes = (endDate - startDate) / (1000 * 60);
   if (durationMinutes !== callLength) {
     return {
@@ -146,7 +139,7 @@ function validateBooking(startDate, endDate, existingBookings = []) {
     };
   }
 
-  // 7️⃣ Conflict with existing bookings + buffer
+  // 7 Conflict with existing bookings + buffer
   if (!Array.isArray(existingBookings)) existingBookings = [];
   const startLocal = utcToZonedTime(startDate, orgTZ);
   const endLocal = utcToZonedTime(endDate, orgTZ);

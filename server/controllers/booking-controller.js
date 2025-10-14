@@ -38,12 +38,12 @@ module.exports = {
       // Fetch all bookings for that date
       const existingBookings = await Booking.find({ date: dateStr });
 
-      console.group("📥 CREATE BOOKING DEBUG");
-      console.log("Incoming payload:", req.body);
-      console.log("Org TZ:", orgTZ);
-      console.log("normalizedUtcStart:", normalizedUtcStart);
-      console.log("normalizedUtcEnd:", normalizedUtcEnd);
-      console.groupEnd();
+      // console.group("📥 CREATE BOOKING DEBUG");
+      // console.log("Incoming payload:", req.body);
+      // console.log("Org TZ:", orgTZ);
+      // console.log("normalizedUtcStart:", normalizedUtcStart);
+      // console.log("normalizedUtcEnd:", normalizedUtcEnd);
+      // console.groupEnd();
 
       const validation = validateBooking(normalizedUtcStart, normalizedUtcEnd, existingBookings);
       if (!validation.valid) {
