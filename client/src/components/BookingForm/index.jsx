@@ -42,25 +42,25 @@ export default function BookingForm({
       const data = await res.json();
 
       // --- LOG for verification ---
-      console.group(`AVAILABILITY DEBUG → ${orgDateStr}`);
-      console.log("Available slots (raw UTC):", data.availableTimes);
-      console.log(
-        "Available slots (orgTZ view):",
-        data.availableTimes.map(s => formatInTimeZone(parseISO(s), orgTZ, "yyyy-MM-dd HH:mm:ss"))
-      );
-      console.log(
-        "Available slots (userTZ view):",
-        data.availableTimes.map(s => formatInTimeZone(parseISO(s), userTZ, "yyyy-MM-dd HH:mm:ss"))
-      );
-      console.log("Unavailable slots:", data.unavailableTimes);
-      console.groupEnd();
+  //     console.group(`AVAILABILITY DEBUG → ${orgDateStr}`);
+  //     console.log("Available slots (raw UTC):", data.availableTimes);
+  //     console.log(
+  //       "Available slots (orgTZ view):",
+  //       data.availableTimes.map(s => formatInTimeZone(parseISO(s), orgTZ, "yyyy-MM-dd HH:mm:ss"))
+  //     );
+  //     console.log(
+  //       "Available slots (userTZ view):",
+  //       data.availableTimes.map(s => formatInTimeZone(parseISO(s), userTZ, "yyyy-MM-dd HH:mm:ss"))
+  //     );
+  //     console.log("Unavailable slots:", data.unavailableTimes);
+  //     console.groupEnd();
 
-      setSlots(data.availableTimes || []);
-    } catch (err) {
-      console.error("Failed to fetch availability:", err);
-      setSlots([]);
-    }
-  };
+  //     setSlots(data.availableTimes || []);
+  //   } catch (err) {
+  //     console.error("Failed to fetch availability:", err);
+  //     setSlots([]);
+  //   }
+  // };
 
   // --- Handle input changes ---
   const handleInputChange = (e) => {
@@ -94,13 +94,13 @@ export default function BookingForm({
     }
 
     // --- Diagnostic tool for debugging ---
-    const userDateStart = new Date(`${formData.date}T00:00:00`);
-    const orgDateStart = utcToZonedTime(userDateStart, orgTZ);
-    const orgDateStr = format(orgDateStart, "yyyy-MM-dd");
-    console.log(`orgDateString: ${ orgDateStr }, userDateStart: ${userDateStart}, orgDateStart: ${orgDateStr}`);
-    console.group("TZ DEBUG - Main Form");
-    console.log("User selected date:", formData.date);
-    console.log("userTZ:", userTZ, "orgTZ:", orgTZ);
+    // const userDateStart = new Date(`${formData.date}T00:00:00`);
+    // const orgDateStart = utcToZonedTime(userDateStart, orgTZ);
+    // const orgDateStr = format(orgDateStart, "yyyy-MM-dd");
+    // console.log(`orgDateString: ${ orgDateStr }, userDateStart: ${userDateStart}, orgDateStart: ${orgDateStr}`);
+    // console.group("TZ DEBUG - Main Form");
+    // console.log("User selected date:", formData.date);
+    // console.log("userTZ:", userTZ, "orgTZ:", orgTZ);
 
     // fetch slots based on user time
     fetchSlots(formData.date, setAvailableSlots);
