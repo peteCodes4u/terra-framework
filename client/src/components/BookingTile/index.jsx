@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { formatInTimeZone } from 'date-fns-tz';
+import { formatInTimeZone, utcToZonedTime } from 'date-fns-tz';
 import Button from 'react-bootstrap/Button';
 import { useStyle } from '../../StyleContext';
 import calendarData from '../../../../server/calendarData.json'
@@ -43,24 +43,31 @@ export default function BookingTile({ booking, onDelete, onUpdate }) {
   // expand additional details effect
   const [ showDetails, setShowDetails ] = useState(false);
 
+  // Determine if booking is past (based on orgTZ)
+  const nowOrg = utcToZonedTime(new Date(), orgTZ);
+  const bookingEndOrg = utcToZonedTime(booking.end, orgTZ);
+  const bookingStartOrg = utcToZonedTime(booking.start, orgTZ);
+  const isPast = bookingEndOrg < nowOrg || bookingStartOrg < nowOrg;
 
-  return (
+return (
     <section className={`${activeStyle}-booking-tile`}>
       <div className={`${activeStyle}-booking-tile-info`}>
         <p>Contact: {booking.name}</p>
         <p>Email: {booking.email}</p>
         <p>Phone: {booking.phoneNumber}</p>
-        <p>Local Date : {formatDate(booking.start)}</p>
+        <p>Local Date: {formatDate(booking.start)}</p>
         <p>
           Local Time: {formatTime(booking.start)} - {formatTime(booking.end)}
         </p>
+
         <Button
-          variant='link'
+          variant="link"
           style={{ padding: 0, fontSize: '0.8em' }}
           onClick={() => setShowDetails(!showDetails)}
         >
           {showDetails ? 'hide additional details ▲' : 'show additional details ▼'}
         </Button>
+
         {showDetails && (
           <div>
             <p>----</p>
@@ -70,18 +77,25 @@ export default function BookingTile({ booking, onDelete, onUpdate }) {
               but both times refer to the same meeting.
             </p>
             <p>---</p>
-            <p className="text-muted" style={{ fontSize: '0.7em' }}>This office is located in: {orgTZ}</p>
-            <p className="text-muted" style={{ fontSize: '0.7em' }}>Your appointment in {orgTZ} is on {formatDateOrg(booking.start)} at {formatTimeOrg(booking.start)} - {formatTimeOrg(booking.end)} </p>
+            <p className="text-muted" style={{ fontSize: '0.7em' }}>
+              This office is located in: {orgTZ}
+            </p>
+            <p className="text-muted" style={{ fontSize: '0.7em' }}>
+              Your appointment in {orgTZ} is on {formatDateOrg(booking.start)} at{' '}
+              {formatTimeOrg(booking.start)} - {formatTimeOrg(booking.end)}
+            </p>
           </div>
         )}
-
       </div>
+
       <div className={`${activeStyle}-booking-tile-buttons`}>
-        <Button variant="primary" onClick={() => onUpdate && onUpdate(booking._id, booking)}>
-          Update
-        </Button>
+        {!isPast && (
+          <Button variant="primary" onClick={() => onUpdate && onUpdate(booking._id, booking)}>
+            Update
+          </Button>
+        )}
         <Button variant="danger" onClick={() => onDelete && onDelete(booking._id)}>
-          Cancel
+          {isPast ? 'Remove Past Appointment' : 'Cancel'}
         </Button>
       </div>
     </section>

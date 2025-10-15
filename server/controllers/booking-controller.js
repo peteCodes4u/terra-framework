@@ -134,7 +134,16 @@ module.exports = {
           });
         }
       }
-
+      
+      //  Restrict update to PAST BOOKINGS (past records can be deleted not updated)
+      const nowOrg = utcToZonedTime(new Date(), orgTZ);
+      const bookingEndOrg = utcToZonedTime(booking.end, orgTZ);
+      if (bookingEndOrg < nowOrg) {
+        return res.status(403).json({
+          error: "past_booking",
+          message: "Past bookings cannot be updated. Past appointments can only be deleted. Thank you.",
+        });
+      }
       // Apply updates
       if (slotIso) {
         booking.start = normalizedUtcStart;
