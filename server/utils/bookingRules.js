@@ -124,6 +124,15 @@ function validateBooking(startDate, endDate, existingBookings = []) {
     };
   }
 
+    // 5b Prevent bookings for past times today
+    const nowUtcInstant = new Date();
+    if (startDate < nowUtcInstant) {
+      return {
+        valid: false,
+        message: "We're sorry, this time slot has already passed.",
+      };
+    }
+
   // 6 Slot length / call length validation
   const durationMinutes = (endDate - startDate) / (1000 * 60);
   if (durationMinutes !== callLength) {

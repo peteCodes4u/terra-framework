@@ -34,7 +34,7 @@ function getAvailability(dateStr, bookedEvents = []) {
 
   // Day bounds in UTC for the org date (safe anchor)
   // const { startOfDayUtc } = getDayBounds(dateStr, orgTZ);
-  
+
   // Force dateStr to be interpreted in orgTZ (not userTZ)
   const normalizedDateStr = formatInTimeZone(
     zonedTimeToUtc(`${dateStr}T00:00:00`, orgTZ),
@@ -118,18 +118,37 @@ function getAvailability(dateStr, bookedEvents = []) {
     });
   });
 
-  // 7) Remove slots that are already in the past (compare to the real current instant)
-  const now = new Date();
+// 7) Remove slots that are already in the past (compare only if dateStr is today in orgTZ)
+const nowInOrg = utcToZonedTime(new Date(), orgTZ);
+const todayStrInOrgTZ = formatInTimeZone(nowInOrg, orgTZ, "yyyy-MM-dd");
+
+// Only filter past slots if user selected today's date in orgTZ
+if (normalizedDateStr === todayStrInOrgTZ) {
+  const nowUtc = zonedTimeToUtc(nowInOrg, orgTZ); // align with org clock
+
   const pastSlots = [];
   slots = slots.filter((slot) => {
-    const slotEnd = addMinutes(slot, callLengthMinutes);
-    if (isBefore(slotEnd, now) || slotEnd.getTime() === now.getTime()) {
-      pastSlots.push(slot.toISOString());
+    // compare slot *start* instead of end
+    const isPast = isBefore(slot, nowUtc) || slot.getTime() === nowUtc.getTime();
+    if (isPast) {
+    // -- DEBUG LOGGING -- 
+    //   pastSlots.push(slot.toISOString());
+    //   console.log("PAST SLOT CHECK", {
+    //     slotStart: slot.toISOString(),
+    //     nowUtc: nowUtc.toISOString(),
+    //     isPast,
+    //   }
+    // );
       return false;
     }
     return true;
   });
+
   unavailableTimes.push(...pastSlots);
+}
+
+  
+
 
   // 8) Return normalized result (UTC ISO strings)
   return {

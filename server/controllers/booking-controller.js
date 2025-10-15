@@ -81,6 +81,24 @@ module.exports = {
         return res.status(404).json({ message: "Booking not found" });
       }
 
+      const updateWindowMins = calendarData.updateAppointmentWindowValidation;
+      const nowUtc = new Date();
+
+      // Check if updates are restricted based on upcoming start time
+      if (updateWindowMins && updateWindowMins > 0) {
+        const diffMs = booking.start.getTime() - nowUtc.getTime();
+        const diffMins = diffMs / (1000 * 60);
+
+        if (diffMins <= updateWindowMins) {
+          return res.status(403).json({
+            error: "update_window_violation",
+            message: `Updates are not allowed within ${updateWindowMins} minutes (${Math.floor(
+              updateWindowMins / 60
+            )} hours) of the appointment.`,
+          });
+        }
+      }
+
       let normalizedUtcStart = booking.start;
       let normalizedUtcEnd = booking.end;
 
@@ -117,7 +135,7 @@ module.exports = {
         }
       }
 
-      // Update only fields that were sent
+      // Apply updates
       if (slotIso) {
         booking.start = normalizedUtcStart;
         booking.end = normalizedUtcEnd;
@@ -136,8 +154,6 @@ module.exports = {
       res.status(400).json({ message: "Error updating booking", error: err.message });
     }
   },
-
-
 
   // Get all bookings
   async getAllBookings(req, res) {
