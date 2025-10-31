@@ -42,25 +42,25 @@ export default function BookingForm({
       const data = await res.json();
 
       // --- LOG for verification ---
-  //     console.group(`AVAILABILITY DEBUG → ${orgDateStr}`);
-  //     console.log("Available slots (raw UTC):", data.availableTimes);
-  //     console.log(
-  //       "Available slots (orgTZ view):",
-  //       data.availableTimes.map(s => formatInTimeZone(parseISO(s), orgTZ, "yyyy-MM-dd HH:mm:ss"))
-  //     );
-  //     console.log(
-  //       "Available slots (userTZ view):",
-  //       data.availableTimes.map(s => formatInTimeZone(parseISO(s), userTZ, "yyyy-MM-dd HH:mm:ss"))
-  //     );
-  //     console.log("Unavailable slots:", data.unavailableTimes);
-  //     console.groupEnd();
+      //     console.group(`AVAILABILITY DEBUG → ${orgDateStr}`);
+      //     console.log("Available slots (raw UTC):", data.availableTimes);
+      //     console.log(
+      //       "Available slots (orgTZ view):",
+      //       data.availableTimes.map(s => formatInTimeZone(parseISO(s), orgTZ, "yyyy-MM-dd HH:mm:ss"))
+      //     );
+      //     console.log(
+      //       "Available slots (userTZ view):",
+      //       data.availableTimes.map(s => formatInTimeZone(parseISO(s), userTZ, "yyyy-MM-dd HH:mm:ss"))
+      //     );
+      //     console.log("Unavailable slots:", data.unavailableTimes);
+      //     console.groupEnd();
 
-  //     setSlots(data.availableTimes || []);
-  //   } catch (err) {
-  //     console.error("Failed to fetch availability:", err);
-  //     setSlots([]);
-  //   }
-  // };
+      //     setSlots(data.availableTimes || []);
+    } catch (err) {
+      console.error("Failed to fetch availability:", err);
+      setSlots([]);
+    }
+  };
 
   // --- Handle input changes ---
   const handleInputChange = (e) => {
