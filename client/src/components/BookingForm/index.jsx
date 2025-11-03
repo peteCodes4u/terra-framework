@@ -55,7 +55,7 @@ export default function BookingForm({
       //     console.log("Unavailable slots:", data.unavailableTimes);
       //     console.groupEnd();
 
-      //     setSlots(data.availableTimes || []);
+      setSlots(data.availableTimes || []);
     } catch (err) {
       console.error("Failed to fetch availability:", err);
       setSlots([]);
@@ -70,7 +70,12 @@ export default function BookingForm({
 
   const handleModalInputChange = (e) => {
     const { name, value } = e.target;
-    setUpdatedForm((prev) => ({ ...prev, [name]: value }));
+      setUpdatedForm((prev) => {
+    if (name === "date") {
+      return { ...prev, date: value, slotIso: "" };
+    }
+    return { ...prev, [name]: value };
+  });
   };
 
   // hydrate modal with user data
@@ -110,7 +115,7 @@ export default function BookingForm({
     setFormData((prev) => ({ ...prev, slotIso: "" }));
   }, [formData.date]);
 
-  // --- Hook: modal form date mapping ---
+  // Fetch modal slots on date change
   useEffect(() => {
     if (!updatedForm.date) {
       setModalSlots([]);
@@ -128,9 +133,21 @@ export default function BookingForm({
     // fetch slots based on user time
     fetchSlots(updatedForm.date, setModalSlots);
 
-    // Reset modal slot selection
-    setUpdatedForm((prev) => ({ ...prev, slotIso: "" }));
   }, [updatedForm.date]);
+
+  // refetch slots on modal open
+  useEffect(() => {
+    if (showModal && updatedForm.date) {
+      fetchSlots(updatedForm.date, setModalSlots);
+    }
+  }, [showModal]);
+
+  // reset modal on colse
+  useEffect(() => {
+  if (!showModal) {
+    setModalSlots([]);
+  }
+  }, [showModal]);
 
   // --- Render slots in user TZ ---
   const renderSlotOptions = (slots) =>
