@@ -23,114 +23,116 @@ function getDayBounds(dateStr, orgTZ) {
  */
 function getAvailability(dateStr, bookedEvents = []) {
   const orgTZ = calendarData.timeZone || calendarData.orgTZ || "UTC";
-  const {
-    businessHours,
-    callLengthMinutes,
-    bufferMinutes,
-    slotLengthMinutes,
-    unavailableDates,
-    sameDayBookingPermitted,
-  } = calendarData;
+  const businessHours = calendarData.businessHours || {};
+  const callLength = Number(calendarData.callLengthMinutes) || 30;
+  const bufferMinutes = Number(calendarData.bufferMinutes) || 0;
+  const slotStep = Number(calendarData.slotLengthMinutes) || callLength;
+  const sameDayBookingPermitted = Boolean(calendarData.sameDayBookingPermitted);
+  const unavailableDates = Array.isArray(calendarData.unavailableDates) ? calendarData.unavailableDates : [];
 
-  // Normalize date to orgTZ
-  const normalizedDateStr = formatInTimeZone(
-    zonedTimeToUtc(`${dateStr}T00:00:00`, orgTZ),
-    orgTZ,
-    "yyyy-MM-dd"
-  );
+  // normalize input date (expect 'YYYY-MM-DD' or ISO)
+  const normalizedDate = dateStr && dateStr.includes("T") ? dateStr.split("T")[0] : dateStr;
 
-  const { startOfDayUtc } = getDayBounds(normalizedDateStr, orgTZ);
+  // quick unavailable dates check
+  if (unavailableDates.includes(normalizedDate)) {
+    return {
+      date: normalizedDate,
+      availableTimes: [],
+      unavailableTimes: [],
+      callLengthMinutes: callLength,
+      bufferMinutes,
+    };
+  }
+
+  // compute startOfDayUtc for the requested date (orgTZ midnight -> UTC)
+  const { startOfDayUtc } = getDayBounds(normalizedDate, orgTZ);
+
+  // weekday name in orgTZ
   const weekdayName = formatInTimeZone(startOfDayUtc, orgTZ, "EEEE").toLowerCase();
-
-  // 1) Block fully unavailable dates
-  if (Array.isArray(unavailableDates) && unavailableDates.includes(dateStr)) {
-    return {
-      date: dateStr,
-      availableTimes: [],
-      unavailableTimes: [],
-      callLengthMinutes,
-      bufferMinutes,
-    };
-  }
-
-  // 2) Same-day booking rules
-  const todayStrInOrgTZ = formatInTimeZone(new Date(), orgTZ, "yyyy-MM-dd");
-  const selectedDateStrInOrgTZ = formatInTimeZone(startOfDayUtc, orgTZ, "yyyy-MM-dd");
-
-  if (!sameDayBookingPermitted && selectedDateStrInOrgTZ === todayStrInOrgTZ) {
-    return {
-      date: dateStr,
-      availableTimes: [],
-      unavailableTimes: [],
-      callLengthMinutes,
-      bufferMinutes,
-    };
-  }
-
-  // 3) Business hours
   const hours = businessHours[weekdayName];
   if (!hours || !hours.start || !hours.end) {
     return {
-      date: dateStr,
+      date: normalizedDate,
       availableTimes: [],
       unavailableTimes: [],
-      callLengthMinutes,
+      callLengthMinutes: callLength,
       bufferMinutes,
     };
   }
 
-  // 4) Build business window in UTC
+  // business window in UTC
   const startMinutes = minutesFromTime(hours.start);
   const endMinutes = minutesFromTime(hours.end);
   const businessStartUtc = addMinutes(startOfDayUtc, startMinutes);
   const businessEndUtc = addMinutes(startOfDayUtc, endMinutes);
 
-  // 5) Generate candidate slots
-  let slots = [];
-  let cursor = new Date(businessStartUtc);
-  while (isBefore(addMinutes(cursor, callLengthMinutes), businessEndUtc)) {
-    slots.push(new Date(cursor));
-    cursor = addMinutes(cursor, slotLengthMinutes);
+  // If same-day booking is NOT permitted and selected date is today in orgTZ -> return empty
+  const todayInOrg = formatInTimeZone(new Date(), orgTZ, "yyyy-MM-dd");
+  const selectedInOrg = formatInTimeZone(startOfDayUtc, orgTZ, "yyyy-MM-dd");
+  if (!sameDayBookingPermitted && selectedInOrg === todayInOrg) {
+    return {
+      date: normalizedDate,
+      availableTimes: [],
+      unavailableTimes: [],
+      callLengthMinutes: callLength,
+      bufferMinutes,
+    };
   }
 
-  // 6) Remove booked slots
+  // compute "cutoff" (now + buffer) in UTC to exclude slots too soon / past
+  const nowUtc = new Date();
+  const cutoffUtc = addMinutes(nowUtc, bufferMinutes);
+
+  // helper: check overlap with existing booked events array of { normalizedUtc } or { start, end }
+  const parseBooked = (ev) => {
+    if (ev && ev.normalizedUtc) {
+      const s = parseISO(ev.normalizedUtc);
+      const e = addMinutes(s, callLength + bufferMinutes);
+      return { start: s, end: e };
+    }
+    if (ev && ev.start && ev.end) {
+      return { start: parseISO(ev.start), end: parseISO(ev.end) };
+    }
+    return null;
+  };
+  const parsedBooked = (bookedEvents || []).map(parseBooked).filter(Boolean);
+
+  const candidateSlots = [];
   const unavailableTimes = [];
-  bookedEvents.forEach(({ normalizedUtc }) => {
-    const bookedStart = parseISO(normalizedUtc);
-    const bookedEnd = addMinutes(bookedStart, callLengthMinutes + bufferMinutes);
 
-    slots = slots.filter((slot) => {
-      const slotEnd = addMinutes(slot, callLengthMinutes);
-      const overlaps = isBefore(slot, bookedEnd) && isAfter(slotEnd, bookedStart);
-      if (overlaps) unavailableTimes.push(slot.toISOString());
-      return !overlaps;
-    });
-  });
+  // iterate slots (cursor in UTC)
+  let cursor = new Date(businessStartUtc);
+  while (isBefore(addMinutes(cursor, callLength), businessEndUtc) || +addMinutes(cursor, callLength) === +businessEndUtc) {
+    const slotStartUtc = new Date(cursor);
+    const slotEndUtc = addMinutes(slotStartUtc, callLength);
 
-  // 7) Remove past slots if selected date is today in orgTZ
-  if (selectedDateStrInOrgTZ === todayStrInOrgTZ) {
-    const nowInOrg = utcToZonedTime(new Date(), orgTZ);
-    const nowUtc = zonedTimeToUtc(nowInOrg, orgTZ);
-    const pastSlots = [];
-
-    slots = slots.filter((slot) => {
-      const isPast = isBefore(slot, nowUtc);
-      if (isPast) {
-        pastSlots.push(slot.toISOString());
-        return false;
+    // 1) if same-day and selected date is today, respect cutoff; otherwise normal allowance
+    if (selectedInOrg === todayInOrg && !sameDayBookingPermitted) {
+      // already returned earlier; left for clarity
+      unavailableTimes.push(slotStartUtc.toISOString());
+    } else {
+      // 2) exclude past / too-soon slots
+      if (slotStartUtc < cutoffUtc) {
+        unavailableTimes.push(slotStartUtc.toISOString());
+      } else {
+        // 3) check overlap with existing bookings (consider buffer applied to booked events)
+        const overlaps = parsedBooked.some((b) => slotStartUtc < b.end && slotEndUtc > b.start);
+        if (overlaps) {
+          unavailableTimes.push(slotStartUtc.toISOString());
+        } else {
+          candidateSlots.push(slotStartUtc.toISOString());
+        }
       }
-      return true;
-    });
+    }
 
-    unavailableTimes.push(...pastSlots);
+    cursor = addMinutes(cursor, slotStep);
   }
 
-  // 8) Return normalized result
   return {
-    date: dateStr,
-    availableTimes: slots.map((s) => s.toISOString()),
+    date: normalizedDate,
+    availableTimes: candidateSlots,
     unavailableTimes,
-    callLengthMinutes,
+    callLengthMinutes: callLength,
     bufferMinutes,
   };
 }

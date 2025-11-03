@@ -1,9 +1,9 @@
 {
-  "timeZone":"America/New_York",
+  "timeZone":"America/Los_Angeles",
   "slotLengthMinutes": 45,
   "callLengthMinutes": 30,
   "bufferMinutes": 15,
-  "sameDayBookingPermitted": true,
+  "sameDayBookingPermitted": false,
   "updateAppointmentWindowValidation": 1440,
   "createAppointmentWindowValidation": 1440,
   "unavailableDates": [
@@ -18,7 +18,7 @@
     "thursday": { "start": "09:00", "end": "17:00" },
     "friday":   { "start": "09:00", "end": "12:00" },
     "saturday": null,
-    "sunday":   { "start": "09:00", "end": "23:00" }
+    "sunday":   null
   },
   "mockEvents": [
     {
