@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Form, Button, Modal } from "react-bootstrap";
 import { useStyle } from "../../StyleContext";
 import { parseISO, addMinutes, format } from "date-fns";
-import { zonedTimeToUtc, utcToZonedTime, formatInTimeZone } from "date-fns-tz";
+import { formatInTimeZone } from "date-fns-tz";
 import calendarData from "../../../../server/calendarData.json";
 
 export default function BookingForm({
@@ -25,7 +25,6 @@ export default function BookingForm({
     date: "",
     slotIso: "",
   });
-
   const [availableSlots, setAvailableSlots] = useState([]);
   const [errorMessage, setErrorMessage] = useState("");
   const [showErrorModal, setShowErrorModal] = useState(false);
@@ -33,34 +32,6 @@ export default function BookingForm({
   // --- Modal state ---
   const [updatedForm, setUpdatedForm] = useState({ ...formData });
   const [modalSlots, setModalSlots] = useState([]);
-
-  // --- slot fetch ---
-  const fetchSlots = async (orgDateStr, setSlots) => {
-    if (!orgDateStr) return setSlots([]);
-    try {
-      const res = await fetch(`/api/availability?date=${orgDateStr}`);
-      const data = await res.json();
-
-      // --- LOG for verification ---
-      //     console.group(`AVAILABILITY DEBUG → ${orgDateStr}`);
-      //     console.log("Available slots (raw UTC):", data.availableTimes);
-      //     console.log(
-      //       "Available slots (orgTZ view):",
-      //       data.availableTimes.map(s => formatInTimeZone(parseISO(s), orgTZ, "yyyy-MM-dd HH:mm:ss"))
-      //     );
-      //     console.log(
-      //       "Available slots (userTZ view):",
-      //       data.availableTimes.map(s => formatInTimeZone(parseISO(s), userTZ, "yyyy-MM-dd HH:mm:ss"))
-      //     );
-      //     console.log("Unavailable slots:", data.unavailableTimes);
-      //     console.groupEnd();
-
-      setSlots(data.availableTimes || []);
-    } catch (err) {
-      console.error("Failed to fetch availability:", err);
-      setSlots([]);
-    }
-  };
 
   // --- Handle input changes ---
   const handleInputChange = (e) => {
@@ -70,15 +41,10 @@ export default function BookingForm({
 
   const handleModalInputChange = (e) => {
     const { name, value } = e.target;
-      setUpdatedForm((prev) => {
-    if (name === "date") {
-      return { ...prev, date: value, slotIso: "" };
-    }
-    return { ...prev, [name]: value };
-  });
+    setUpdatedForm((prev) => ({ ...prev, [name]: value, ...(name === "date" ? { slotIso: "" } : {}) }));
   };
 
-  // hydrate modal with user data
+  // --- hydrate modal with user data ---
   useEffect(() => {
     if (showModal) {
       setUpdatedForm({
@@ -91,65 +57,60 @@ export default function BookingForm({
     }
   }, [showModal, initialData]);
 
-  // --- Hook: main form date → org date mapping ---
+  // --- Fetch slots helper ---
+  const fetchSlots = async (dateStr, setSlots, resetSlot) => {
+    if (!dateStr) return setSlots([]);
+    try {
+      const res = await fetch(`/api/availability?date=${dateStr}`);
+      const data = await res.json();
+      setSlots(data.availableTimes || []);
+      if (resetSlot) resetSlot("");
+    } catch (err) {
+      console.error("Failed to fetch availability:", err);
+      setSlots([]);
+      if (resetSlot) resetSlot("");
+    }
+  };
+
+  // --- Main form slots ---
   useEffect(() => {
     if (!formData.date) {
       setAvailableSlots([]);
       return;
     }
-
-    // --- Diagnostic tool for debugging ---
-    // const userDateStart = new Date(`${formData.date}T00:00:00`);
-    // const orgDateStart = utcToZonedTime(userDateStart, orgTZ);
-    // const orgDateStr = format(orgDateStart, "yyyy-MM-dd");
-    // console.log(`orgDateString: ${ orgDateStr }, userDateStart: ${userDateStart}, orgDateStart: ${orgDateStr}`);
-    // console.group("TZ DEBUG - Main Form");
-    // console.log("User selected date:", formData.date);
-    // console.log("userTZ:", userTZ, "orgTZ:", orgTZ);
-
-    // fetch slots based on user time
-    fetchSlots(formData.date, setAvailableSlots);
-
-
-    // Reset selected slot
-    setFormData((prev) => ({ ...prev, slotIso: "" }));
+    fetchSlots(formData.date, setAvailableSlots, (val) =>
+      setFormData((prev) => ({ ...prev, slotIso: val }))
+    );
   }, [formData.date]);
 
-  // Fetch modal slots on date change
+  // --- Modal slots ---
   useEffect(() => {
     if (!updatedForm.date) {
       setModalSlots([]);
       return;
     }
-
-    // --- Diagnostic tools ---
-    // const userDateStart = new Date(`${updatedForm.date}T00:00:00`);
-    // const orgDateStart = utcToZonedTime(userDateStart, orgTZ);
-    // const orgDateStr = format(orgDateStart, "yyyy-MM-dd");
-    // console.log(`returned from modal: { orgDateStr: ${ orgDateStr }, userDateStart: ${userDateStart}, orgDateStart: ${orgDateStart} }`);
-    // console.group("TZ DEBUG - Modal Form");
-    // console.log("Modal user-selected date:", updatedForm.date);
-
-    // fetch slots based on user time
-    fetchSlots(updatedForm.date, setModalSlots);
-
+    fetchSlots(updatedForm.date, setModalSlots, (val) =>
+      setUpdatedForm((prev) => ({ ...prev, slotIso: val }))
+    );
   }, [updatedForm.date]);
 
   // refetch slots on modal open
   useEffect(() => {
     if (showModal && updatedForm.date) {
-      fetchSlots(updatedForm.date, setModalSlots);
+      fetchSlots(updatedForm.date, setModalSlots, (val) =>
+        setUpdatedForm((prev) => ({ ...prev, slotIso: val }))
+      );
     }
   }, [showModal]);
 
-  // reset modal on colse
+  // reset modal on close
   useEffect(() => {
-  if (!showModal) {
-    setModalSlots([]);
-  }
+    if (!showModal) {
+      setModalSlots([]);
+    }
   }, [showModal]);
 
-  // --- Render slots in user TZ ---
+  // --- Render slots ---
   const renderSlotOptions = (slots) =>
     slots.map((slot) => {
       const userView = formatInTimeZone(parseISO(slot), userTZ, "h:mm a");
@@ -160,7 +121,7 @@ export default function BookingForm({
       );
     });
 
-  // --- Build payload for API ---
+  // --- Build payload ---
   const createPayload = (data, original = {}) => ({
     ...original,
     name: data.name ?? original?.name,
@@ -229,7 +190,6 @@ export default function BookingForm({
 
   return (
     <>
-      {/* Error Modal */}
       <Modal show={showErrorModal} onHide={() => setShowErrorModal(false)} centered>
         <Modal.Header closeButton>
           <Modal.Title>Booking Error</Modal.Title>
@@ -244,7 +204,6 @@ export default function BookingForm({
         </Modal.Footer>
       </Modal>
 
-      {/* Main Booking Form */}
       <Form className={`${activeStyle}-booking-form`} onSubmit={handleSubmit}>
         <div className={`${activeStyle}-form-container`}>
           <div className={`${activeStyle}-form-group`}>
@@ -282,7 +241,6 @@ export default function BookingForm({
         </div>
       </Form>
 
-      {/* Update Booking Modal */}
       <Modal show={showModal} onHide={onClose}>
         <Modal.Header closeButton>
           <Modal.Title>Update Booking</Modal.Title>
