@@ -28,6 +28,8 @@ function getAvailability(dateStr, bookedEvents = []) {
   const bufferMinutes = Number(calendarData.bufferMinutes) || 0;
   const slotStep = Number(calendarData.slotLengthMinutes) || callLength;
   const sameDayBookingPermitted = Boolean(calendarData.sameDayBookingPermitted);
+  // NEW: dynamic create-window (minutes) that org can set
+  const createWindowMinutes = Number(calendarData.createAppointmentWindowValidation) || 0;
   const unavailableDates = Array.isArray(calendarData.unavailableDates) ? calendarData.unavailableDates : [];
 
   // normalize input date (expect 'YYYY-MM-DD' or ISO)
@@ -79,9 +81,11 @@ function getAvailability(dateStr, bookedEvents = []) {
     };
   }
 
-  // compute "cutoff" (now + buffer) in UTC to exclude slots too soon / past
+  // compute "cutoff" (now + effectiveLead) in UTC to exclude slots before allowed lead time
+  // effectiveLead = max(bufferMinutes, createWindowMinutes)
   const nowUtc = new Date();
-  const cutoffUtc = addMinutes(nowUtc, bufferMinutes);
+  const effectiveLeadMinutes = Math.max(bufferMinutes, createWindowMinutes);
+  const cutoffUtc = addMinutes(nowUtc, effectiveLeadMinutes);
 
   // helper: check overlap with existing booked events array of { normalizedUtc } or { start, end }
   const parseBooked = (ev) => {
