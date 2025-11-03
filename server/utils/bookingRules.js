@@ -124,14 +124,26 @@ function validateBooking(startDate, endDate, existingBookings = []) {
     };
   }
 
-    // 5b Prevent bookings for past times today
-    const nowUtcInstant = new Date();
-    if (startDate < nowUtcInstant) {
+  // 5b Prevent bookings for past times today
+  const nowUtcInstant = new Date();
+  if (startDate < nowUtcInstant) {
+    return {
+      valid: false,
+      message: "We're sorry, this time slot has already passed.",
+    };
+  }
+
+  // 5c Minimum advance booking window validation
+  const createWindowMinutes = calendarData.createAppointmentWindowValidation || 0;
+  if (createWindowMinutes > 0) {
+    const minAllowedStartUtc = addMinutes(nowUtcInstant, createWindowMinutes);
+    if (startDate < minAllowedStartUtc) {
       return {
         valid: false,
-        message: "We're sorry, this time slot has already passed.",
+        message: `We're sorry, the organization requires at least ${createWindowMinutes} minutes in advance to create a new appointment.`,
       };
     }
+  }
 
   // 6 Slot length / call length validation
   const durationMinutes = (endDate - startDate) / (1000 * 60);
