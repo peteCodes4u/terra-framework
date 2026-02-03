@@ -5,6 +5,16 @@ import { parseISO, addMinutes, format } from "date-fns";
 import { formatInTimeZone } from "date-fns-tz";
 import calendarData from "../../../../server/calendarData.json";
 
+
+//Formatting functions
+const formatDateOrg = (isoString) => {
+  return formatInTimeZone(parseISO(isoString), orgTZ, "MMMM d, yyyy");
+};
+
+const formatTimeOrg = (isoString) => {
+  return formatInTimeZone(parseISO(isoString), orgTZ, "h:mm a");
+};
+
 export default function BookingForm({
   onBookingCreated,
   onBookingUpdated,
@@ -25,6 +35,9 @@ export default function BookingForm({
     date: "",
     slotIso: "",
   });
+  // expand additional details effect
+  const [showDetails, setShowDetails] = useState(false);
+
   const [availableSlots, setAvailableSlots] = useState([]);
   const [errorMessage, setErrorMessage] = useState("");
   const [showErrorModal, setShowErrorModal] = useState(false);
@@ -235,9 +248,39 @@ export default function BookingForm({
               {renderSlotOptions(availableSlots)}
             </select>
           </div>
+          <Button
+            variant="link"
+            style={{ padding: 0, fontSize: '0.8em' }}
+            onClick={() => setShowDetails(!showDetails)}
+          >
+            {showDetails ? 'hide additional details ▲' : 'show additional details ▼'}
+          </Button>
+
+          {showDetails && (
+            <div>
+              <p>----</p>
+              <p className="text-muted" style={{ fontSize: '0.7em' }}>
+                Please join the meeting at <strong>your local time shown above.</strong><br />
+                The organization's time may appear different depending on your location,
+                but both times refer to the same meeting.
+              </p>
+              <p>---</p>
+              <p className="text-muted" style={{ fontSize: '0.7em' }}>
+                This office is located in: {orgTZ}
+              </p>
+              {formData.slotIso && (
+                <p className="text-muted" style={{ fontSize: '0.7em' }}>
+                  Your appointment in {orgTZ} is on {formatDateOrg(formData.slotIso)} at{' '}
+                  {formatTimeOrg(formData.slotIso)} - {formatTimeOrg(addMinutes(parseISO(formData.slotIso), callLengthMinutes).toISOString())}
+                </p>
+              )}
+            </div>
+          )}
+
           <Button type="submit" disabled={!formData.date || !formData.slotIso}>
             Book Now
           </Button>
+
         </div>
       </Form>
 
