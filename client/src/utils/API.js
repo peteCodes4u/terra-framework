@@ -2,6 +2,10 @@
 // the configuration of the requests is done here and the requests are exported to be used in other files
 // Defining the functions that will make the requests to the server to get the data from the database will require establishing the routes to the server as shown in the fetch requests below and the method used to make the request.
 
+
+// Route to get logged in user's info (needs the token)
+const getUserTimeZone = () => localStorage.getItem("user_tz") || Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+
 // route to get logged in user's info (needs the token)
 export const getMe = (token) => {
   return fetch("/api/users/me", {
@@ -60,7 +64,7 @@ export const getAllBookings = async (token) => {
 };
 
 // Route to update a booking by its ID
-export const updateBooking = async(bookingId, userData, token) => {
+export const updateBooking = async (bookingId, userData, token) => {
   const response = await fetch(`/api/booking/${bookingId}`, {
     method: "PUT",
     headers: {
@@ -82,7 +86,7 @@ export const deleteBooking = async (bookingId, token) => {
     },
   });
   const result = await response.json();
-  if(result.token) {
+  if (result.token) {
     localStorage.setItem("id_token", result.token);
   }
 };
