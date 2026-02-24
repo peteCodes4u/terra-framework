@@ -41,7 +41,7 @@ export default function BookingTile({ booking, onDelete, onUpdate }) {
   const { activeStyle } = useStyle();
 
   // expand additional details effect
-  const [ showDetails, setShowDetails ] = useState(false);
+  const [showDetails, setShowDetails] = useState(false);
 
   // Determine if booking is past (based on orgTZ)
   const nowOrg = utcToZonedTime(new Date(), orgTZ);
@@ -49,7 +49,7 @@ export default function BookingTile({ booking, onDelete, onUpdate }) {
   const bookingStartOrg = utcToZonedTime(booking.start, orgTZ);
   const isPast = bookingEndOrg < nowOrg || bookingStartOrg < nowOrg;
 
-return (
+  return (
     <section className={`${activeStyle}-booking-tile`}>
       <div className={`${activeStyle}-booking-tile-info`}>
         <p>Contact: {booking.name}</p>
@@ -74,7 +74,7 @@ return (
             <p className="text-muted" style={{ fontSize: '0.7em' }}>
               Please join the meeting at <strong>your local time shown above.</strong><br />
               The organization’s time may appear different depending on your location,
-              but both times refer to the same meeting.
+              but both times refer to the same meeting
             </p>
             <p>---</p>
             <p className="text-muted" style={{ fontSize: '0.7em' }}>

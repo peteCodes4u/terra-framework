@@ -30,6 +30,9 @@ const LoginForm = ({ handleModalClose, activeStyle }) => {
       if (!response.ok) {
         throw new Error("something went wrong!");
       }
+      // Store user time zone in localStorage for later use
+      const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+      localStorage.setItem('userTimeZone', userTimeZone);
 
       const { token, user } = await response.json();
       Auth.login(token);
@@ -44,6 +47,8 @@ const LoginForm = ({ handleModalClose, activeStyle }) => {
       email: "",
       password: "",
     });
+
+
   };
 
   return (
