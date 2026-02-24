@@ -1,5 +1,7 @@
 // use this to decode a token and get the user's information out of it
 import decode from "jwt-decode";
+const TIMEZONE_KEY = "user_tz";
+const TOKEN_KEY = "id_token";
 
 // create a new class to instantiate for a user
 class AuthService {
@@ -29,19 +31,34 @@ class AuthService {
 
   getToken() {
     // Retrieves the user token from localStorage
-    return localStorage.getItem("id_token");
+    return localStorage.getItem(TOKEN_KEY);
+  }
+
+  setTimeZone(timezone) {
+    if (!timezone) return;
+    localStorage.setItem(TIMEZONE_KEY, timezone);
+  }
+  getTimeZone() {
+    const saved = localStorage.getItem(TIMEZONE_KEY);
+    if (saved) return saved;
+    return Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+  }
+
+  clearTimeZone() {
+    localStorage.removeItem(TIMEZONE_KEY);
   }
 
   login(idToken) {
     // Saves user token to localStorage
-    localStorage.setItem("id_token", idToken);
+    localStorage.setItem(TOKEN_KEY, idToken);
     // this will reload the page and reset the state of the application
-    window.location.assign("/"); 
+    window.location.assign("/");
   }
 
   logout() {
     // Clear user token and profile data from localStorage
-    localStorage.removeItem("id_token");
+    localStorage.removeItem(TOKEN_KEY);
+    this.clearTimeZone();
     // this will reload the page and reset the state of the application
     window.location.assign("/");
   }
