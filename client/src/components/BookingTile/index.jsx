@@ -72,9 +72,8 @@ export default function BookingTile({ booking, onDelete, onUpdate }) {
           <div>
             <p>----</p>
             <p className="text-muted" style={{ fontSize: '0.7em' }}>
-              Please review our business hours before finalizing your appointment.
-              The organization’s time may appear different depending on your location,
-              but both times refer to the same meeting
+              Please join the meeting at your local time shown above.
+              The organization's time may appear different depending on your location, but both times refer to the same meeting.
             </p>
             <p>---</p>
             <p className="text-muted" style={{ fontSize: '0.7em' }}>
