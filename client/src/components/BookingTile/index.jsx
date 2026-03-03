@@ -17,8 +17,8 @@ const userTZ = Auth.getTimeZone();
 // Format ISO date string to 12-hour time in user TZ
 function formatTime(dateStr, timeZone) {
   if (!dateStr) return 'N/A';
-  return formatInTimeZone(dateStr, timeZone, 'h:mm a');
-}
+  return formatInTimeZone(dateStr, timeZone, 'h:mm a')
+};
 
 // Format ISO date string to Month Day, Year in user TZ
 function formatDate(dateStr, timeZone) {
@@ -61,9 +61,9 @@ export default function BookingTile({ booking, onDelete, onUpdate }) {
         <p>Contact: {booking.name}</p>
         <p>Email: {booking.email}</p>
         <p>Phone: {booking.phoneNumber}</p>
-        <p>Local Date: {formatDate(booking.start)}</p>
+        <p>Local Date: {formatDate(booking.start, userTZ)}</p>
         <p>
-          Local Time: {formatTime(booking.start)} - {formatTime(booking.end)}
+          Local Time: {formatTime(booking.start, userTZ)} - {formatTime(booking.end, userTZ)}
         </p>
 
         <Button
