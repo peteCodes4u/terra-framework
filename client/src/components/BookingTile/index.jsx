@@ -9,18 +9,18 @@ import Auth from '../../utils/auth';
 const orgTZ = calendarData.timeZone;
 
 // Use browser-detected user time zone
-const userTZ = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+// const userTZ = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
 
 // Format ISO date string to 12-hour time in user TZ
-function formatTime(dateStr) {
+function formatTime(dateStr, timeZone) {
   if (!dateStr) return 'N/A';
-  return formatInTimeZone(dateStr, userTZ, 'h:mm a');
+  return formatInTimeZone(dateStr, timeZone, 'h:mm a');
 }
 
 // Format ISO date string to Month Day, Year in user TZ
-function formatDate(dateStr) {
+function formatDate(dateStr, timeZone) {
   if (!dateStr) return 'N/A';
-  return formatInTimeZone(dateStr, userTZ, 'MMMM d, yyyy');
+  return formatInTimeZone(dateStr, timeZone, 'MMMM d, yyyy');
 }
 
 // format time for org comparison
