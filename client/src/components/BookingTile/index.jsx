@@ -3,6 +3,9 @@ import { formatInTimeZone, utcToZonedTime } from 'date-fns-tz';
 import Button from 'react-bootstrap/Button';
 import { useStyle } from '../../StyleContext';
 import calendarData from '../../../../server/calendarData.json'
+import Auth from '../../utils/auth';
+
+// Get organization time zone from calendar data
 const orgTZ = calendarData.timeZone;
 
 // Use browser-detected user time zone
