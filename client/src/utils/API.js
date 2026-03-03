@@ -7,8 +7,8 @@
 const getUserTimeZone = () => localStorage.getItem("user_tz") || Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
 
 
-// Build Headers Helper Function
-const builderHeaders = (token) => ({
+// Build Headers Helper Function -  to include user timezone in all requests if available
+const buildHeaders = (token) => ({
   "Content-Type": "application/json",
   ...token(token ? { authorization: `Bearer ${token}` } : {}),
   'x-user-timezone': getUserTimeZone(),
@@ -19,6 +19,7 @@ export const getMe = (token) => {
     headers: {
       "Content-Type": "application/json",
       authorization: `Bearer ${token}`,
+      ...buildHeaders(token),
     },
   });
 };
@@ -62,10 +63,7 @@ export const createBooking = async (formData, token) => {
 // route to get all bookings
 export const getAllBookings = async (token) => {
   const response = await fetch("/api/booking", {
-    headers: {
-      "Content-Type": "application/json",
-      authorization: `Bearer ${token}`,
-    },
+    headers: buildHeaders(token),
   });
   return response.json();
 };
