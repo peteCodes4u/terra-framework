@@ -8,6 +8,9 @@ import Auth from '../../utils/auth';
 // Get organization time zone from calendar data
 const orgTZ = calendarData.timeZone;
 
+// Ensures that Render uses the latest user timezone
+const userTZ = Auth.getTimeZone();
+
 // Use browser-detected user time zone
 // const userTZ = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
 
