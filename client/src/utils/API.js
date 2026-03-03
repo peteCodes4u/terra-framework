@@ -6,6 +6,13 @@
 // Route to get logged in user's info (needs the token)
 const getUserTimeZone = () => localStorage.getItem("user_tz") || Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
 
+
+// Build Headers Helper Function
+const builderHeaders = (token) => ({
+  "Content-Type": "application/json",
+  ...token(token ? { authorization: `Bearer ${token}` } : {}),
+  'x-user-timezone': getUserTimeZone(),
+});
 // route to get logged in user's info (needs the token)
 export const getMe = (token) => {
   return fetch("/api/users/me", {
