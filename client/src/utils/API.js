@@ -78,3 +78,11 @@ export const deleteBooking = async (bookingId, token) => {
     localStorage.setItem("id_token", result.token);
   }
 };
+
+// Exported Helper Function to get availability for a specific date
+export const getAvailability = async (date) => {
+  const response = await fetch(`/api/availability?date=${date}`, {
+    headers: buildHeaders(),
+  });
+  return response.json();
+};
