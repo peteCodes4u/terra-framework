@@ -4,7 +4,7 @@ import { useStyle } from "../../StyleContext";
 import { parseISO, addMinutes, format } from "date-fns";
 import { formatInTimeZone } from "date-fns-tz";
 import calendarData from "../../../../server/calendarData.json";
-
+import { getAvailability } from "../../utils/API";
 
 //Formatting functions
 const formatDateOrg = (isoString) => {
@@ -74,8 +74,7 @@ export default function BookingForm({
   const fetchSlots = async (dateStr, setSlots, resetSlot) => {
     if (!dateStr) return setSlots([]);
     try {
-      const res = await fetch(`/api/availability?date=${dateStr}`);
-      const data = await res.json();
+      const data = await getAvailability(dateStr);
       setSlots(data.availableTimes || []);
       if (resetSlot) resetSlot("");
     } catch (err) {
