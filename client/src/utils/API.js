@@ -16,11 +16,7 @@ const buildHeaders = (token) => ({
 // route to get logged in user's info (needs the token)
 export const getMe = (token) => {
   return fetch("/api/users/me", {
-    headers: {
-      "Content-Type": "application/json",
-      authorization: `Bearer ${token}`,
-      ...buildHeaders(token),
-    },
+    headers: buildHeaders(token),
   });
 };
 
@@ -46,10 +42,7 @@ export const loginUser = (userData) => {
 export const createBooking = async (formData, token) => {
   const response = await fetch("/api/booking", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      authorization: `Bearer ${token}`,
-    },
+    headers: buildHeaders(token),
     body: JSON.stringify(formData),
   });
   const data = await response.json().catch(() => ({}));
@@ -68,10 +61,7 @@ export const getAllBookings = async (token) => {
 export const updateBooking = async (bookingId, userData, token) => {
   const response = await fetch(`/api/booking/${bookingId}`, {
     method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      authorization: `Bearer ${token}`,
-    },
+    headers: buildHeaders(token),
     body: JSON.stringify(userData),
   });
   const data = await response.json().catch(() => ({}));
@@ -81,10 +71,7 @@ export const updateBooking = async (bookingId, userData, token) => {
 export const deleteBooking = async (bookingId, token) => {
   const response = await fetch(`/api/booking/${bookingId}`, {
     method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-      authorization: `Bearer ${token}`,
-    },
+    headers: buildHeaders(token),
   });
   const result = await response.json();
   if (result.token) {
