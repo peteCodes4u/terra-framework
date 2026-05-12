@@ -12,7 +12,7 @@ async function checkAvailability(req, res) {
   const { date } = req.query;
 
   try {
-    const orgTZ = calendarData.orgTimeZone;
+    const orgTZ = calendarData.TimeZone || "UTC";
 
     // Get day bounds for orgTZ
     const { startOfDayUtc, endOfDayUtc } = getDayBounds(date, orgTZ);
