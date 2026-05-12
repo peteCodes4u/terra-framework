@@ -10,7 +10,7 @@ const getUserTimeZone = () => localStorage.getItem("user_tz") || Intl.DateTimeFo
 // Build Headers Helper Function -  to include user timezone in all requests if available
 const buildHeaders = (token) => ({
   "Content-Type": "application/json",
-  ...token(token ? { authorization: `Bearer ${token}` } : {}),
+  ...(token ? { authorization: `Bearer ${token}` } : {}),
   'x-user-timezone': getUserTimeZone(),
 });
 // route to get logged in user's info (needs the token)
