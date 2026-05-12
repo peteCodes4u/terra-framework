@@ -13,7 +13,7 @@ async function checkAvailability(req, res) {
   const userTimeZone = req.userTimeZone || "UTC"; // Fallback to UTC if not set by middleware
 
   try {
-    const orgTZ = calendarData.TimeZone || "UTC";
+    const orgTZ = calendarData.timeZone || "UTC";
 
     // Get day bounds for orgTZ
     const { startOfDayUtc, endOfDayUtc } = getDayBounds(date, orgTZ);
@@ -31,7 +31,7 @@ async function checkAvailability(req, res) {
     // Merge DB bookings with business rules
     const availability = getAvailability(date, bookedEvents);
 
-    res.json({ ...availability, userTimeZone });
+    res.json({ ...availability, orgTZ, userTimeZone });
   } catch (err) {
     console.error("Error getting availability:", err);
     res.status(500).json({
