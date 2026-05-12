@@ -10,6 +10,7 @@ const calendarData = require("../calendarData.json");
  */
 async function checkAvailability(req, res) {
   const { date } = req.query;
+  const userTimeZone = req.userTimeZone || "UTC"; // Fallback to UTC if not set by middleware
 
   try {
     const orgTZ = calendarData.TimeZone || "UTC";
@@ -30,7 +31,7 @@ async function checkAvailability(req, res) {
     // Merge DB bookings with business rules
     const availability = getAvailability(date, bookedEvents);
 
-    res.json(availability);
+    res.json({ ...availability, userTimeZone });
   } catch (err) {
     console.error("Error getting availability:", err);
     res.status(500).json({
