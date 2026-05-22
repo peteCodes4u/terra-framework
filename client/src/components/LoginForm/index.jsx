@@ -32,7 +32,7 @@ const LoginForm = ({ handleModalClose, activeStyle }) => {
       }
       // Store user time zone in localStorage for later use
       const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
-      localStorage.setItem('userTimeZone', userTimeZone);
+      localStorage.setItem('user_tz', userTimeZone);
 
       const { token, user } = await response.json();
       Auth.login(token);
