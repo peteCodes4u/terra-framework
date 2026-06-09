@@ -30,7 +30,7 @@ const LoginForm = ({ handleModalClose, activeStyle }) => {
       if (!response.ok) {
         throw new Error("something went wrong!");
       }
-      // Store user time zone in localStorage for later use
+      // Set user time zone in Auth utility
       const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
       Auth.setTimeZone(userTimeZone);
 
