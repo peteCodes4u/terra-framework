@@ -23,6 +23,8 @@ function getDayBounds(dateStr, orgTZ) {
  */
 function getAvailability(dateStr, bookedEvents = []) {
   const orgTZ = calendarData.timeZone || calendarData.orgTZ || "UTC";
+  // compute startOfDayUtc for the requested date (orgTZ midnight -> UTC)
+  const { startOfDayUtc } = getDayBounds(dateStr, orgTZ);
   const businessHours = calendarData.businessHours || {};
   const callLength = Number(calendarData.callLengthMinutes) || 30;
   const bufferMinutes = Number(calendarData.bufferMinutes) || 0;
