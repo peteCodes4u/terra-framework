@@ -31,7 +31,19 @@ async function checkAvailability(req, res) {
     // Merge DB bookings with business rules
     const availability = getAvailability(date, bookedEvents);
 
-    res.json({ ...availability, orgTZ, userTimeZone });
+    // Convert business hours to userTimeZone for response
+    const businessHoursInUserTZ = Object.keys(calendarData.businessHours || {}).reduce((acc, key) => {
+      const hours = calendarData.businessHours[key];
+      if (hours && hours.start && hours.end) {
+        acc[key] = {
+          start: formatInTimeZone(parseISO(hours.start), userTimeZone, 'h:mm a'),
+          end: formatInTimeZone(parseISO(hours.end), userTimeZone, 'h:mm a'),
+        };
+      }
+      return acc;
+    }, {});
+
+    res.json({ ...availability, orgTZ, userTimeZone, businessHoursInUserTZ, });
   } catch (err) {
     console.error("Error getting availability:", err);
     res.status(500).json({
