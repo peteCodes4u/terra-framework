@@ -30,8 +30,6 @@ async function checkAvailability(req, res) {
 
     // Merge DB bookings with business rules
     const availability = getAvailability(date, bookedEvents);
-    // Get day bounds for orgTZ again to include in response
-    const { startOfDayUtc } = getDayBounds(date, orgTZ);
 
     res.json({ ...availability, orgTZ, userTimeZone });
   } catch (err) {
